@@ -7,6 +7,7 @@ use Pterodactyl\Http\Middleware\Admin\Servers\ServerInstalled;
 Route::get('/', [Admin\BaseController::class, 'index'])->name('admin.index');
 
 Route::get('/miuujs', [Admin\MiuuJS\MiuuJSController::class, 'index'])->name('admin.miuujs');
+Route::post('/miuujs', [Admin\MiuuJS\MiuuJSController::class, 'update'])->name('admin.miuujs.update');
 
 /*
 |--------------------------------------------------------------------------
