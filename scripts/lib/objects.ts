@@ -1,26 +1,20 @@
-/**
- * Determines if the value provided to the function is an object type that
- * is not null.
+/*
+ * MiuuJS - Pterodactyl Theme
+ * Copyright (C) 2026 MiuuJS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  */
 function isObject(val: unknown): val is Record<string, unknown> {
     return typeof val === 'object' && val !== null && !Array.isArray(val);
 }
 
-/**
- * Determines if an object is truly empty by looking at the keys present
- * and the prototype value.
- */
-// eslint-disable-next-line @typescript-eslint/ban-types
 function isEmptyObject(val: {}): boolean {
     return Object.keys(val).length === 0 && Object.getPrototypeOf(val) === Object.prototype;
 }
 
-/**
- * A helper function for use in TypeScript that returns all of the keys
- * for an object, but in a typed manner to make working with them a little
- * easier.
- */
-// eslint-disable-next-line @typescript-eslint/ban-types
 function getObjectKeys<T extends {}>(o: T): (keyof T)[] {
     return Object.keys(o) as (keyof typeof o)[];
 }

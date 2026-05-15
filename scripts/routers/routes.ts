@@ -1,3 +1,12 @@
+/*
+ * MiuuJS - Pterodactyl Theme
+ * Copyright (C) 2026 MiuuJS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
 import React, { lazy } from 'react';
 import DashboardContainer from '@/components/server/dashboard/DashboardContainer';
 import ServerConsole from '@/components/server/console/ServerConsoleContainer';
@@ -18,54 +27,6 @@ import { UserIcon, EyeIcon, ViewGridIcon, TerminalIcon, FolderOpenIcon, Database
 const FileEditContainer = lazy(() => import('@/components/server/files/FileEditContainer'));
 const ScheduleEditContainer = lazy(() => import('@/components/server/schedules/ScheduleEditContainer'));
 
-/*
-        ██╗██╗  ░██╗░░░░░░░██╗░█████╗░██████╗░███╗░░██╗  ██╗██╗
-        ██║██║  ░██║░░██╗░░██║██╔══██╗██╔══██╗████╗░██║  ██║██║
-        ██║██║  ░╚██╗████╗██╔╝███████║██████╔╝██╔██╗██║  ██║██║
-        ╚═╝╚═╝  ░░████╔═████║░██╔══██║██╔══██╗██║╚████║  ╚═╝╚═╝
-        ██╗██╗  ░░╚██╔╝░╚██╔╝░██║░░██║██║░░██║██║░╚███║  ██╗██╗
-        ╚═╝╚═╝  ░░░╚═╝░░░╚═╝░░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝  ╚═╝╚═╝
-
-
-        Read this before doing addon modifications
-
-        Arix Theme has already handled many panel 
-        modifications for you, so there's no need for 
-        any changes in the "ServerRouter.tsx" file.
-
-        To add an adodn to your theme, you just need
-        to add an icon from the Heroicons font pack to
-        the import statement on line 16. You can find
-        the icons at https://v1.heroicons.com/. For
-        instance, if you want to add "inbox-in", include
-        the following in the import statement: 
-
-        "InboxInIcon," 
-        
-        Your import statement might look like this example:
-
-        import { InboxInIcon, UserIcon, EyeIcon, ... 
-
-        After importing the desired icon, refer to the addon's
-        readme file and include the required import line. 
-        An example might be:
-
-        import PluginInstallerContainer from '@/components/server/plugin/PluginInstallerContainer';
-
-        Once you've imported the correct icon and the component,
-        you simply need to follow the instructions in the addon's
-        readme to add the route. Don't forget to include
-        the icon in the route definition. Here's an example:
-
-        {
-            path: '/plugin-installer',
-            permission: null,
-            name: 'Plugin installer',
-            icon: InboxInIcon,  
-            component: PluginInstallerContainer,
-            exact: true,
-        },
-*/
 
 interface RouteDefinition {
     path: string;

@@ -1,3 +1,12 @@
+/*
+ * MiuuJS - Pterodactyl Theme
+ * Copyright (C) 2026 MiuuJS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
 import TransferListener from '@/components/server/TransferListener';
 import React, { useEffect, useState } from 'react';
 import { useRouteMatch } from 'react-router-dom';
@@ -30,21 +39,6 @@ import { Navigation, ComponentLoader } from '@/routers/RouterElements';
 import { GlobeIcon } from '@heroicons/react/outline';
 import { ip } from '@/lib/formatters';
 
-/*
-        ██╗██╗  ░██╗░░░░░░░██╗░█████╗░██████╗░███╗░░██╗  ██╗██╗
-        ██║██║  ░██║░░██╗░░██║██╔══██╗██╔══██╗████╗░██║  ██║██║
-        ██║██║  ░╚██╗████╗██╔╝███████║██████╔╝██╔██╗██║  ██║██║
-        ╚═╝╚═╝  ░░████╔═████║░██╔══██║██╔══██╗██║╚████║  ╚═╝╚═╝
-        ██╗██╗  ░░╚██╔╝░╚██╔╝░██║░░██║██║░░██║██║░╚███║  ██╗██╗
-        ╚═╝╚═╝  ░░░╚═╝░░░╚═╝░░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝  ╚═╝╚═╝
-
-
-        Read this before doing addon modifications
-
-        MiuuJS Theme has already handled many panel 
-        modifications for you, so there's no need for 
-        any changes in the "ServerRouter.tsx" file.
-*/
 
 export default () => {
     const match = useRouteMatch<{ id: string }>();

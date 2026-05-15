@@ -1,12 +1,18 @@
+/*
+ * MiuuJS - Pterodactyl Theme
+ * Copyright (C) 2026 MiuuJS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import I18NextHttpBackend, { BackendOptions } from 'i18next-http-backend';
 import I18NextMultiloadBackendAdapter from 'i18next-multiload-backend-adapter';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-// If we're using HMR use a unique hash per page reload so that we're always
-// doing cache busting. Otherwise just use the builder provided hash value in
-// the URL to allow cache busting to occur whenever the front-end is rebuilt.
 const hash = module.hot ? Date.now().toString(16) : process.env.WEBPACK_BUILD_HASH;
 
 i18n.use(I18NextMultiloadBackendAdapter)

@@ -1,8 +1,16 @@
+/*
+ * MiuuJS - Pterodactyl Theme
+ * Copyright (C) 2026 MiuuJS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
 import { useDeepCompareMemo } from '@/plugins/useDeepCompareMemo';
 import { ServerContext } from '@/state/server';
 import { useStoreState } from '@/state/hooks';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type Context = string | string[] | (string | number | null | {})[];
 
 function useSWRKey(context: Context, prefix: string | null = null): string {

@@ -1,11 +1,14 @@
-/**
- * Similar to "withQueryBuilderParams" except this function filters out any null,
- * undefined, or empty string key values. This allows the parameters to be used for
- * caching without having to account for all of the different data combinations.
+/*
+ * MiuuJS - Pterodactyl Theme
+ * Copyright (C) 2026 MiuuJS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  */
 import { isEmptyObject, isObject } from '@/lib/objects';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 export default <T extends {}>(data: T): T => {
     const empty = [undefined, null, ''] as unknown[];
 

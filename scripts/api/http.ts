@@ -1,3 +1,12 @@
+/*
+ * MiuuJS - Pterodactyl Theme
+ * Copyright (C) 2026 MiuuJS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
 import axios, { AxiosInstance } from 'axios';
 import { store } from '@/state';
 
@@ -36,10 +45,6 @@ http.interceptors.response.use(
 
 export default http;
 
-/**
- * Converts an error into a human readable response. Mostly just a generic helper to
- * make sure we display the message from the server back to the user if we can.
- */
 export function httpErrorToHuman(error: any): string {
     if (error.response && error.response.data) {
         let { data } = error.response;
@@ -129,11 +134,6 @@ export interface QueryBuilderParams<FilterKeys extends string = string, SortKeys
     };
 }
 
-/**
- * Helper function that parses a data object provided and builds query parameters
- * for the Laravel Query Builder package automatically. This will apply sorts and
- * filters deterministically based on the provided values.
- */
 export const withQueryBuilderParams = (data?: QueryBuilderParams): Record<string, unknown> => {
     if (!data) return {};
 
