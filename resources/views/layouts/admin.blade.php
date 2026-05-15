@@ -27,8 +27,18 @@
             {!! Theme::css('vendor/animate/animate.min.css?t={cache-version}') !!}
             {!! Theme::css('css/pterodactyl.css?t={cache-version}') !!}
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-            <link rel="stylesheet" href="/themes/pterodactyl/css/arix.css">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+            <style>
+                :root {
+                    --primary: #4A35CF;
+                    --gray50: #f4f4f4; --gray100: #d5d5db; --gray200: #b2b2c1;
+                    --gray300: #8282a4; --gray400: #5e5e7f; --gray500: #42425b;
+                    --gray600: #2b2b40; --gray700: #1d1d37; --gray800: #0b0d2a; --gray900: #040519;
+                    --successText: #E1FFD8; --successBorder: #56AA2B; --successBackground: #3D8F1F;
+                    --dangerText: #FFD8D8; --dangerBorder: #AA2A2A; --dangerBackground: #8F1F20;
+                    --secondaryText: #B2B2C1; --secondaryBorder: #42425B; --secondaryBackground: #2B2B40;
+                }
+            </style>
 
             <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
