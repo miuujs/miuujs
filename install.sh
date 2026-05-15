@@ -110,6 +110,7 @@ uninstall_theme() {
 }
 
 main() {
+    clear 2>/dev/null || true
     print_banner
     check_root
     check_panel
