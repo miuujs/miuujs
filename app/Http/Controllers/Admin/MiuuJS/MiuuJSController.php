@@ -10,7 +10,7 @@ class MiuuJSController extends Controller
     public function index(): View
     {
         return view('admin.miuujs.index', [
-            'config' => config('arix'),
+            'config' => config('miuujs'),
         ]);
     }
 }
