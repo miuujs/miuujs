@@ -1,9 +1,23 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=24&height=220&section=header&text=MiuuJS%20-%20Pterodactyl%20Theme&fontSize=40&fontColor=ffffff&descAlignY=60">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=24&height=220&section=header&text=MiuuJS%20-%20Pterodactyl%20Theme&fontSize=40&fontColor=4A35CF&descAlignY=60">
+  <source media="(prefers-color-scheme: dark)" srcset="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=24&height=220&section=header&text=MiuuJS&fontSize=70&fontColor=ffffff&desc=Pterodactyl%20Theme&descSize=20&descAlignY=65">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=24&height=220&section=header&text=MiuuJS&fontSize=70&fontColor=4A35CF&desc=Pterodactyl%20Theme&descSize=20&descAlignY=65">
 </picture>
 
+<div align="center">
+
+[![Stars](https://img.shields.io/github/stars/miuujs/miuujs?style=for-the-badge&logo=github&color=4A35CF)](https://github.com/miuujs/miuujs/stargazers)
+[![Forks](https://img.shields.io/github/forks/miuujs/miuujs?style=for-the-badge&logo=github&color=4A35CF)](https://github.com/miuujs/miuujs/forks)
+[![License](https://img.shields.io/github/license/miuujs/miuujs?style=for-the-badge&logo=gnu&color=4A35CF)](https://github.com/miuujs/miuujs/blob/main/LICENSE)
+[![Code Size](https://img.shields.io/github/languages/code-size/miuujs/miuujs?style=for-the-badge&logo=codefactor&color=4A35CF)](https://github.com/miuujs/miuujs)
+[![Last Commit](https://img.shields.io/github/last-commit/miuujs/miuujs?style=for-the-badge&logo=git&color=4A35CF)](https://github.com/miuujs/miuujs/commits/main)
+
+</div>
+
 MiuuJS is a modern dark theme for Pterodactyl panel. It integrates the full Arix UI for the user dashboard, featuring a custom login page with MiuuJS branding, WhatsApp/GitHub social widgets, and a fully responsive design.
+
+> [!CAUTION]
+> This project is not affiliated with or endorsed by WhatsApp. Use at your own discretion.
+> Do not spam or misuse this software for automated bulk messaging.
 
 ## Features
 
@@ -18,9 +32,11 @@ MiuuJS is a modern dark theme for Pterodactyl panel. It integrates the full Arix
 
 ## License
 
-GNU General Public License v3.0. See LICENSE file for details.
+Distributed under the **GNU General Public License v3.0**. See [LICENSE](LICENSE) for more information.
 
-This project includes modified code from Arix Theme (originally by Weijers.one) and Pterodactyl Panel (MIT License).
+This project includes modified code from:
+- **Arix Theme** -- originally by Weijers.one
+- **Pterodactyl Panel** -- MIT License
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=24&height=120&section=footer">
