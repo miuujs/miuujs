@@ -15,6 +15,17 @@
 
 MiuuJS is a modern dark theme for Pterodactyl panel. It integrates the full Arix UI for the user dashboard, featuring a custom login page with MiuuJS branding, WhatsApp/GitHub social widgets, and a fully responsive design.
 
+## Quick Install
+
+```bash
+bash <(curl -s https://raw.githubusercontent.com/miuujs/miuujs/main/install.sh)
+```
+
+To uninstall:
+```bash
+bash <(curl -s https://raw.githubusercontent.com/miuujs/miuujs/main/install.sh) uninstall
+```
+
 > [!CAUTION]
 > This theme modifies core Pterodactyl panel files. Always backup your installation before applying.
 > Use at your own risk. The maintainers are not responsible for any data loss or service disruption.
