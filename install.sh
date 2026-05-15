@@ -36,6 +36,12 @@ backup_files() {
     [[ -f "$PTERO_DIR/config/miuujs.php" ]] && cp "$PTERO_DIR/config/miuujs.php" "$BACKUP_DIR/"
     [[ -f "$PTERO_DIR/tailwind.config.js" ]] && cp "$PTERO_DIR/tailwind.config.js" "$BACKUP_DIR/"
     [[ -f "$PTERO_DIR/webpack.config.js" ]] && cp "$PTERO_DIR/webpack.config.js" "$BACKUP_DIR/"
+    [[ -f "$PTERO_DIR/app/Http/ViewComposers/AssetComposer.php" ]] && cp "$PTERO_DIR/app/Http/ViewComposers/AssetComposer.php" "$BACKUP_DIR/"
+    [[ -f "$PTERO_DIR/app/Http/Requests/Base/LocaleRequest.php" ]] && cp "$PTERO_DIR/app/Http/Requests/Base/LocaleRequest.php" "$BACKUP_DIR/"
+    [[ -f "$PTERO_DIR/routes/admin.php" ]] && cp "$PTERO_DIR/routes/admin.php" "$BACKUP_DIR/"
+    [[ -f "$PTERO_DIR/routes/base.php" ]] && cp "$PTERO_DIR/routes/base.php" "$BACKUP_DIR/"
+    [[ -f "$PTERO_DIR/resources/views/layouts/admin.blade.php" ]] && cp "$PTERO_DIR/resources/views/layouts/admin.blade.php" "$BACKUP_DIR/"
+    [[ -f "$PTERO_DIR/resources/views/templates/wrapper.blade.php" ]] && cp "$PTERO_DIR/resources/views/templates/wrapper.blade.php" "$BACKUP_DIR/"
     echo "Backup saved to $BACKUP_DIR"
 }
 
@@ -95,11 +101,42 @@ clear_cache() {
 
 uninstall_theme() {
     echo "Removing theme files..."
-    for file in "$PTERO_DIR/config/miuujs.php" "$PTERO_DIR/tailwind.config.js" "$PTERO_DIR/webpack.config.js"; do
-        [[ -e "$file" ]] && rm -rf "$file"
-    done
-    [[ -d "$PTERO_DIR/public/miuujs" ]] && rm -rf "$PTERO_DIR/public/miuujs"
-    [[ -f "$PTERO_DIR/public/themes/pterodactyl/css/miuujs.css" ]] && rm -f "$PTERO_DIR/public/themes/pterodactyl/css/miuujs.css"
+    rm -rf "$PTERO_DIR/config/miuujs.php" 2>/dev/null || true
+    rm -rf "$PTERO_DIR/public/miuujs" 2>/dev/null || true
+    rm -rf "$PTERO_DIR/public/themes/pterodactyl/css/miuujs.css" 2>/dev/null || true
+    rm -rf "$PTERO_DIR/app/Http/Controllers/Admin/MiuuJS" 2>/dev/null || true
+
+    echo "Restoring original panel files..."
+    if [[ -d "$BACKUP_DIR/scripts" ]]; then
+        cp -r "$BACKUP_DIR/scripts/"* "$PTERO_DIR/resources/scripts/" 2>/dev/null || true
+    fi
+    if [[ -d "$BACKUP_DIR/resources" ]]; then
+        cp -r "$BACKUP_DIR/views/"* "$PTERO_DIR/resources/views/" 2>/dev/null || true
+    fi
+    if [[ -f "$BACKUP_DIR/tailwind.config.js" ]]; then
+        cp "$BACKUP_DIR/tailwind.config.js" "$PTERO_DIR/" 2>/dev/null || true
+    fi
+    if [[ -f "$BACKUP_DIR/webpack.config.js" ]]; then
+        cp "$BACKUP_DIR/webpack.config.js" "$PTERO_DIR/" 2>/dev/null || true
+    fi
+    if [[ -f "$BACKUP_DIR/AssetComposer.php" ]]; then
+        cp "$BACKUP_DIR/AssetComposer.php" "$PTERO_DIR/app/Http/ViewComposers/" 2>/dev/null || true
+    fi
+    if [[ -f "$BACKUP_DIR/LocaleRequest.php" ]]; then
+        cp "$BACKUP_DIR/LocaleRequest.php" "$PTERO_DIR/app/Http/Requests/Base/" 2>/dev/null || true
+    fi
+    if [[ -f "$BACKUP_DIR/admin.php" ]]; then
+        cp "$BACKUP_DIR/admin.php" "$PTERO_DIR/routes/" 2>/dev/null || true
+    fi
+    if [[ -f "$BACKUP_DIR/base.php" ]]; then
+        cp "$BACKUP_DIR/base.php" "$PTERO_DIR/routes/" 2>/dev/null || true
+    fi
+    if [[ -f "$BACKUP_DIR/admin.blade.php" ]]; then
+        cp "$BACKUP_DIR/admin.blade.php" "$PTERO_DIR/resources/views/layouts/" 2>/dev/null || true
+    fi
+    if [[ -f "$BACKUP_DIR/wrapper.blade.php" ]]; then
+        cp "$BACKUP_DIR/wrapper.blade.php" "$PTERO_DIR/resources/views/templates/" 2>/dev/null || true
+    fi
 
     echo "Rebuilding panel..."
     cd "$PTERO_DIR"
