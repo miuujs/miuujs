@@ -68,7 +68,7 @@
                                 </a>
                             </li>
                             <li>
-                                <li><a href="{{ route('admin.settings') }}" data-toggle="tooltip" data-placement="bottom" title="Configure"><i class="fa fa-cog"></i></a></li>
+                                <li><a href="{{ route('admin.miuujs') }}" data-toggle="tooltip" data-placement="bottom" title="MiuuJS Config"><i class="fa fa-paint-brush"></i></a></li>
                             </li>
                             <li>
                                 <li><a href="{{ route('index') }}" data-toggle="tooltip" data-placement="bottom" title="Exit Admin"><i class="fa fa-server"></i></a></li>
@@ -92,6 +92,11 @@
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.settings') ?: 'active' }}">
                             <a href="{{ route('admin.settings')}}">
                                 <i class="fa fa-wrench"></i> <span>Settings</span>
+                            </a>
+                        </li>
+                        <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.miuujs') ?: 'active' }}">
+                            <a href="{{ route('admin.miuujs')}}">
+                                <i class="fa fa-paint-brush"></i> <span>MiuuJS Theme</span>
                             </a>
                         </li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.api') ?: 'active' }}">
