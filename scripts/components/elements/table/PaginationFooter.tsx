@@ -21,7 +21,7 @@ interface Props {
 }
 
 const PaginationFooter = ({ pagination, className, onPageSelect }: Props) => {
-    const { t } = useTranslation('arix/utilities');
+    const { t } = useTranslation('miuujs/utilities');
     const start = (pagination.currentPage - 1) * pagination.perPage;
     const end = (pagination.currentPage - 1) * pagination.perPage + pagination.count;
 

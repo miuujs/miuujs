@@ -24,7 +24,7 @@ import useLocationHash from '@/plugins/useLocationHash';
 import { useTranslation } from 'react-i18next';
 
 export default () => {
-    const { t } = useTranslation('arix/activity');
+    const { t } = useTranslation('miuujs/activity');
     const { hash } = useLocationHash();
     const { clearAndAddHttpError } = useFlashKey('account');
     const [filters, setFilters] = useState<ActivityLogFilters>({ page: 1, sorts: { timestamp: -1 } });

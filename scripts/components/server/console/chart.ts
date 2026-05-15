@@ -109,7 +109,7 @@ type ChartDatasetCallback = (value: ChartDataset<'line'>, index: number) => Char
 
 function getEmptyData(label: string, sets = 1, callback?: ChartDatasetCallback | undefined): ChartData<'line'> {
     const next = callback || ((value) => value);
-    const primary = useStoreState((state: ApplicationStore) => state.settings.data!.arix.primary);
+    const primary = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.primary);
 
     return {
         labels: Array(20)

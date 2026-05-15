@@ -21,7 +21,7 @@ interface CopyOnClickProps {
 }
 
 const CopyOnClick = ({ text, showInNotification = true, children }: CopyOnClickProps) => {
-    const { t } = useTranslation('arix/utilities');
+    const { t } = useTranslation('miuujs/utilities');
     const [copied, setCopied] = useState(false);
 
     useEffect(() => {

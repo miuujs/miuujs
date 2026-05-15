@@ -27,7 +27,7 @@ interface FormikValues {
 type OwnProps = RequiredModalProps & { files: string[]; useMoveTerminology?: boolean };
 
 const RenameFileModal = ({ files, useMoveTerminology, ...props }: OwnProps) => {
-    const { t } = useTranslation('arix/server/files');
+    const { t } = useTranslation('miuujs/server/files');
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { mutate } = useFileManagerSwr();
     const { clearFlashes, clearAndAddHttpError } = useFlash();

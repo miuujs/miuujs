@@ -18,7 +18,7 @@ import Code from '@/components/elements/Code';
 import { useTranslation } from 'react-i18next';
 
 export default ({ name, fingerprint }: { name: string; fingerprint: string }) => {
-    const { t } = useTranslation('arix/account');
+    const { t } = useTranslation('miuujs/account');
     const { clearAndAddHttpError } = useFlashKey('account');
     const [visible, setVisible] = useState(false);
     const { mutate } = useSSHKeys();

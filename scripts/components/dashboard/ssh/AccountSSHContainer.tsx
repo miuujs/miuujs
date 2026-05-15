@@ -24,7 +24,7 @@ import DeleteSSHKeyButton from '@/components/dashboard/ssh/DeleteSSHKeyButton';
 import { useTranslation } from 'react-i18next';
 
 export default () => {
-    const { t } = useTranslation('arix/account');
+    const { t } = useTranslation('miuujs/account');
     const { clearAndAddHttpError } = useFlashKey('account');
     const { data, isValidating, error } = useSSHKeys({
         revalidateOnMount: true,

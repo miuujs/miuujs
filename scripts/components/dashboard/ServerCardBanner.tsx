@@ -21,7 +21,7 @@ const isAlarmState = (current: number, limit: number): boolean => limit > 0 && c
 type Timer = ReturnType<typeof setInterval>;
 
 export default ({ server }: { server: Server }) => {
-    const { t } = useTranslation(['arix/utilities', 'arix/dashboard']);
+    const { t } = useTranslation(['miuujs/utilities', 'miuujs/dashboard']);
     const interval = useRef<Timer>(null) as React.MutableRefObject<Timer>;
     const [isSuspended, setIsSuspended] = useState(server.status === 'suspended');
     const [stats, setStats] = useState<ServerStats | null>(null);
@@ -154,7 +154,7 @@ export default ({ server }: { server: Server }) => {
             </div>
             <div className={'px-6 pb-5'}>
                 <Link to={`/server/${server.id}`} className={'text-secondary-50 bg-secondary-200 border border-secondary-100 hover:bg-secondary-100 rounded-component px-3 py-3 w-full block text-center duration-300'}>
-                    {t('manage-server', { ns: 'arix/dashboard'})}
+                    {t('manage-server', { ns: 'miuujs/dashboard'})}
                 </Link>
             </div>
         </div>

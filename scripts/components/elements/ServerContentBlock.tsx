@@ -20,7 +20,7 @@ interface Props extends PageContentBlockProps {
 
 const ServerContentBlock: React.FC<Props> = ({ title, icon: Icon, children, ...props }) => {
     const name = ServerContext.useStoreState((state) => state.server.data!.name);
-    const pageTitle = String(useStoreState((state: ApplicationStore) => state.settings.data!.arix.pageTitle));
+    const pageTitle = String(useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.pageTitle));
 
     return (
         <PageContentBlock title={`${name} | ${title}`} {...props}>

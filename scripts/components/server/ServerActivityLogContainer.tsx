@@ -25,7 +25,7 @@ import { EyeIcon } from '@heroicons/react/outline';
 import { useTranslation } from 'react-i18next';
 
 export default () => {
-    const { t } = useTranslation('arix/activity')
+    const { t } = useTranslation('miuujs/activity')
     const { hash } = useLocationHash();
     const { clearAndAddHttpError } = useFlashKey('server:activity');
     const [filters, setFilters] = useState<ActivityLogFilters>({ page: 1, sorts: { timestamp: -1 } });

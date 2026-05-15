@@ -25,7 +25,7 @@ interface Props {
 }
 
 const NavItem = ({ route }: Props) => {
-  const { t } = useTranslation('arix/navigation');
+  const { t } = useTranslation('miuujs/navigation');
   const match = useRouteMatch<{ id: string }>();
 
   const nestId = ServerContext.useStoreState((state) => state.server.data?.nestId);
@@ -62,7 +62,7 @@ const renderNavItem = (route: any) => (
 );
 
 export const SubNavigationLinks = () => {
-  const { t } = useTranslation('arix/navigation');
+  const { t } = useTranslation('miuujs/navigation');
   
   return (
     <>
@@ -96,7 +96,7 @@ export const SubNavigationLinks = () => {
 };
 
 export const Navigation = () => {
-  const { t } = useTranslation('arix/navigation');
+  const { t } = useTranslation('miuujs/navigation');
   
   return (
     <>

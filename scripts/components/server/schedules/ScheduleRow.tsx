@@ -26,7 +26,7 @@ const getLocale = (localeKey: keyof typeof locales) => {
 };
 
 export default ({ schedule }: { schedule: Schedule }) => {
-    const { t, i18n } = useTranslation('arix/server/schedules');
+    const { t, i18n } = useTranslation('miuujs/server/schedules');
     const currentLang = i18n.language;
     const localeKey = currentLang as keyof typeof locales;
     const match = useRouteMatch();

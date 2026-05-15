@@ -54,7 +54,7 @@ const generateDirectoryData = (name: string): FileObject => ({
 const NewDirectoryDialog = asDialog({
     title: 'Create Directory',
 })(() => {
-    const { t } = useTranslation('arix/server/files');
+    const { t } = useTranslation('miuujs/server/files');
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const directory = ServerContext.useStoreState((state) => state.files.directory);
 
@@ -110,7 +110,7 @@ const NewDirectoryDialog = asDialog({
 });
 
 export default ({ className }: WithClassname) => {
-    const { t } = useTranslation('arix/server/files');
+    const { t } = useTranslation('miuujs/server/files');
     const [open, setOpen] = useState(false);
 
     return (

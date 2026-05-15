@@ -63,11 +63,11 @@ interface Props {
 }
 
 const SideBarIcon = ({ children }: Props) => {
-    const { t } = useTranslation('arix/navigation');
+    const { t } = useTranslation('miuujs/navigation');
     const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
-    const logo = useStoreState((state: ApplicationStore) => state.settings.data!.arix.logo);
-    const logoHeight = useStoreState((state: ApplicationStore) => state.settings.data!.arix.logoHeight);
+    const logo = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.logo);
+    const logoHeight = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.logoHeight);
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
 
     useEffect(() => {

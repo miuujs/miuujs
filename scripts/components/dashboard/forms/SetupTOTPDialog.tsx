@@ -30,7 +30,7 @@ interface Props {
 }
 
 const ConfigureTwoFactorForm = ({ onTokens }: Props) => {
-    const { t } = useTranslation('arix/account');
+    const { t } = useTranslation('miuujs/account');
     const [submitting, setSubmitting] = useState(false);
     const [value, setValue] = useState('');
     const [password, setPassword] = useState('');

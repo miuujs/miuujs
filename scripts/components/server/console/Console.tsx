@@ -69,7 +69,7 @@ interface Props {
 }
 
 export default ({ fullConsole }: Props) => {
-    const { t } = useTranslation('arix/server/console');
+    const { t } = useTranslation('miuujs/server/console');
     const [consoleLog, setConsoleLog] = useState<string[]>([]);
     const [isCopied, setCopied] = useState<Boolean>(false);
     const daemonText = ServerContext.useStoreState((state) => state.server.data?.daemonText);

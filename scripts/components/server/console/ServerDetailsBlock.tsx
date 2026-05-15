@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 type Stats = Record<'memory' | 'cpu' | 'disk', number>;
 
 const ServerDetailsBlock = () => {
-    const { t } = useTranslation('arix/utilities');
+    const { t } = useTranslation('miuujs/utilities');
     const [stats, setStats] = useState<Stats>({ memory: 0, cpu: 0, disk: 0 });
 
     const status = ServerContext.useStoreState((state) => state.status.value);

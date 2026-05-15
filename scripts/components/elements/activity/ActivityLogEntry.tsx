@@ -71,7 +71,7 @@ export default ({ activity, children }: Props) => {
     const properties = wrapProperties(activity.properties);
     const [countryCode, setCountryCode] = useState<string | null>(null);
 
-    const ipFlag = String(useStoreState((state: ApplicationStore) => state.settings.data!.arix.ipFlag));
+    const ipFlag = String(useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.ipFlag));
     
     // 6af03b1c2edaa7a3615f4a8ca4855839
 

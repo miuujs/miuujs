@@ -22,7 +22,7 @@ import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 export default () => {
-    const { t } = useTranslation('arix/account');
+    const { t } = useTranslation('miuujs/account');
     const { state } = useLocation<undefined | { twoFactorRedirect?: boolean }>();
     const [isTab, setIsTab] = useState('ssh')
 

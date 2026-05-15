@@ -25,7 +25,7 @@ import Code from '@/components/elements/Code';
 import { useTranslation } from 'react-i18next';
 
 export default () => {
-    const { t } = useTranslation('arix/account');
+    const { t } = useTranslation('miuujs/account');
     const [deleteIdentifier, setDeleteIdentifier] = useState('');
     const [keys, setKeys] = useState<ApiKey[]>([]);
     const [loading, setLoading] = useState(true);

@@ -26,16 +26,16 @@ interface Props {
 }
 
 const SideBar = ({ children, type }: Props) => {
-    const { t } = useTranslation('arix/navigation');
+    const { t } = useTranslation('miuujs/navigation');
     const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
     const onClickRef = useRef<DropdownMenu>(null);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const name = useStoreState((state: ApplicationStore) => state.settings.data!.name);
-    const layout = useStoreState((state: ApplicationStore) => state.settings.data!.arix.layout);
-    const modeToggler = useStoreState((state: ApplicationStore) => state.settings.data!.arix.modeToggler);
-    const logo = useStoreState((state: ApplicationStore) => state.settings.data!.arix.logo);
-    const logoHeight = useStoreState((state: ApplicationStore) => state.settings.data!.arix.logoHeight);
-    const fullLogo = useStoreState((state: ApplicationStore) => state.settings.data!.arix.fullLogo);
+    const layout = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.layout);
+    const modeToggler = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.modeToggler);
+    const logo = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.logo);
+    const logoHeight = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.logoHeight);
+    const fullLogo = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.fullLogo);
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
 
     useEffect(() => {

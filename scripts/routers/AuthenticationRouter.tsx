@@ -40,15 +40,15 @@ const Switches = () => {
 };
 
 const TopBar = () => {
-    const { t } = useTranslation('arix/auth');
+    const { t } = useTranslation('miuujs/auth');
     const name = useStoreState((state: ApplicationStore) => state.settings.data!.name);
-    const logo = useStoreState((state: ApplicationStore) => state.settings.data!.arix.logo);
-    const logoHeight = useStoreState((state: ApplicationStore) => state.settings.data!.arix.logoHeight);
-    const fullLogo = useStoreState((state: ApplicationStore) => state.settings.data!.arix.fullLogo);
-    const socialPosition = useStoreState((state: ApplicationStore) => state.settings.data!.arix.socialPosition);
-    const logoPosition = useStoreState((state: ApplicationStore) => state.settings.data!.arix.logoPosition);
-    const whatsapp = useStoreState((state: ApplicationStore) => state.settings.data!.arix.whatsapp);
-    const support = useStoreState((state: ApplicationStore) => state.settings.data!.arix.support);
+    const logo = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.logo);
+    const logoHeight = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.logoHeight);
+    const fullLogo = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.fullLogo);
+    const socialPosition = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.socialPosition);
+    const logoPosition = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.logoPosition);
+    const whatsapp = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.whatsapp);
+    const support = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.support);
 
     return(
         <div className={'flex items-center justify-between p-5'}>
@@ -74,9 +74,9 @@ const TopBar = () => {
 }
 
 const AuthContainer = () => {
-    const loginBackground = useStoreState((state: ApplicationStore) => state.settings.data!.arix.loginBackground);
-    const loginLayout = useStoreState((state: ApplicationStore) => state.settings.data!.arix.loginLayout);
-    const loginGradient = useStoreState((state: ApplicationStore) => state.settings.data!.arix.loginGradient);
+    const loginBackground = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.loginBackground);
+    const loginLayout = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.loginLayout);
+    const loginGradient = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.loginGradient);
 
     const Gradient = () => (
         String(loginGradient) == 'true' ? <div className={'absolute inset-0 z-[-1]'} css={'background-image:radial-gradient(circle, color-mix(in srgb, var(--gray800) 45%, transparent) 0%, var(--gray800) 100%);'} /> : null

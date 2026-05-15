@@ -26,7 +26,7 @@ import { GlobeIcon } from '@heroicons/react/outline';
 import { useTranslation } from 'react-i18next';
 
 const NetworkContainer = () => {
-    const { t } = useTranslation('arix/server/network');
+    const { t } = useTranslation('miuujs/server/network');
     const [loading, setLoading] = useState(false);
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const allocationLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.allocations);

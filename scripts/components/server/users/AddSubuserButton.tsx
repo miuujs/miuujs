@@ -13,7 +13,7 @@ import { Button } from '@/components/elements/button/index';
 import { useTranslation } from 'react-i18next';
 
 export default () => {
-    const { t } = useTranslation('arix/server/users');
+    const { t } = useTranslation('miuujs/server/users');
     const [visible, setVisible] = useState(false);
 
     return (

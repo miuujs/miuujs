@@ -38,7 +38,7 @@ interface Values {
 }
 
 const EditSubuserModal = ({ subuser }: Props) => {
-    const { t } = useTranslation('arix/server/users');
+    const { t } = useTranslation('miuujs/server/users');
     const ref = useRef<HTMLHeadingElement>(null);
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const appendSubuser = ServerContext.useStoreActions((actions) => actions.subusers.appendSubuser);

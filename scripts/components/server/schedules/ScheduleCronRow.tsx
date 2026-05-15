@@ -18,7 +18,7 @@ interface Props {
 }
 
 const ScheduleCronRow = ({ cron, className }: Props) => {
-    const { t } = useTranslation('arix/server/schedules');
+    const { t } = useTranslation('miuujs/server/schedules');
 
     return(
         <div className={classNames('flex', className)}>

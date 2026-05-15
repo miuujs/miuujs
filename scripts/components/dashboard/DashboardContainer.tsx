@@ -30,7 +30,7 @@ import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 export default () => {
-    const { t } = useTranslation('arix/dashboard');
+    const { t } = useTranslation('miuujs/dashboard');
     const { search } = useLocation();
     const defaultPage = Number(new URLSearchParams(search).get('page') || '1');
     const [githubData, setGithubData] = useState<{ stargazers_count: number, forks_count: number } | null>(null);
@@ -40,13 +40,13 @@ export default () => {
     const uuid = useStoreState((state) => state.user.data!.uuid);
     const rootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
     const [showOnlyAdmin, setShowOnlyAdmin] = usePersistedState(`${uuid}:show_all_servers`, false);
-    const githubBox = useStoreState((state: ApplicationStore) => state.settings.data!.arix.githubBox);
-    const whatsapp = useStoreState((state: ApplicationStore) => state.settings.data!.arix.whatsapp);
-    const billing = useStoreState((state: ApplicationStore) => state.settings.data!.arix.billing);
-    const support = useStoreState((state: ApplicationStore) => state.settings.data!.arix.support);
-    const status = useStoreState((state: ApplicationStore) => state.settings.data!.arix.status);
-    const socialButtons = useStoreState((state: ApplicationStore) => state.settings.data!.arix.socialButtons);
-    const serverRow = useStoreState((state: ApplicationStore) => state.settings.data!.arix.serverRow);
+    const githubBox = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.githubBox);
+    const whatsapp = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.whatsapp);
+    const billing = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.billing);
+    const support = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.support);
+    const status = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.status);
+    const socialButtons = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.socialButtons);
+    const serverRow = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.serverRow);
 
     const { data: servers, error } = useSWR<PaginatedResult<Server>>(
         ['/api/client/servers', showOnlyAdmin && rootAdmin, page],

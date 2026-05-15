@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 type Stats = Record<'uptime', number>;
 
 const InfoCardAdvanced = () => {
-    const { t } = useTranslation(['arix/server/dashboard', 'arix/utilities']);
+    const { t } = useTranslation(['miuujs/server/dashboard', 'miuujs/utilities']);
     const [stats, setStats] = useState<Stats>({ uptime: 0 });
 
     const status = ServerContext.useStoreState((state) => state.status.value);
@@ -56,7 +56,7 @@ const InfoCardAdvanced = () => {
     return(
         <TitledGreyBox title={t('server-info.title')}>
             <div className={'grid grid-cols-2 pb-4 border-b-2 border-gray-600'}>
-                <span className={'text-gray-300'}>{t('status', { ns: 'arix/utilities' })}:</span>
+                <span className={'text-gray-300'}>{t('status', { ns: 'miuujs/utilities' })}:</span>
                 <p>
                     <span className={`py-1 px-2 rounded
                         ${status === 'offline'
@@ -78,13 +78,13 @@ const InfoCardAdvanced = () => {
                         }`}
                     >
                         {status === 'offline' 
-                            ? t('offline', { ns: 'arix/utilities' })
+                            ? t('offline', { ns: 'miuujs/utilities' })
                             : status === 'running'
-                            ? t('online', { ns: 'arix/utilities' })
+                            ? t('online', { ns: 'miuujs/utilities' })
                             : status === 'starting'
-                            ? t('starting', { ns: 'arix/utilities' })
+                            ? t('starting', { ns: 'miuujs/utilities' })
                             : status === 'stopping'
-                            ? t('stopping', { ns: 'arix/utilities' })
+                            ? t('stopping', { ns: 'miuujs/utilities' })
                             : ''
                         }
                     </span>
@@ -93,7 +93,7 @@ const InfoCardAdvanced = () => {
             <div className={'grid grid-cols-2 py-4 border-b-2 border-gray-600'}>
                 <span className={'text-gray-300'}>{t('server-info.uptime')}:</span>
                 {status === null ? (
-                    t('offline', { ns: 'arix/utilities' })
+                    t('offline', { ns: 'miuujs/utilities' })
                 ) : stats.uptime > 0 ? (
                     <UptimeDuration uptime={stats.uptime / 1000} />
                 ) : (

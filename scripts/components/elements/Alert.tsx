@@ -51,9 +51,9 @@ const MyAlert = styled.div`
 const Alert = () => {
     const [isOpen, setIsOpen] = useState(true);
 
-    const announcementType = useStoreState((state: ApplicationStore) => state.settings.data!.arix.announcementType);
-    const announcementCloseable = useStoreState((state: ApplicationStore) => state.settings.data!.arix.announcementCloseable);
-    const announcementMessage = useStoreState((state: ApplicationStore) => state.settings.data!.arix.announcementMessage);
+    const announcementType = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.announcementType);
+    const announcementCloseable = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.announcementCloseable);
+    const announcementMessage = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.announcementMessage);
 
     useEffect(() => {
         const closedTime = localStorage.getItem('closedTime');

@@ -51,7 +51,7 @@ const CronBox = ({ title, value }: { title: string; value: string }) => (
 );
 
 const ActivePill = ({ active }: { active: boolean }) => {
-    const { t } = useTranslation('arix/server/schedules');
+    const { t } = useTranslation('miuujs/server/schedules');
     
     return (
         <span
@@ -64,7 +64,7 @@ const ActivePill = ({ active }: { active: boolean }) => {
 };
 
 export default () => {
-    const { t, i18n } = useTranslation('arix/server/schedules');
+    const { t, i18n } = useTranslation('miuujs/server/schedules');
     const currentLang = i18n.language;
     const localeKey = currentLang as keyof typeof locales;
 

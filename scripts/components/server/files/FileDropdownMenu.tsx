@@ -58,7 +58,7 @@ const Row = ({ icon: Icon, title, ...props }: RowProps) => (
 );
 
 const FileDropdownMenu = ({ file }: { file: FileObject }) => {
-    const { t } = useTranslation('arix/server/files');
+    const { t } = useTranslation('miuujs/server/files');
     const onClickRef = useRef<DropdownMenu>(null);
     const [showSpinner, setShowSpinner] = useState(false);
     const [modal, setModal] = useState<ModalType | null>(null);

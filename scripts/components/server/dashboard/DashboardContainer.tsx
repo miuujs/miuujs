@@ -63,14 +63,14 @@ const Component = ({ type }: Props) => {
 
 
 const DashboardContainer = () => {
-    const { t } = useTranslation('arix/server/dashboard');
-    const slot1 = useStoreState((state: ApplicationStore) => state.settings.data!.arix.slot1);
-    const slot2 = useStoreState((state: ApplicationStore) => state.settings.data!.arix.slot2);
-    const slot3 = useStoreState((state: ApplicationStore) => state.settings.data!.arix.slot3);
-    const slot4 = useStoreState((state: ApplicationStore) => state.settings.data!.arix.slot4);
-    const slot5 = useStoreState((state: ApplicationStore) => state.settings.data!.arix.slot5);
-    const slot6 = useStoreState((state: ApplicationStore) => state.settings.data!.arix.slot6);
-    const slot7 = useStoreState((state: ApplicationStore) => state.settings.data!.arix.slot7);
+    const { t } = useTranslation('miuujs/server/dashboard');
+    const slot1 = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.slot1);
+    const slot2 = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.slot2);
+    const slot3 = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.slot3);
+    const slot4 = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.slot4);
+    const slot5 = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.slot5);
+    const slot6 = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.slot6);
+    const slot7 = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.slot7);
 
     const isInstalling = ServerContext.useStoreState((state) => state.server.isInstalling);
     const isTransferring = ServerContext.useStoreState((state) => state.server.data!.isTransferring);

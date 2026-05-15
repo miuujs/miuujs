@@ -54,7 +54,7 @@ const SortButton: React.FC<SortButtonProps> = ({ label, filterType, onClick }) =
 );
 
 export default () => {
-    const { t } = useTranslation('arix/server/files');
+    const { t } = useTranslation('miuujs/server/files');
     const [filterType, setFilterType] = useState('name');
     const id = ServerContext.useStoreState((state) => state.server.data!.id);
     const { hash } = useLocation();

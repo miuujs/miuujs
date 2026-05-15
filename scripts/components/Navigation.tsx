@@ -120,10 +120,10 @@ const SubNavigation = () => {
     const [stats, setStats] = useState<Stats>({ memory: 0, cpu: 0, disk: 0, uptime: 0 });
     const [toggleStats, setToggleStats] = useState<boolean>(false);
 
-    const { t } = useTranslation(['arix/utilities', 'arix/navigation']);
+    const { t } = useTranslation(['miuujs/utilities', 'miuujs/navigation']);
 
     const rootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
-    const layout = useStoreState((state: ApplicationStore) => state.settings.data!.arix.layout);
+    const layout = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.layout);
 
     const name = ServerContext.useStoreState((state) => state.server.data?.name);
     const status = ServerContext.useStoreState((state) => state.status.value);
@@ -251,7 +251,7 @@ const SubNavigation = () => {
                 {rootAdmin && (
                     // eslint-disable-next-line react/jsx-no-target-blank
                     <a href={`/admin/servers/view/${serverId}`} target={'_blank'}>
-                        <FontAwesomeIcon icon={faExternalLinkAlt} /> {t('admin-view', { ns: 'arix/navigation' })}
+                        <FontAwesomeIcon icon={faExternalLinkAlt} /> {t('admin-view', { ns: 'miuujs/navigation' })}
                     </a>
                 )}
             </NavigationLinks>}

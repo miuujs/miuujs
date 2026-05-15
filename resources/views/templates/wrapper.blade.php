@@ -9,21 +9,21 @@
             <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
             <meta name="csrf-token" content="{{ csrf_token() }}">
 
-            @if(!empty($siteConfiguration['arix']))
-            <meta name="theme-color" content="{{ $siteConfiguration['arix']['meta_color'] }}"/>
-            <link rel="icon" type="image/x-icon" href="{{ $siteConfiguration['arix']['meta_favicon'] }}">
-            <meta name="title" content="{{ $siteConfiguration['arix']['meta_title'] }}" />
-            <meta name="description" content="{{ $siteConfiguration['arix']['meta_description'] }}" />
+            @if(!empty($siteConfiguration['miuujs']))
+            <meta name="theme-color" content="{{ $siteConfiguration['miuujs']['meta_color'] }}"/>
+            <link rel="icon" type="image/x-icon" href="{{ $siteConfiguration['miuujs']['meta_favicon'] }}">
+            <meta name="title" content="{{ $siteConfiguration['miuujs']['meta_title'] }}" />
+            <meta name="description" content="{{ $siteConfiguration['miuujs']['meta_description'] }}" />
             <meta property="og:type" content="website" />
             <meta property="og:url" content="{{config('app.url', 'https://localhost')}}" />
-            <meta property="og:title" content="{{ $siteConfiguration['arix']['meta_title'] }}" />
-            <meta property="og:description" content="{{ $siteConfiguration['arix']['meta_description'] }}" />
-            <meta property="og:image" content="{{ $siteConfiguration['arix']['meta_image'] }}" />
+            <meta property="og:title" content="{{ $siteConfiguration['miuujs']['meta_title'] }}" />
+            <meta property="og:description" content="{{ $siteConfiguration['miuujs']['meta_description'] }}" />
+            <meta property="og:image" content="{{ $siteConfiguration['miuujs']['meta_image'] }}" />
             <meta property="twitter:card" content="summary_large_image" />
             <meta property="twitter:url" content="{{config('app.url', 'https://localhost')}}" />
-            <meta property="twitter:title" content="{{ $siteConfiguration['arix']['meta_title'] }}" />
-            <meta property="twitter:description" content="{{ $siteConfiguration['arix']['meta_description'] }}" />
-            <meta property="twitter:image" content="{{ $siteConfiguration['arix']['meta_image'] }}" />
+            <meta property="twitter:title" content="{{ $siteConfiguration['miuujs']['meta_title'] }}" />
+            <meta property="twitter:description" content="{{ $siteConfiguration['miuujs']['meta_description'] }}" />
+            <meta property="twitter:image" content="{{ $siteConfiguration['miuujs']['meta_image'] }}" />
             @endif
 
             <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
@@ -47,74 +47,74 @@
                 </script>
             @endif
         @show
-        @if(!empty($siteConfiguration['arix']))
+        @if(!empty($siteConfiguration['miuujs']))
         <style>
             :root{
-                <?php if ($siteConfiguration['arix']['borderInput']) {
+                <?php if ($siteConfiguration['miuujs']['borderInput']) {
                     echo '--borderInput: 1px solid;
 ';  }?>
-                --radiusBox: {{ $siteConfiguration['arix']['radiusBox'] }};
-                --radiusInput: {{ $siteConfiguration['arix']['radiusInput'] }};
+                --radiusBox: {{ $siteConfiguration['miuujs']['radiusBox'] }};
+                --radiusInput: {{ $siteConfiguration['miuujs']['radiusInput'] }};
             }
 
-            <?php if ($siteConfiguration['arix']['defaultMode'] === 'darkmode') {
+            <?php if ($siteConfiguration['miuujs']['defaultMode'] === 'darkmode') {
                 echo ':root';
             } else {
                 echo '.lightmode';
             }?>{
-                --image: url({{ $siteConfiguration['arix']['backgroundImage'] }});
-                --primary: {{ $siteConfiguration['arix']['primary'] }};
-                --successText: {{ $siteConfiguration['arix']['successText'] }};
-                --successBorder: {{ $siteConfiguration['arix']['successBorder'] }};
-                --successBackground: {{ $siteConfiguration['arix']['successBackground'] }};
-                --dangerText: {{ $siteConfiguration['arix']['dangerText'] }};
-                --dangerBorder: {{ $siteConfiguration['arix']['dangerBorder'] }};
-                --dangerBackground: {{ $siteConfiguration['arix']['dangerBackground'] }};
-                --secondaryText: {{ $siteConfiguration['arix']['secondaryText'] }};
-                --secondaryBorder: {{ $siteConfiguration['arix']['secondaryBorder'] }};
-                --secondaryBackground: {{ $siteConfiguration['arix']['secondaryBackground'] }};
-                --gray50: {{ $siteConfiguration['arix']['gray50'] }};
-                --gray100: {{ $siteConfiguration['arix']['gray100'] }};
-                --gray200: {{ $siteConfiguration['arix']['gray200'] }};
-                --gray300: {{ $siteConfiguration['arix']['gray300'] }};
-                --gray400: {{ $siteConfiguration['arix']['gray400'] }};
-                --gray500: {{ $siteConfiguration['arix']['gray500'] }};
-                --gray600: {{ $siteConfiguration['arix']['gray600'] }};
-                --gray700: color-mix(in srgb, {{ $siteConfiguration['arix']['gray700'] }} {{ $siteConfiguration['arix']['backdropPercentage'] }}, transparent);
-                --gray800: {{ $siteConfiguration['arix']['gray800'] }};
-                --gray900: {{ $siteConfiguration['arix']['gray900'] }};
-                --gray700-default: {{ $siteConfiguration['arix']['gray700'] }};
+                --image: url({{ $siteConfiguration['miuujs']['backgroundImage'] }});
+                --primary: {{ $siteConfiguration['miuujs']['primary'] }};
+                --successText: {{ $siteConfiguration['miuujs']['successText'] }};
+                --successBorder: {{ $siteConfiguration['miuujs']['successBorder'] }};
+                --successBackground: {{ $siteConfiguration['miuujs']['successBackground'] }};
+                --dangerText: {{ $siteConfiguration['miuujs']['dangerText'] }};
+                --dangerBorder: {{ $siteConfiguration['miuujs']['dangerBorder'] }};
+                --dangerBackground: {{ $siteConfiguration['miuujs']['dangerBackground'] }};
+                --secondaryText: {{ $siteConfiguration['miuujs']['secondaryText'] }};
+                --secondaryBorder: {{ $siteConfiguration['miuujs']['secondaryBorder'] }};
+                --secondaryBackground: {{ $siteConfiguration['miuujs']['secondaryBackground'] }};
+                --gray50: {{ $siteConfiguration['miuujs']['gray50'] }};
+                --gray100: {{ $siteConfiguration['miuujs']['gray100'] }};
+                --gray200: {{ $siteConfiguration['miuujs']['gray200'] }};
+                --gray300: {{ $siteConfiguration['miuujs']['gray300'] }};
+                --gray400: {{ $siteConfiguration['miuujs']['gray400'] }};
+                --gray500: {{ $siteConfiguration['miuujs']['gray500'] }};
+                --gray600: {{ $siteConfiguration['miuujs']['gray600'] }};
+                --gray700: color-mix(in srgb, {{ $siteConfiguration['miuujs']['gray700'] }} {{ $siteConfiguration['miuujs']['backdropPercentage'] }}, transparent);
+                --gray800: {{ $siteConfiguration['miuujs']['gray800'] }};
+                --gray900: {{ $siteConfiguration['miuujs']['gray900'] }};
+                --gray700-default: {{ $siteConfiguration['miuujs']['gray700'] }};
             }
-            <?php if ($siteConfiguration['arix']['defaultMode'] !== 'darkmode') {
+            <?php if ($siteConfiguration['miuujs']['defaultMode'] !== 'darkmode') {
                 echo ':root';
             } else {
                 echo '.lightmode';
             }?>{
-                --image: url({{ $siteConfiguration['arix']['backgroundImageLight'] }});
-                --primary: {{ $siteConfiguration['arix']['lightmode_primary'] }};
-                --successText: {{ $siteConfiguration['arix']['lightmode_successText'] }};
-                --successBorder: {{ $siteConfiguration['arix']['lightmode_successBorder'] }};
-                --successBackground: {{ $siteConfiguration['arix']['lightmode_successBackground'] }};
-                --dangerText: {{ $siteConfiguration['arix']['lightmode_dangerText'] }};
-                --dangerBorder: {{ $siteConfiguration['arix']['lightmode_dangerBorder'] }};
-                --dangerBackground: {{ $siteConfiguration['arix']['lightmode_dangerBackground'] }};
-                --secondaryText: {{ $siteConfiguration['arix']['lightmode_secondaryText'] }};
-                --secondaryBorder: {{ $siteConfiguration['arix']['lightmode_secondaryBorder'] }};
-                --secondaryBackground: {{ $siteConfiguration['arix']['lightmode_secondaryBackground'] }};
-                --gray50: {{ $siteConfiguration['arix']['lightmode_gray50'] }};
-                --gray100: {{ $siteConfiguration['arix']['lightmode_gray100'] }};
-                --gray200: {{ $siteConfiguration['arix']['lightmode_gray200'] }};
-                --gray300: {{ $siteConfiguration['arix']['lightmode_gray300'] }};
-                --gray400: {{ $siteConfiguration['arix']['lightmode_gray400'] }};
-                --gray500: {{ $siteConfiguration['arix']['lightmode_gray500'] }};
-                --gray600: {{ $siteConfiguration['arix']['lightmode_gray600'] }};
-                --gray700: color-mix(in srgb, {{ $siteConfiguration['arix']['lightmode_gray700'] }} {{ $siteConfiguration['arix']['backdropPercentage'] }}, transparent);
-                --gray800: {{ $siteConfiguration['arix']['lightmode_gray800'] }};
-                --gray900: {{ $siteConfiguration['arix']['lightmode_gray900'] }};
-                --gray700-default: {{ $siteConfiguration['arix']['lightmode_gray700'] }};
+                --image: url({{ $siteConfiguration['miuujs']['backgroundImageLight'] }});
+                --primary: {{ $siteConfiguration['miuujs']['lightmode_primary'] }};
+                --successText: {{ $siteConfiguration['miuujs']['lightmode_successText'] }};
+                --successBorder: {{ $siteConfiguration['miuujs']['lightmode_successBorder'] }};
+                --successBackground: {{ $siteConfiguration['miuujs']['lightmode_successBackground'] }};
+                --dangerText: {{ $siteConfiguration['miuujs']['lightmode_dangerText'] }};
+                --dangerBorder: {{ $siteConfiguration['miuujs']['lightmode_dangerBorder'] }};
+                --dangerBackground: {{ $siteConfiguration['miuujs']['lightmode_dangerBackground'] }};
+                --secondaryText: {{ $siteConfiguration['miuujs']['lightmode_secondaryText'] }};
+                --secondaryBorder: {{ $siteConfiguration['miuujs']['lightmode_secondaryBorder'] }};
+                --secondaryBackground: {{ $siteConfiguration['miuujs']['lightmode_secondaryBackground'] }};
+                --gray50: {{ $siteConfiguration['miuujs']['lightmode_gray50'] }};
+                --gray100: {{ $siteConfiguration['miuujs']['lightmode_gray100'] }};
+                --gray200: {{ $siteConfiguration['miuujs']['lightmode_gray200'] }};
+                --gray300: {{ $siteConfiguration['miuujs']['lightmode_gray300'] }};
+                --gray400: {{ $siteConfiguration['miuujs']['lightmode_gray400'] }};
+                --gray500: {{ $siteConfiguration['miuujs']['lightmode_gray500'] }};
+                --gray600: {{ $siteConfiguration['miuujs']['lightmode_gray600'] }};
+                --gray700: color-mix(in srgb, {{ $siteConfiguration['miuujs']['lightmode_gray700'] }} {{ $siteConfiguration['miuujs']['backdropPercentage'] }}, transparent);
+                --gray800: {{ $siteConfiguration['miuujs']['lightmode_gray800'] }};
+                --gray900: {{ $siteConfiguration['miuujs']['lightmode_gray900'] }};
+                --gray700-default: {{ $siteConfiguration['miuujs']['lightmode_gray700'] }};
             }
 
-            <?php if ($siteConfiguration['arix']['backdrop']) {
+            <?php if ($siteConfiguration['miuujs']['backdrop']) {
                 echo '.backdrop{border:1px solid;border-color:var(--gray600)!important;backdrop-filter:blur(16px);}';
             }?>
             @import url('//fonts.googleapis.com/css?family=Rubik:300,400,500&display=swap');

@@ -75,7 +75,7 @@ const ActionListener = () => {
 };
 
 const TaskDetailsModal = ({ schedule, task }: Props) => {
-    const { t } = useTranslation('arix/server/schedules');
+    const { t } = useTranslation('miuujs/server/schedules');
     const { dismiss } = useContext(ModalContext);
     const { clearFlashes, addError } = useFlash();
 

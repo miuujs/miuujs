@@ -49,7 +49,7 @@ interface Props {
     type?: FlashMessageType;
 }
 const MessageBox = ({ title, children, type }: Props) => {
-    const flashMessage = useStoreState((state: ApplicationStore) => state.settings.data!.arix.flashMessage);
+    const flashMessage = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.flashMessage);
 
     return (
         <TopAlert className={

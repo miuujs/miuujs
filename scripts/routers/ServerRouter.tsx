@@ -44,10 +44,10 @@ export default () => {
     const match = useRouteMatch<{ id: string }>();
     const location = useLocation();
     
-    const { t } = useTranslation('arix/navigation');
+    const { t } = useTranslation('miuujs/navigation');
 
     const rootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
-    const layout = useStoreState((state: ApplicationStore) => state.settings.data!.arix.layout);
+    const layout = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.layout);
     const [error, setError] = useState('');
 
     const name = ServerContext.useStoreState((state) => state.server.data?.name);

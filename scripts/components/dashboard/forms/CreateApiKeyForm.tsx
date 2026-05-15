@@ -34,7 +34,7 @@ const CustomTextarea = styled(Textarea)`
 `;
 
 export default ({ onKeyCreated }: { onKeyCreated: (key: ApiKey) => void }) => {
-    const { t } = useTranslation('arix/account');
+    const { t } = useTranslation('miuujs/account');
     const [apiKey, setApiKey] = useState('');
     const { addError, clearFlashes } = useStoreActions((actions: Actions<ApplicationStore>) => actions.flashes);
 

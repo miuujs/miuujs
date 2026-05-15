@@ -27,7 +27,7 @@ interface Values {
 }
 
 export default ({ onFileNamed, onDismissed, ...props }: Props) => {
-    const { t } = useTranslation('arix/server/files');
+    const { t } = useTranslation('miuujs/server/files');
     const directory = ServerContext.useStoreState((state) => state.files.directory);
 
     const submit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {

@@ -20,7 +20,7 @@ import Select from '@/components/elements/Select';
 import { useTranslation } from 'react-i18next';
 
 export default () => {
-    const { t } = useTranslation('arix/navigation');
+    const { t } = useTranslation('miuujs/navigation');
     const { search } = useLocation();
     const defaultPage = Number(new URLSearchParams(search).get('page') || '1');
 

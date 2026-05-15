@@ -24,7 +24,7 @@ import { ArchiveIcon } from '@heroicons/react/outline';
 import { useTranslation } from 'react-i18next';
 
 const BackupContainer = () => {
-    const { t } = useTranslation('arix/server/backups');
+    const { t } = useTranslation('miuujs/server/backups');
     const { page, setPage } = useContext(ServerBackupContext);
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const { data: backups, error, isValidating } = getServerBackups();

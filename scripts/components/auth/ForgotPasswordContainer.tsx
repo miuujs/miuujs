@@ -29,7 +29,7 @@ interface Values {
 }
 
 export default () => {
-    const { t } = useTranslation('arix/auth');
+    const { t } = useTranslation('miuujs/auth');
     const ref = useRef<Reaptcha>(null);
     const [token, setToken] = useState('');
 

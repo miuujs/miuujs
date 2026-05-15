@@ -20,7 +20,7 @@ interface Props {
 }
 
 const ApiKeyModal = ({ apiKey }: Props) => {
-    const { t } = useTranslation('arix/account');
+    const { t } = useTranslation('miuujs/account');
     const { dismiss } = useContext(ModalContext);
 
     return (

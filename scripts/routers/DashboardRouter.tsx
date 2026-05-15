@@ -24,7 +24,7 @@ import routes from '@/routers/routes';
 
 export default () => {
     const location = useLocation();
-    const layout = useStoreState((state: ApplicationStore) => state.settings.data!.arix.layout);
+    const layout = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.layout);
 
     return (
         <>

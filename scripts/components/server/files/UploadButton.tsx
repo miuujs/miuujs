@@ -35,7 +35,7 @@ function isFileOrDirectory(event: DragEvent): boolean {
 }
 
 export default ({ className }: WithClassname) => {
-    const { t } = useTranslation('arix/server/files');
+    const { t } = useTranslation('miuujs/server/files');
     const fileUploadInput = useRef<HTMLInputElement>(null);
 
     const visible = useSignal(false);

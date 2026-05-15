@@ -19,7 +19,7 @@ import tw from 'twin.macro';
 import { useTranslation } from 'react-i18next';
 
 export default ({ databaseId, onUpdate }: { databaseId: string; onUpdate: (database: ServerDatabase) => void }) => {
-    const { t } = useTranslation('arix/server/databases');
+    const { t } = useTranslation('miuujs/server/databases');
     const [loading, setLoading] = useState(false);
     const { addFlash, clearFlashes } = useStoreActions((actions: Actions<ApplicationStore>) => actions.flashes);
     const server = ServerContext.useStoreState((state) => state.server.data!);

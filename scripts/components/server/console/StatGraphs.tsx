@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next';
 type Stats = Record<'memory' | 'cpu' | 'rx' | 'tx', number>;
 
 export default () => {
-    const { t } = useTranslation('arix/utilities');
+    const { t } = useTranslation('miuujs/utilities');
     const [stats, setStats] = useState<Stats>({ memory: 0, cpu: 0, rx: 0, tx: 0 });
 
     const status = ServerContext.useStoreState((state) => state.status.value);

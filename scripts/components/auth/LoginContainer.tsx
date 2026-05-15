@@ -28,7 +28,7 @@ interface Values {
 }
 
 const LoginContainer = ({ history }: RouteComponentProps) => {
-    const { t } = useTranslation('arix/auth');
+    const { t } = useTranslation('miuujs/auth');
     const ref = useRef<Reaptcha>(null);
     const [token, setToken] = useState('');
     const [eyeOpen, setEyeOpen] = useState(false);

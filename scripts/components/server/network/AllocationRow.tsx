@@ -36,7 +36,7 @@ interface Props {
 }
 
 const AllocationRow = ({ allocation }: Props) => {
-    const { t } = useTranslation('arix/server/network');
+    const { t } = useTranslation('miuujs/server/network');
     const [loading, setLoading] = useState(false);
     const { clearFlashes, clearAndAddHttpError } = useFlashKey('server:network');
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);

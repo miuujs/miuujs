@@ -25,7 +25,7 @@ interface Props {
 }
 
 export default ({ scheduleId, onDeleted }: Props) => {
-    const { t } = useTranslation('arix/server/schedules');
+    const { t } = useTranslation('miuujs/server/schedules');
     const [visible, setVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);

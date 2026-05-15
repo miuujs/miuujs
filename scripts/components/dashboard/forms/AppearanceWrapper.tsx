@@ -16,7 +16,7 @@ import Switch from '@/components/elements/Switch';
 import Select from '@/components/elements/Select';
 
 const AppearanceWrapper = () => {
-    const { i18n, t } = useTranslation('arix/account');
+    const { i18n, t } = useTranslation('miuujs/account');
     const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
     const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
         const storedMode = localStorage.getItem('darkMode');
@@ -27,9 +27,9 @@ const AppearanceWrapper = () => {
         return soundsEnabled ? soundsEnabled === 'true' : false;
     });
 
-    const modeToggler = String(useStoreState((state: ApplicationStore) => state.settings.data!.arix.modeToggler));
-    const langSwitch = String(useStoreState((state: ApplicationStore) => state.settings.data!.arix.langSwitch));
-    const defaultMode = useStoreState((state: ApplicationStore) => state.settings.data!.arix.defaultMode);
+    const modeToggler = String(useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.modeToggler));
+    const langSwitch = String(useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.langSwitch));
+    const defaultMode = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.defaultMode);
 
     const languages = [
         { key: 'en', value: 'English' },

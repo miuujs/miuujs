@@ -39,7 +39,7 @@ const schema = object().shape({
 });
 
 export default () => {
-    const { t } = useTranslation('arix/server/databases');
+    const { t } = useTranslation('miuujs/server/databases');
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { addError, clearFlashes } = useFlash();
     const [visible, setVisible] = useState(false);

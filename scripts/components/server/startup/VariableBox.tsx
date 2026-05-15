@@ -30,7 +30,7 @@ interface Props {
 }
 
 const VariableBox = ({ variable }: Props) => {
-    const { t } = useTranslation('arix/server/startup');
+    const { t } = useTranslation('miuujs/server/startup');
     const FLASH_KEY = `server:startup:${variable.envVariable}`;
 
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);

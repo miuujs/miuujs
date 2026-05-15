@@ -33,10 +33,10 @@ const getBackgroundColor = (value: number, uptime: number | null, max: number | 
 };
 
 export default () => {
-    const { t } = useTranslation('arix/utilities');
+    const { t } = useTranslation('miuujs/utilities');
     const [stats, setStats] = useState<Stats>({ memory: 0, cpu: 0, disk: 0, uptime: 0 });
-    const lowResourcesAlert = String(useStoreState((state: ApplicationStore) => state.settings.data!.arix.lowResourcesAlert));
-    const billing = String(useStoreState((state: ApplicationStore) => state.settings.data!.arix.billing));
+    const lowResourcesAlert = String(useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.lowResourcesAlert));
+    const billing = String(useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.billing));
 
     const connected = ServerContext.useStoreState((state) => state.socket.connected);
     const instance = ServerContext.useStoreState((state) => state.socket.instance);

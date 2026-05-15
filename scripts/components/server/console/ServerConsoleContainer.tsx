@@ -26,10 +26,10 @@ import { useTranslation } from 'react-i18next';
 export type PowerAction = 'start' | 'stop' | 'restart' | 'kill';
 
 const ServerConsoleContainer = () => {
-    const { t } = useTranslation('arix/server/console')
-    const sideGraphs = useStoreState((state: ApplicationStore) => state.settings.data!.arix.sideGraphs);
-    const statsCards = useStoreState((state: ApplicationStore) => state.settings.data!.arix.statsCards);
-    const graphs = useStoreState((state: ApplicationStore) => state.settings.data!.arix.graphs);
+    const { t } = useTranslation('miuujs/server/console')
+    const sideGraphs = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.sideGraphs);
+    const statsCards = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.statsCards);
+    const graphs = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.graphs);
     const isInstalling = ServerContext.useStoreState((state) => state.server.isInstalling);
     const isTransferring = ServerContext.useStoreState((state) => state.server.data!.isTransferring);
     const eggFeatures = ServerContext.useStoreState((state) => state.server.data!.eggFeatures, isEqual);

@@ -22,7 +22,7 @@ interface PowerButtonProps {
 }
 
 export default ({ className, icons }: PowerButtonProps) => {
-    const { t } = useTranslation('arix/utilities');
+    const { t } = useTranslation('miuujs/utilities');
     const [open, setOpen] = useState(false);
     const status = ServerContext.useStoreState((state) => state.status.value);
     const instance = ServerContext.useStoreState((state) => state.socket.instance);

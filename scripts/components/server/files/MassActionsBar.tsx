@@ -24,7 +24,7 @@ import { Dialog } from '@/components/elements/dialog';
 import { useTranslation } from 'react-i18next';
 
 const MassActionsBar = () => {
-    const { t } = useTranslation('arix/server/files');
+    const { t } = useTranslation('miuujs/server/files');
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
 
     const { mutate } = useFileManagerSwr();

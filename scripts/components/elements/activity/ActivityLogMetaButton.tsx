@@ -14,7 +14,7 @@ import { Button } from '@/components/elements/button/index';
 import { useTranslation } from 'react-i18next';
 
 export default ({ meta }: { meta: Record<string, unknown> }) => {
-    const { t } = useTranslation('arix/activity');
+    const { t } = useTranslation('miuujs/activity');
     const [open, setOpen] = useState(false);
 
     return (

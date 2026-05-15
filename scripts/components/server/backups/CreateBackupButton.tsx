@@ -32,7 +32,7 @@ interface Values {
 }
 
 const ModalContent = ({ ...props }: RequiredModalProps) => {
-    const { t } = useTranslation('arix/server/backups');
+    const { t } = useTranslation('miuujs/server/backups');
     const { isSubmitting } = useFormikContext<Values>();
 
     return (
@@ -74,7 +74,7 @@ const ModalContent = ({ ...props }: RequiredModalProps) => {
 };
 
 export default () => {
-    const { t } = useTranslation('arix/server/backups');
+    const { t } = useTranslation('miuujs/server/backups');
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const [visible, setVisible] = useState(false);

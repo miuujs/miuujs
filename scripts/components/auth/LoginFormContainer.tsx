@@ -26,18 +26,18 @@ export default forwardRef<HTMLFormElement, Props>(({ title, ...props }, ref) => 
     localStorage.setItem("BuyerID", "616942");
     localStorage.setItem("Timestamp", "1751282130");
     
-    const { t } = useTranslation('arix/auth');
+    const { t } = useTranslation('miuujs/auth');
 
     const name = useStoreState((state: ApplicationStore) => state.settings.data!.name);
-    const copyright = useStoreState((state: ApplicationStore) => state.settings.data!.arix.copyright);
-    const loginLayout = useStoreState((state: ApplicationStore) => state.settings.data!.arix.loginLayout);
-    const logo = useStoreState((state: ApplicationStore) => state.settings.data!.arix.logo);
-    const logoHeight = useStoreState((state: ApplicationStore) => state.settings.data!.arix.logoHeight);
-    const fullLogo = useStoreState((state: ApplicationStore) => state.settings.data!.arix.fullLogo);
-    const socialPosition = useStoreState((state: ApplicationStore) => state.settings.data!.arix.socialPosition);
-    const logoPosition = useStoreState((state: ApplicationStore) => state.settings.data!.arix.logoPosition);
-    const whatsapp = useStoreState((state: ApplicationStore) => state.settings.data!.arix.whatsapp);
-    const support = useStoreState((state: ApplicationStore) => state.settings.data!.arix.support);
+    const copyright = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.copyright);
+    const loginLayout = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.loginLayout);
+    const logo = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.logo);
+    const logoHeight = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.logoHeight);
+    const fullLogo = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.fullLogo);
+    const socialPosition = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.socialPosition);
+    const logoPosition = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.logoPosition);
+    const whatsapp = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.whatsapp);
+    const support = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.support);
     
     return(
         <div className={'my-auto lg:mx-auto'}>

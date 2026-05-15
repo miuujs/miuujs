@@ -21,7 +21,7 @@ import { httpErrorToHuman } from '@/api/http';
 import { useTranslation } from 'react-i18next';
 
 export default ({ subuser }: { subuser: Subuser }) => {
-    const { t } = useTranslation('arix/server/users');
+    const { t } = useTranslation('miuujs/server/users');
     const [loading, setLoading] = useState(false);
     const [showConfirmation, setShowConfirmation] = useState(false);
 

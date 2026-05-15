@@ -41,7 +41,7 @@ interface Values {
 }
 
 const EditScheduleModal = ({ schedule }: Props) => {
-    const { t } = useTranslation('arix/server/schedules');
+    const { t } = useTranslation('miuujs/server/schedules');
     const { addError, clearFlashes } = useFlash();
     const { dismiss } = useContext(ModalContext);
 

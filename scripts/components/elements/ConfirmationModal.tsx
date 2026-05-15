@@ -23,7 +23,7 @@ type Props = {
 
 const ConfirmationModal: React.FC<Props> = ({ title, children, buttonText, onConfirmed }) => {
     const { dismiss } = useContext(ModalContext);
-    const { t } = useTranslation('arix/utilities');
+    const { t } = useTranslation('miuujs/utilities');
 
     return (
         <>

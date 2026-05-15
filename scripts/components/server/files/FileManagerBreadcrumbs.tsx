@@ -21,7 +21,7 @@ interface Props {
 }
 
 export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
-    const { t } = useTranslation('arix/server/files');
+    const { t } = useTranslation('miuujs/server/files');
     const [file, setFile] = useState<string | null>(null);
     const id = ServerContext.useStoreState((state) => state.server.data!.id);
     const directory = ServerContext.useStoreState((state) => state.files.directory);

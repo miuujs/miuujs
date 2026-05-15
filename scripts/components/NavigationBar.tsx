@@ -84,9 +84,9 @@ const ClientDropdown = ({ sideBar }: Dropdown) => {
     const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
     const onClickRef = useRef<DropdownMenu>(null);
     
-    const { t } = useTranslation(['arix/navigation']);
+    const { t } = useTranslation(['miuujs/navigation']);
 
-    const modeToggler = useStoreState((state: ApplicationStore) => state.settings.data!.arix.modeToggler);
+    const modeToggler = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.modeToggler);
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
 
     useEffect(() => {
@@ -152,16 +152,16 @@ export default ({ children }: Props) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [guildData, setGuildData] = useState<{ instant_invite: string } | null>(null);
 
-    const { t } = useTranslation(['arix/navigation']);
+    const { t } = useTranslation(['miuujs/navigation']);
 
     const name = useStoreState((state: ApplicationStore) => state.settings.data!.name);
-    const layout = useStoreState((state: ApplicationStore) => state.settings.data!.arix.layout);
-    const logo = useStoreState((state: ApplicationStore) => state.settings.data!.arix.logo);
-    const logoHeight = useStoreState((state: ApplicationStore) => state.settings.data!.arix.logoHeight);
-    const fullLogo = useStoreState((state: ApplicationStore) => state.settings.data!.arix.fullLogo);
-    const searchComponent = useStoreState((state: ApplicationStore) => state.settings.data!.arix.searchComponent);
-    const whatsapp = useStoreState((state: ApplicationStore) => state.settings.data!.arix.whatsapp);
-    const support = useStoreState((state: ApplicationStore) => state.settings.data!.arix.support);
+    const layout = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.layout);
+    const logo = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.logo);
+    const logoHeight = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.logoHeight);
+    const fullLogo = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.fullLogo);
+    const searchComponent = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.searchComponent);
+    const whatsapp = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.whatsapp);
+    const support = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.support);
 
     return (
         <>
