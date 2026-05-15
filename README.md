@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=24&height=200&section=header&text=MiuuJS&fontSize=70&fontColor=ffffff&desc=Pterodactyl%20Theme&descSize=20&descAlignY=65">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=24&height=200&section=header&text=MiuuJS&fontSize=70&fontColor=4A35CF&desc=Pterodactyl%20Theme&descSize=20&descAlignY=65">
+  <source media="(prefers-color-scheme: dark)" srcset="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=24&height=220&section=header&text=MiuuJS&fontSize=70&fontColor=ffffff&desc=Pterodactyl%20Theme&descSize=18&descAlignY=60">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=24&height=220&section=header&text=MiuuJS&fontSize=70&fontColor=4A35CF&desc=Pterodactyl%20Theme&descSize=18&descAlignY=60">
 </picture>
 
 MiuuJS is a modern dark theme for Pterodactyl panel. It integrates the full Arix UI for the user dashboard, featuring a custom login page with MiuuJS branding, WhatsApp/GitHub social widgets, and a fully responsive design.
