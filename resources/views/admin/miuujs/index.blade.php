@@ -25,66 +25,28 @@
         }
         .miuujs-loader.hidden { opacity: 0; pointer-events: none; transition: opacity .4s; }
     </style>
+    <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Rubik', -apple-system, sans-serif;
-            background: #0b0d2a; color: #b2b2c1;
-            min-height: 100vh;
-        }
-        .navbar {
-            background: #1d1d37; border-bottom: 1px solid #42425b;
-            padding: 12px 24px; display: flex; align-items: center;
-            justify-content: space-between;
-        }
+        body { font-family: 'Rubik', -apple-system, sans-serif; background: #0b0d2a; color: #b2b2c1; min-height: 100vh; }
+        .navbar { background: #1d1d37; border-bottom: 1px solid #42425b; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
         .navbar h1 { color: #f4f4f4; font-size: 18px; font-weight: 600; }
-        .navbar a {
-            color: #8282a4; text-decoration: none; font-size: 14px;
-            display: flex; align-items: center; gap: 6px;
-            transition: color .2s;
-        }
+        .navbar a { color: #8282a4; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 6px; transition: color .2s; }
         .navbar a:hover { color: #f4f4f4; }
         .container { max-width: 900px; margin: 0 auto; padding: 30px 20px; }
-        .card {
-            background: #1d1d37; border: 1px solid #42425b;
-            border-radius: 10px; padding: 24px; margin-bottom: 20px;
-        }
-        .card h2 {
-            color: #f4f4f4; font-size: 16px; font-weight: 600;
-            margin-bottom: 16px; padding-bottom: 10px;
-            border-bottom: 1px solid #42425b;
-        }
+        .card { background: #1d1d37; border: 1px solid #42425b; border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+        .card h2 { color: #f4f4f4; font-size: 16px; font-weight: 600; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #42425b; }
         .form-group { margin-bottom: 14px; }
-        .form-group label {
-            display: block; color: #8282a4; font-size: 13px;
-            margin-bottom: 4px; font-weight: 500;
-        }
-        .form-group input, .form-group select {
-            width: 100%; padding: 10px 12px;
-            background: #2b2b40; border: 1px solid #42425b;
-            border-radius: 6px; color: #f4f4f4; font-size: 14px;
-            outline: none; transition: border-color .2s;
-        }
+        .form-group label { display: block; color: #8282a4; font-size: 13px; margin-bottom: 4px; font-weight: 500; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 12px; background: #2b2b40; border: 1px solid #42425b; border-radius: 6px; color: #f4f4f4; font-size: 14px; outline: none; transition: border-color .2s; }
         .form-group input:focus { border-color: #4A35CF; }
-        .form-group .hint {
-            color: #5e5e7f; font-size: 11px; margin-top: 3px;
-        }
+        .form-group .hint { color: #5e5e7f; font-size: 11px; margin-top: 3px; }
         .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .btn {
-            padding: 10px 24px; border: none; border-radius: 6px;
-            font-size: 14px; font-weight: 500; cursor: pointer;
-            transition: opacity .2s;
-        }
+        .btn { padding: 10px 24px; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity .2s; }
         .btn-primary { background: #4A35CF; color: #fff; }
         .btn-primary:hover { opacity: .9; }
-        .btn-secondary {
-            background: #42425b; color: #b2b2c1; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 6px;
-        }
+        .btn-secondary { background: #42425b; color: #b2b2c1; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
         .btn-secondary:hover { opacity: .9; }
-        .alert {
-            padding: 12px 16px; border-radius: 6px; margin-bottom: 16px;
-            font-size: 14px;
-        }
+        .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
         .alert-success { background: #3D8F1F; color: #E1FFD8; border: 1px solid #56AA2B; }
         .flex { display: flex; align-items: center; gap: 10px; }
         @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
