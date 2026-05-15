@@ -156,7 +156,7 @@ main() {
         echo ""
         echo "MiuuJS theme is already installed."
         echo ""
-        echo "[1] Reinstall (update to latest version)"
+        echo "[1] Reinstall"
         echo "[2] Uninstall"
         echo "[3] Cancel"
         echo ""
@@ -166,6 +166,14 @@ main() {
             2) echo ""; uninstall_theme; exit 0 ;;
             *) echo ""; exit 0 ;;
         esac
+    else
+        echo ""
+        echo "[1] Install"
+        echo "[2] Cancel"
+        echo ""
+        read -p "Select option [1-2]: " choice
+        echo ""
+        [[ "$choice" != "1" ]] && exit 0
     fi
 
     backup_files
