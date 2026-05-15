@@ -149,46 +149,11 @@ uninstall_theme() {
 main() {
     clear 2>/dev/null || true
     print_banner
-    check_root
-    check_panel
-
-    if [[ -f "$PTERO_DIR/config/miuujs.php" ]]; then
-        echo ""
-        echo "MiuuJS theme is already installed."
-        echo ""
-        echo "[1] Reinstall"
-        echo "[2] Uninstall"
-        echo "[3] Cancel"
-        echo ""
-        read -p "Select option [1-3]: " choice
-        case "$choice" in
-            1) echo "" ;;
-            2) echo ""; uninstall_theme; exit 0 ;;
-            *) echo ""; exit 0 ;;
-        esac
-    else
-        echo ""
-        echo "[1] Install"
-        echo "[2] Cancel"
-        echo ""
-        read -p "Select option [1-2]: " choice
-        echo ""
-        [[ "$choice" != "1" ]] && exit 0
-    fi
-
-    backup_files
-    install_deps
-    clone_theme
-    install_theme
-    build_assets
-    clear_cache
-
     echo ""
-    echo "================================"
-    echo "  Installation complete!"
-    echo "================================"
+    echo "Coming soon."
+    echo "The auto-installer is still in development."
     echo ""
-    echo "Backup: $BACKUP_DIR"
+    echo "For manual installation, please refer to the README."
     echo ""
 }
 
