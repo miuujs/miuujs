@@ -121,10 +121,12 @@
             @import url('//fonts.googleapis.com/css?family=IBM+Plex+Mono|IBM+Plex+Sans:500&display=swap');
         </style>
         <style>
+            html { overflow-x: hidden; }
+            body { overflow-x: hidden; width: 100%; }
+            #app > div { width: 100%; max-width: 100%; }
+            [class*="App___StyledDiv"] { width: 100% !important; max-width: 100% !important; }
             @media (min-width: 1400px) {
                 [class*="ContentContainer"] { max-width: 1400px !important; }
-                [class*="PageContentBlock___StyledContentContainer"],
-                [class*="PageContentBlock"] > div { padding-left: 32px !important; padding-right: 32px !important; }
             }
             @media (min-width: 1920px) {
                 [class*="ContentContainer"] { max-width: 1600px !important; }
@@ -132,8 +134,8 @@
             @media (min-width: 2560px) {
                 [class*="ContentContainer"] { max-width: 1800px !important; }
             }
-            [class*="ServerRow___StyledDiv"] { max-width: 100%; }
-            [class*="App___StyledDiv"] > div { width: 100%; }
+            [class*="SideBar"] { flex-shrink: 0; }
+            [class*="PageContentBlock"] > div > div { max-width: 100%; }
         </style>
         @endif
 
