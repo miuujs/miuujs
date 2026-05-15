@@ -21,10 +21,7 @@ MiuuJS is a modern dark theme for Pterodactyl panel. It integrates the full Arix
 bash <(curl -s https://raw.githubusercontent.com/miuujs/miuujs/main/install.sh)
 ```
 
-To uninstall:
-```bash
-bash <(curl -s https://raw.githubusercontent.com/miuujs/miuujs/main/install.sh) uninstall
-```
+Run the same command again and select "Uninstall" from the menu.
 
 > [!CAUTION]
 > This theme modifies core Pterodactyl panel files. Always backup your installation before applying.
