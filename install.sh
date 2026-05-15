@@ -203,13 +203,25 @@ uninstall_theme() {
 main() {
     print_banner
     
-    if [[ "$1" == "uninstall" ]]; then
-        uninstall_theme
-        exit 0
-    fi
-    
     check_root
     check_panel
+    
+    if [[ -f "$PTERO_DIR/config/miuujs.php" ]]; then
+        echo -e "${YELLOW}MiuuJS theme is already installed.${NC}"
+        echo ""
+        echo -e "1) ${GREEN}Reinstall${NC} (update to latest version)"
+        echo -e "2) ${RED}Uninstall${NC} (remove theme files)"
+        echo -e "3) ${YELLOW}Cancel${NC}"
+        echo ""
+        read -p "Select option (1-3): " choice
+        
+        case "$choice" in
+            1) ;;
+            2) uninstall_theme; exit 0 ;;
+            *) echo -e "${YELLOW}Cancelled${NC}"; exit 0 ;;
+        esac
+    fi
+    
     backup_files
     install_deps
     clone_theme
@@ -224,7 +236,7 @@ main() {
     echo ""
     echo -e "Backup: ${GREEN}$BACKUP_DIR${NC}"
     echo ""
-    echo -e "To uninstall: ${YELLOW}bash $0 uninstall${NC}"
+    echo -e "Run again to uninstall: ${YELLOW}bash <(curl -s https://raw.githubusercontent.com/miuujs/miuujs/main/install.sh)${NC}"
 }
 
-main "$@"
+main
