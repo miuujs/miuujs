@@ -157,9 +157,9 @@ export default () => {
                     )}
                 </div>
                 {String(githubBox) == 'true' &&
-                <a href="https://github.com/miuujs/miuujs" target="_blank" className={'group max-w-[275px] w-full border border-[#333] hover:border-[#666] rounded-box flex items-center justify-between px-6 py-5 duration-300'} css={'background-image:radial-gradient(circle, rgba(29,29,55,1) 0%, rgba(4,5,25,1) 100%);'}>
+                <a href="https://github.com/miuujs/miuujs" target="_blank" className={'group border border-[#333] hover:border-[#666] rounded-box flex items-center justify-between px-6 py-5 w-full duration-300'} css={'background-image:radial-gradient(circle, rgba(29,29,55,1) 0%, rgba(4,5,25,1) 100%);'}>
                     <div>
-                        <span className={'font-light text-sm text-white/70'}>{githubData ? githubData.stargazers_count : '0'} stars</span>
+                        <span className={'font-light text-sm text-white/70'}>{githubData ? githubData.stargazers_count : '0'} stars / {githubData ? githubData.forks_count : '0'} forks</span>
                         <p className={'font-medium text-white'}>{t('view-on-github')}</p>
                     </div>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-white/70 group-hover:text-white duration-300">
