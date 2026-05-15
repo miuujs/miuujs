@@ -1,7 +1,5 @@
-GNU GENERAL PUBLIC LICENSE
-Version 3, 29 June 2007
-
-Copyright (C) 2024 MiuuJS
+MiuuJS - Pterodactyl Theme
+Copyright (C) 2026  MiuuJS
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,16 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
----
-
-MiuuJS Pterodactyl Theme
-A modern dark theme for Pterodactyl panel.
-
-This project includes code from:
-- Arix Theme (originally by Weijers.one) - modified and rebranded
-- Pterodactyl Panel (MIT License) - https://pterodactyl.io
-
-Full GNU GPL v3 text below:
+------------------------------------------------------------------------
 
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
