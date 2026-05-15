@@ -7,7 +7,7 @@
 
 [![Stars](https://img.shields.io/github/stars/miuujs/miuujs?style=for-the-badge&logo=github&color=4A35CF)](https://github.com/miuujs/miuujs/stargazers)
 [![Forks](https://img.shields.io/github/forks/miuujs/miuujs?style=for-the-badge&logo=github&color=4A35CF)](https://github.com/miuujs/miuujs/forks)
-[![License](https://img.shields.io/github/license/miuujs/miuujs?style=for-the-badge&logo=gnu&color=4A35CF)](https://github.com/miuujs/miuujs/blob/main/LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge&color=4A35CF)](https://github.com/miuujs/miuujs/blob/main/LICENSE)
 [![Code Size](https://img.shields.io/github/languages/code-size/miuujs/miuujs?style=for-the-badge&logo=codefactor&color=4A35CF)](https://github.com/miuujs/miuujs)
 [![Last Commit](https://img.shields.io/github/last-commit/miuujs/miuujs?style=for-the-badge&logo=git&color=4A35CF)](https://github.com/miuujs/miuujs/commits/main)
 
@@ -16,8 +16,8 @@
 MiuuJS is a modern dark theme for Pterodactyl panel. It integrates the full Arix UI for the user dashboard, featuring a custom login page with MiuuJS branding, WhatsApp/GitHub social widgets, and a fully responsive design.
 
 > [!CAUTION]
-> This project is not affiliated with or endorsed by WhatsApp. Use at your own discretion.
-> Do not spam or misuse this software for automated bulk messaging.
+> This theme modifies core Pterodactyl panel files. Always backup your installation before applying.
+> Use at your own risk. The maintainers are not responsible for any data loss or service disruption.
 
 ## Features
 
