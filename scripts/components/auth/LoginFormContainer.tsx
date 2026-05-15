@@ -40,7 +40,7 @@ export default forwardRef<HTMLFormElement, Props>(({ title, ...props }, ref) => 
     const support = useStoreState((state: ApplicationStore) => state.settings.data!.miuujs.support);
     
     return(
-        <div className={'my-auto lg:mx-auto'}>
+        <div className={'my-auto mx-auto px-4'}>
             <FlashMessageRender css={tw`mb-2 px-1`} />
             <Form {...props} ref={ref}>
                 <div className={`max-w-[450px] w-screen lg:p-6 p-5 ${loginLayout == 1 ? 'bg-gray-700 rounded-box' : ''}`}>
