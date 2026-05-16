@@ -494,6 +494,19 @@ uninstall_plugins() {
 
     cd "$PANEL_DIR"
 
+    info "Restoring theme original files..."
+    # Restore NavigationBar, SideBar, DashboardRouter from theme source
+    determine_source
+    if [ -f "$REPO_DIR/scripts/components/NavigationBar.tsx" ]; then
+        cp "$REPO_DIR/scripts/components/NavigationBar.tsx" "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx"
+    fi
+    if [ -f "$REPO_DIR/scripts/components/SideBar.tsx" ]; then
+        cp "$REPO_DIR/scripts/components/SideBar.tsx" "$PANEL_DIR/resources/scripts/components/SideBar.tsx"
+    fi
+    if [ -f "$REPO_DIR/scripts/routers/DashboardRouter.tsx" ]; then
+        cp "$REPO_DIR/scripts/routers/DashboardRouter.tsx" "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx"
+    fi
+
     info "Removing plugin files..."
 
     # Remove controllers
@@ -525,27 +538,6 @@ uninstall_plugins() {
     # Remove route entries from api-client.php using markers
     if [ -f "$PANEL_DIR/routes/api-client.php" ]; then
         sed -i '/MIUUJS_PLUGIN_STORE_START/,/MIUUJS_PLUGIN_STORE_END/d' "$PANEL_DIR/routes/api-client.php"
-    fi
-
-    # Revert DashboardRouter
-    DASHBOARD_ROUTER="$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx"
-    if [ -f "$DASHBOARD_ROUTER" ]; then
-        sed -i "/import StoreContainer from '@\/components\/dashboard\/StoreContainer';/d" "$DASHBOARD_ROUTER"
-        sed -i "/<Route path={'\/store'} exact>/,/<\/Route>/d" "$DASHBOARD_ROUTER"
-    fi
-
-    # Revert SideBar
-    SIDEBAR="$PANEL_DIR/resources/scripts/components/SideBar.tsx"
-    if [ -f "$SIDEBAR" ]; then
-        sed -i "s|, ShoppingCartIcon } from '@heroicons/react/outline'|} from '@heroicons/react/outline'|" "$SIDEBAR"
-        sed -i "/<NavLink to={'\/store'} exact>/,/<\/NavLink>/d" "$SIDEBAR"
-    fi
-
-    # Revert NavigationBar
-    NAVBAR="$PANEL_DIR/resources/scripts/components/NavigationBar.tsx"
-    if [ -f "$NAVBAR" ]; then
-        sed -i "s|, ShoppingCartIcon } from '@heroicons/react/outline'|} from '@heroicons/react/outline'|" "$NAVBAR"
-        sed -i "/<NavLink to={'\/store'}><ShoppingCartIcon/,/<\/NavLink>/d" "$NAVBAR"
     fi
 
     # Revert User.php fillable
