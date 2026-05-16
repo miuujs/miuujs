@@ -222,7 +222,12 @@ install_deps() {
     if [ -x "$(command -v composer)" ]; then
         info "Updating Composer dependencies..."
         composer install --no-dev --no-interaction 2>&1 | tail -5
-        success "Composer dependencies updated."
+        local COMPOSER_EXIT=${PIPESTATUS[0]}
+        if [ "$COMPOSER_EXIT" -ne 0 ]; then
+            warning "Composer install exited with code $COMPOSER_EXIT."
+        else
+            success "Composer dependencies updated."
+        fi
     else
         warning "Composer not found. Skipping PHP dependency check."
     fi
@@ -230,23 +235,22 @@ install_deps() {
     info "Installing Node.js dependencies with $PKG_MANAGER..."
     echo ""
 
+    # Use the repo's package.json so all deps (including path-browserify) match
+    # the repo's webpack.config.js and scripts
+    cp "$REPO_DIR/package.json" "$PANEL_DIR/package.json"
     cp "$REPO_DIR/tailwind.config.js" "$PANEL_DIR/tailwind.config.js"
     cp "$REPO_DIR/webpack.config.js" "$PANEL_DIR/webpack.config.js"
 
     if [ "$PKG_MANAGER" = "yarn" ]; then
-        yarn install --frozen-lockfile --no-progress 2>&1 | tail -10 || yarn install --no-progress 2>&1 | tail -10
+        yarn install --no-progress 2>&1 | tail -10
+        local INSTALL_EXIT=${PIPESTATUS[0]}
     else
         npm install --no-progress 2>&1 | tail -10
+        local INSTALL_EXIT=${PIPESTATUS[0]}
     fi
-
-    # webpack 5 needs path-browserify polyfill; panel's package.json doesn't have it
-    if ! grep -q "path-browserify" "$PANEL_DIR/package.json" 2>/dev/null; then
-        info "Installing path-browserify (webpack polyfill)..."
-        if [ "$PKG_MANAGER" = "yarn" ]; then
-            yarn add --dev path-browserify --no-progress 2>&1 | tail -3
-        else
-            npm install --save-dev path-browserify --no-progress 2>&1 | tail -3
-        fi
+    if [ "$INSTALL_EXIT" -ne 0 ]; then
+        error "$PKG_MANAGER install failed (exit $INSTALL_EXIT)."
+        exit 1
     fi
     echo ""
 
