@@ -502,8 +502,8 @@ install_mod() {
         return
     fi
 
-    if [ ! -d "$REPO_DIR/pteromod" ]; then
-        warning "pteromod/ not found in $REPO_DIR. Re-cloning repository..."
+    if [ ! -d "$REPO_DIR/plugins" ]; then
+        warning "plugins/ not found in $REPO_DIR. Re-cloning repository..."
         rm -rf "$REPO_DIR"
         git clone https://github.com/miuujs/miuujs.git "$REPO_DIR" 2>/dev/null || {
             error "Failed to clone repo. Ensure git is installed."
@@ -517,38 +517,38 @@ install_mod() {
     info "Installing MustikaPay mod..."
 
     # Copy Extensions
-    if [ -d "$SRC/pteromod/app/Extensions" ]; then
-        cp -r "$SRC/pteromod/app/Extensions" "$PANEL_DIR/app/"
+    if [ -d "$SRC/plugins/app/Extensions" ]; then
+        cp -r "$SRC/plugins/app/Extensions" "$PANEL_DIR/app/"
     fi
 
     # Copy Controllers
-    if [ -d "$SRC/pteromod/app/Http/Controllers/Admin" ]; then
-        cp "$SRC/pteromod/app/Http/Controllers/Admin/MustikaPayController.php" "$PANEL_DIR/app/Http/Controllers/Admin/"
+    if [ -d "$SRC/plugins/app/Http/Controllers/Admin" ]; then
+        cp "$SRC/plugins/app/Http/Controllers/Admin/MustikaPayController.php" "$PANEL_DIR/app/Http/Controllers/Admin/"
     fi
-    if [ -d "$SRC/pteromod/app/Http/Controllers/Api/Client/Store" ]; then
+    if [ -d "$SRC/plugins/app/Http/Controllers/Api/Client/Store" ]; then
         mkdir -p "$PANEL_DIR/app/Http/Controllers/Api/Client/Store"
-        cp "$SRC/pteromod/app/Http/Controllers/Api/Client/Store/StoreController.php" "$PANEL_DIR/app/Http/Controllers/Api/Client/Store/"
+        cp "$SRC/plugins/app/Http/Controllers/Api/Client/Store/StoreController.php" "$PANEL_DIR/app/Http/Controllers/Api/Client/Store/"
     fi
 
     # Copy Models
-    if [ -d "$SRC/pteromod/app/Models" ]; then
-        cp "$SRC/pteromod/app/Models/"*.php "$PANEL_DIR/app/Models/"
+    if [ -d "$SRC/plugins/app/Models" ]; then
+        cp "$SRC/plugins/app/Models/"*.php "$PANEL_DIR/app/Models/"
     fi
 
     # Copy Migrations
-    if [ -d "$SRC/pteromod/database/migrations" ]; then
-        cp "$SRC/pteromod/database/migrations/"*.php "$PANEL_DIR/database/migrations/"
+    if [ -d "$SRC/plugins/database/migrations" ]; then
+        cp "$SRC/plugins/database/migrations/"*.php "$PANEL_DIR/database/migrations/"
     fi
 
     # Copy Views
-    if [ -f "$SRC/pteromod/resources/views/admin/mustikapay.blade.php" ]; then
-        cp "$SRC/pteromod/resources/views/admin/mustikapay.blade.php" "$PANEL_DIR/resources/views/admin/"
+    if [ -f "$SRC/plugins/resources/views/admin/mustikapay.blade.php" ]; then
+        cp "$SRC/plugins/resources/views/admin/mustikapay.blade.php" "$PANEL_DIR/resources/views/admin/"
     fi
 
     # Copy the miuujs-upgraded StoreContainer if exists
-    if [ -f "$SRC/pteromod/resources/scripts/components/dashboard/StoreContainer.tsx" ]; then
+    if [ -f "$SRC/plugins/resources/scripts/components/dashboard/StoreContainer.tsx" ]; then
         mkdir -p "$PANEL_DIR/resources/scripts/components/dashboard"
-        cp "$SRC/pteromod/resources/scripts/components/dashboard/StoreContainer.tsx" "$PANEL_DIR/resources/scripts/components/dashboard/"
+        cp "$SRC/plugins/resources/scripts/components/dashboard/StoreContainer.tsx" "$PANEL_DIR/resources/scripts/components/dashboard/"
     fi
 
     # --- Route modifications ---

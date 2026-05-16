@@ -75,13 +75,13 @@ bash <(curl -s https://raw.githubusercontent.com/miuujs/miuujs/main/install.sh)
 | Extra Server Slot | Rp 5000 | —  | —    | 0%  | 1       |
 
 ### Files
-The mod files live under `pteromod/` in this repository:
-- `pteromod/app/Extensions/Payment/MustikaPay/` -- PHP SDK for MustikaPay API
-- `pteromod/app/Http/Controllers/` -- Admin + API controllers
-- `pteromod/app/Models/` -- Modified User and Server models with balance/billing fields
-- `pteromod/database/migrations/` -- Migration files for balance and billing columns
-- `pteromod/resources/` -- Admin blade view and StoreContainer.tsx frontend
-- `pteromod/routes/` -- Route stubs injected into admin.php and api-client.php
+The mod files live under `plugins/` in this repository:
+- `plugins/app/Extensions/Payment/MustikaPay/` -- PHP SDK for MustikaPay API
+- `plugins/app/Http/Controllers/` -- Admin + API controllers
+- `plugins/app/Models/` -- Modified User and Server models with balance/billing fields
+- `plugins/database/migrations/` -- Migration files for balance and billing columns
+- `plugins/resources/` -- Admin blade view and StoreContainer.tsx frontend
+- `plugins/routes/` -- Route stubs injected into admin.php and api-client.php
 
 ## License
 
