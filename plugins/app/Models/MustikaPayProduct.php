@@ -24,4 +24,9 @@ class MustikaPayProduct extends Model
         'ram' => 'integer',
         'disk' => 'integer',
     ];
+
+    public function egg()
+    {
+        return $this->belongsTo(Egg::class, 'egg_id');
+    }
 }

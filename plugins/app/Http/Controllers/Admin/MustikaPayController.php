@@ -20,7 +20,7 @@ class MustikaPayController extends Controller
     {
         return view('admin.mustikapay', [
             'api_key' => $this->settings->get('mustikapay:api_key', ''),
-            'products' => MustikaPayProduct::all(),
+            'products' => MustikaPayProduct::with('egg.nest')->get(),
             'nests' => Nest::with('eggs')->get(),
         ]);
     }
@@ -41,6 +41,18 @@ class MustikaPayController extends Controller
 
         MustikaPayProduct::create($data);
         $this->alert->success('Product added successfully.')->flash();
+        return redirect()->route('admin.mustikapay');
+    }
+
+    public function updateProduct($id, Request $request)
+    {
+        $product = MustikaPayProduct::findOrFail($id);
+        $data = $request->only(['name', 'image', 'description', 'price', 'cpu', 'ram', 'disk', 'egg_id']);
+        $egg = \Pterodactyl\Models\Egg::findOrFail($request->input('egg_id'));
+        $data['nest_id'] = $egg->nest_id;
+
+        $product->update($data);
+        $this->alert->success('Product updated successfully.')->flash();
         return redirect()->route('admin.mustikapay');
     }
 

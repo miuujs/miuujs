@@ -408,6 +408,7 @@ Route::group(['prefix' => 'mustikapay'], function () {
     Route::get('/', [Admin\MustikaPayController::class, 'index'])->name('admin.mustikapay');
     Route::post('/', [Admin\MustikaPayController::class, 'update'])->name('admin.mustikapay.update');
     Route::post('/product', [Admin\MustikaPayController::class, 'addProduct'])->name('admin.mustikapay.product.add');
+    Route::post('/product/{id}', [Admin\MustikaPayController::class, 'updateProduct'])->name('admin.mustikapay.product.update');
     Route::delete('/product/{id}', [Admin\MustikaPayController::class, 'deleteProduct'])->name('admin.mustikapay.product.delete');
 });
 /* MIUUJS_PLUGIN_MUSTIKAPAY_END */
