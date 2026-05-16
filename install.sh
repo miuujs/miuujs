@@ -212,23 +212,25 @@ install_deps() {
     cd "$PANEL_DIR"
 
     if [ -x "$(command -v composer)" ]; then
-        info "Checking Composer dependencies..."
-        composer install --no-dev --quiet 2>/dev/null || composer install --no-dev 2>&1 | tail -5
+        info "Updating Composer dependencies..."
+        composer install --no-dev --no-interaction 2>&1 | tail -5
         success "Composer dependencies updated."
     else
         warning "Composer not found. Skipping PHP dependency check."
     fi
 
     info "Installing Node.js dependencies with $PKG_MANAGER..."
+    echo ""
 
     cp "$REPO_DIR/tailwind.config.js" "$PANEL_DIR/tailwind.config.js"
     cp "$REPO_DIR/webpack.config.js" "$PANEL_DIR/webpack.config.js"
 
     if [ "$PKG_MANAGER" = "yarn" ]; then
-        yarn install --frozen-lockfile 2>/dev/null || yarn install
+        yarn install --frozen-lockfile --no-progress 2>&1 | tail -10 || yarn install --no-progress 2>&1 | tail -10
     else
-        npm install
+        npm install --no-progress 2>&1 | tail -10
     fi
+    echo ""
 
     success "Dependencies installed."
     echo ""
@@ -313,10 +315,13 @@ build_frontend() {
 
     cd "$PANEL_DIR"
 
-    info "Building frontend assets (this may take a few minutes)..."
+    info "Building frontend assets..."
+    echo -e "  ${DIM}This may take 2-5 minutes. Full log saved for debugging.${RESET}"
     echo ""
 
     BUILD_LOG="/tmp/miuujs-build-$(date +%s).log"
+    info "Build started at $(date '+%H:%M:%S') — log: $BUILD_LOG"
+    echo ""
     if [ "$PKG_MANAGER" = "yarn" ]; then
         yarn run build:production 2>&1 | tee "$BUILD_LOG" | tail -20
     else
@@ -325,7 +330,7 @@ build_frontend() {
     BUILD_EXIT=${PIPESTATUS[0]}
 
     if [ "$BUILD_EXIT" -eq 0 ]; then
-        success "Frontend built successfully."
+        success "Frontend built successfully at $(date '+%H:%M:%S')."
     else
         error "Frontend build failed! Full log: $BUILD_LOG"
         exit 1
@@ -336,8 +341,10 @@ build_frontend() {
 # --- Run Migrations ---
 run_migrations() {
     info "Running database migrations..."
+    echo ""
     cd "$PANEL_DIR"
-    php artisan migrate --force 2>&1
+    php artisan migrate --force --no-interaction 2>&1
+    echo ""
     success "Migrations complete."
     echo ""
 }
