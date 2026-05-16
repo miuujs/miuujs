@@ -71,9 +71,6 @@
                                 <li><a href="{{ route('admin.miuujs') }}" data-toggle="tooltip" data-placement="bottom" title="MiuuJS Config"><i class="fa fa-paint-brush"></i></a></li>
                             </li>
                             <li>
-                                <li><a href="{{ route('admin.mustikapay') }}" data-toggle="tooltip" data-placement="bottom" title="MustikaPay Billing"><i class="fa fa-credit-card"></i></a></li>
-                            </li>
-                            <li>
                                 <li><a href="{{ route('index') }}" data-toggle="tooltip" data-placement="bottom" title="Exit Admin"><i class="fa fa-server"></i></a></li>
                             </li>
                             <li>

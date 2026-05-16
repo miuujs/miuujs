@@ -579,6 +579,34 @@ Route::prefix('/store')->group(function () {
 ROUTES
     fi
 
+    # --- DashboardRouter route ---
+    info "Adding /store route to DashboardRouter..."
+    DASHBOARD_ROUTER="$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx"
+    if ! grep -q "StoreContainer" "$DASHBOARD_ROUTER" 2>/dev/null; then
+        sed -i "s|import { NotFound } from '@/components/elements/ScreenBlock';|import { NotFound } from '@/components/elements/ScreenBlock';\nimport StoreContainer from '@/components/dashboard/StoreContainer';|" "$DASHBOARD_ROUTER"
+        sed -i "/<DashboardContainer \/>/a \\\n\\t\\t\\t\\t\\t\\t\\t\\t<Route path={'\\/store'} exact>\n\\t\\t\\t\\t\\t\\t\\t\\t\\t<StoreContainer />\n\\t\\t\\t\\t\\t\\t\\t\\t<\\/Route>" "$DASHBOARD_ROUTER"
+    fi
+
+    # --- SideBar store link ---
+    info "Adding Store link to SideBar..."
+    SIDEBAR="$PANEL_DIR/resources/scripts/components/SideBar.tsx"
+    if ! grep -q "ShoppingCartIcon" "$SIDEBAR" 2>/dev/null; then
+        sed -i "s|import { ServerIcon, UserCircleIcon, DotsVerticalIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon } from '@heroicons/react/outline';|import { ServerIcon, UserCircleIcon, DotsVerticalIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, ShoppingCartIcon } from '@heroicons/react/outline';|" "$SIDEBAR"
+        sed -i "/<NavLink to={'\\/account'} exact>/,/<\\/NavLink>/a \\t\\t\\t\\t\\t\\t<NavLink to={'\\/store'} exact>\n\\t\\t\\t\\t\\t\\t\\t<ShoppingCartIcon/> Store\n\\t\\t\\t\\t\\t\\t<\\/NavLink>" "$SIDEBAR"
+    fi
+
+    # --- NavigationBar store links ---
+    info "Adding Store link to NavigationBar..."
+    NAVBAR="$PANEL_DIR/resources/scripts/components/NavigationBar.tsx"
+    if ! grep -q "ShoppingCartIcon" "$NAVBAR" 2>/dev/null; then
+        # Desktop: add to import
+        sed -i "s|import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon, SupportIcon } from '@heroicons/react/outline';|import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon, SupportIcon, ShoppingCartIcon } from '@heroicons/react/outline';|" "$NAVBAR"
+        # Desktop: add store link before ClientDropdown
+        sed -i "s|{support && <a href={support}><SupportIcon className={'w-5'} />{t\`supportcenter\`}<\\/a>}\n\\t\\t\\t\\t\\t{layout == 3 && <ClientDropdown />}|{support && <a href={support}><SupportIcon className={'w-5'} />{t\`supportcenter\`}<\\/a>}\n\\t\\t\\t\\t\\t<NavLink to={'\\/store'}><ShoppingCartIcon className={'w-5'} \\/>Store<\\/NavLink>\n\\t\\t\\t\\t\\t{layout == 3 && <ClientDropdown />}|" "$NAVBAR"
+        # Mobile: add store link after account link
+        sed -i "/<NavLink to={'\\/account'} exact>/,/<\\/NavLink> {t\`account\`}<\\/NavLink>/a \\n\\t\\t\\t\\t\\t\\t\\t\\t<NavLink to={'\\/store'} exact>\n\\t\\t\\t\\t\\t\\t\\t\\t\\t<ShoppingCartIcon\\/> Store\n\\t\\t\\t\\t\\t\\t\\t\\t<\\/NavLink>" "$NAVBAR"
+    fi
+
     # --- Model modifications ---
     info "Updating models..."
     if ! grep -q "'balance'" "$PANEL_DIR/app/Models/User.php" 2>/dev/null; then

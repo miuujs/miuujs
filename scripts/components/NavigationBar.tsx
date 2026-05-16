@@ -20,7 +20,7 @@ import ServerSelector from '@/components/elements/ServerSelector';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import UserAvatar from '@/components/UserAvatar';
 import DropdownMenu, { DropdownLinkRow, DropdownButtonRow } from '@/components/elements/DropdownMenu';
-import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon, SupportIcon, ShoppingCartIcon } from '@heroicons/react/outline';
+import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon, SupportIcon } from '@heroicons/react/outline';
 
 import { useTranslation } from 'react-i18next';
 
@@ -197,7 +197,6 @@ export default ({ children }: Props) => {
                         WhatsApp
                     </a>}
                     {support && <a href={support}><SupportIcon className={'w-5'} />{t`supportcenter`}</a>}
-                    <NavLink to={'/store'}><ShoppingCartIcon className={'w-5'} />Store</NavLink>
                     {layout == 3 && <ClientDropdown />}
                 </RightNavigation>
                 <button onClick={() => setIsOpen((isOpen) => !isOpen)} className={'lg:hidden'}>
@@ -225,9 +224,6 @@ export default ({ children }: Props) => {
                         </NavLink>
                         <NavLink to={'/account'} exact>
                             <UserCircleIcon/> {t`account`}
-                        </NavLink>
-                        <NavLink to={'/store'} exact>
-                            <ShoppingCartIcon/> Store
                         </NavLink>
                         {whatsapp &&
                         <a href={whatsapp} target={'_blank'}>

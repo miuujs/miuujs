@@ -14,7 +14,7 @@ import { ApplicationStore } from '@/state';
 import DropdownMenu, { DropdownLinkRow, DropdownButtonRow } from '@/components/elements/DropdownMenu';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import UserAvatar from '@/components/UserAvatar';
-import { ServerIcon, UserCircleIcon, DotsVerticalIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, ShoppingCartIcon } from '@heroicons/react/outline';
+import { ServerIcon, UserCircleIcon, DotsVerticalIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon } from '@heroicons/react/outline';
 import http from '@/api/http';
 import styled from 'styled-components/macro';
 import tw from 'twin.macro';
@@ -117,9 +117,6 @@ const SideBar = ({ children, type }: Props) => {
                 </NavLink>
                 <NavLink to={'/account'} exact>
                     <UserCircleIcon/> {t('account')}
-                </NavLink>
-                <NavLink to={'/store'} exact>
-                    <ShoppingCartIcon/> Store
                 </NavLink>
             </NavigationLinks>}
             <hr className={'border-b border-gray-500 mx-5'}/>
