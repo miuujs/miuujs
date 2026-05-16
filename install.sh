@@ -440,13 +440,42 @@ MIUUJS_ROUTES
         sed -i '/title="MiuuJS Config">.*fa-paint-brush"><\/a><\/li>/a \\t\t\t\t\t\t\t\t<li><a href="{{ route('"'"'admin.mustikapay'"'"') }}" data-toggle="tooltip" data-placement="bottom" title="MustikaPay Billing"><i class="fa fa-credit-card"><\/i><\/a><\/li>' "$PANEL_DIR/resources/views/layouts/admin.blade.php"
     fi
 
+    # Fallback: copy StoreContainer + nav links if theme not installed
+    if [ ! -f "$PANEL_DIR/resources/scripts/components/dashboard/StoreContainer.tsx" ]; then
+        if [ -f "$SRC/scripts/components/dashboard/StoreContainer.tsx" ]; then
+            mkdir -p "$PANEL_DIR/resources/scripts/components/dashboard"
+            cp "$SRC/scripts/components/dashboard/StoreContainer.tsx" "$PANEL_DIR/resources/scripts/components/dashboard/"
+        fi
+    fi
+    if ! grep -q "StoreContainer" "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx" 2>/dev/null; then
+        DASHBOARD_ROUTER="$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx"
+        sed -i "s|import { NotFound } from '@/components/elements/ScreenBlock';|import { NotFound } from '@/components/elements/ScreenBlock';\nimport StoreContainer from '@/components/dashboard/StoreContainer';|" "$DASHBOARD_ROUTER"
+        sed -i "/<Route path={'\/'} exact>/a \\\t\t\t\t\t\t\t<Route path={'\/products'} exact>\n\t\t\t\t\t\t\t\t<StoreContainer />\n\t\t\t\t\t\t\t</Route>" "$DASHBOARD_ROUTER"
+    fi
+    if ! grep -q "ShoppingCartIcon" "$PANEL_DIR/resources/scripts/components/SideBar.tsx" 2>/dev/null; then
+        SIDEBAR="$PANEL_DIR/resources/scripts/components/SideBar.tsx"
+        if grep -q "LogoutIcon } from" "$SIDEBAR" 2>/dev/null; then
+            sed -i "s|LogoutIcon } from '@heroicons/react/outline'|LogoutIcon, ShoppingCartIcon } from '@heroicons/react/outline'|" "$SIDEBAR"
+        fi
+        sed -i "/<NavLink to={'\/account'} exact>/a \\\t\t\t\t<NavLink to={'\/products'} exact>\n\t\t\t\t\t<ShoppingCartIcon/> Products\n\t\t\t\t</NavLink>" "$SIDEBAR"
+    fi
+    if ! grep -q "ShoppingCartIcon" "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" 2>/dev/null; then
+        NAVBAR="$PANEL_DIR/resources/scripts/components/NavigationBar.tsx"
+        if grep -q "ServerIcon } from" "$NAVBAR" 2>/dev/null; then
+            sed -i "s|ServerIcon } from '@heroicons/react/outline'|ServerIcon, ShoppingCartIcon } from '@heroicons/react/outline'|" "$NAVBAR"
+        fi
+        sed -i "s|<RightNavigation>|<RightNavigation>\n\t\t\t\t\t<NavLink to={'\/products'}><ShoppingCartIcon className={'w-5'} \/>Products<\/NavLink>|" "$NAVBAR"
+    fi
+
     # Composer autoload
     if ! grep -q "MustikaPay" "$PANEL_DIR/composer.json" 2>/dev/null; then
         sed -i 's|"Pterodactyl\\\\": "app/",|"Pterodactyl\\\\": "app/",\n            "MustikaPay\\\\": "app/Extensions/Payment/MustikaPay/",|' "$PANEL_DIR/composer.json"
     fi
     composer dump-autoload 2>/dev/null || true
 
-    # Run migrations
+    # Clear stale migration records, then run migrations
+    cd "$PANEL_DIR"
+    php artisan tinker --execute='DB::table("migrations")->where("migration", "like", "%2026_05_11%")->delete();' 2>/dev/null || true
     run_migrations
 
     success "MustikaPay plugin installed."
@@ -541,6 +570,10 @@ uninstall_plugins() {
     info "Dropping plugin database tables..."
     php artisan tinker --execute='Schema::dropIfExists("mustikapay_products");' 2>/dev/null || true
     php artisan tinker --execute='Schema::dropIfExists("mustikapay_transactions");' 2>/dev/null || true
+
+    # Clear migration records so reinstall works
+    info "Clearing migration records..."
+    php artisan tinker --execute='DB::table("migrations")->where("migration", "like", "%2026_05_11%")->delete();' 2>/dev/null || true
 
     success "All plugins uninstalled."
     echo ""
