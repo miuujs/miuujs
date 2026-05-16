@@ -490,12 +490,12 @@ RESTORE_EOF
 # --- Install MustikaPay Mod ---
 install_mod() {
     print_banner
-    echo -e "  ${BOLD}Optional: Install MustikaPay Store Mod${RESET}"
+    echo -e "  ${BOLD}Optional: Install Payment Gateway MustikaPay${RESET}"
     echo ""
-    echo -e "  ${CYAN}Adds:${RESET} Balance top-up, server store, payment gateway (QRIS/VA)"
+    echo -e "  ${CYAN}Adds:${RESET} Top-up saldo, pembelian server, pembayaran QRIS/VA"
     echo ""
 
-    input "Install MustikaPay Store mod? (y/N): "
+    input "Install payment gateway MustikaPay? (y/N): "
     read -r CONFIRM
     if [[ ! "$CONFIRM" =~ [Yy] ]]; then
         info "Skipping mod installation."
