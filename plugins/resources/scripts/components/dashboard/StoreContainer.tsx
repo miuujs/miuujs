@@ -7,12 +7,40 @@ import Button from '@/components/elements/Button';
 import Input from '@/components/elements/Input';
 import Label from '@/components/elements/Label';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCoins, faServer, faCalendarTimes, faCubes } from '@fortawesome/free-solid-svg-icons';
+import { faCoins, faServer, faCalendarTimes, faCubes, faCheckCircle, faExclamationCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components/macro';
 import tw from 'twin.macro';
 
 const PlanCard = styled.div`
     ${tw`bg-neutral-800 border-2 border-neutral-700 rounded-lg p-6 transition-all duration-200 hover:border-cyan-500`};
+`;
+
+const Toast = styled.div<{ $type: 'success' | 'error' }>`
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border-radius: var(--rounded-box, 0.5rem);
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: ${props => props.$type === 'success' ? 'color-mix(in srgb, var(--green) 20%, transparent)' : 'color-mix(in srgb, var(--red) 20%, transparent)'};
+    color: ${props => props.$type === 'success' ? 'var(--green)' : 'var(--red)'};
+    border: 1px solid ${props => props.$type === 'success' ? 'color-mix(in srgb, var(--green) 40%, transparent)' : 'color-mix(in srgb, var(--red) 40%, transparent)'};
+`;
+
+const ConfirmOverlay = styled.div`
+    ${tw`fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4`};
+`;
+
+const ConfirmBox = styled.div`
+    background: var(--bg-secondary, #262626);
+    border: 1px solid var(--border, #404040);
+    border-radius: var(--rounded-box, 0.5rem);
+    padding: 1.5rem;
+    max-width: 24rem;
+    width: 100%;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 `;
 
 export default () => {
@@ -25,6 +53,13 @@ export default () => {
     const [method, setMethod] = useState('QRIS');
     const [paymentData, setPaymentData] = useState<any>(null);
     const [myServers, setMyServers] = useState<any[]>([]);
+    const [confirmProduct, setConfirmProduct] = useState<any>(null);
+    const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+    const showToast = (type: 'success' | 'error', message: string) => {
+        setToast({ type, message });
+        setTimeout(() => setToast(null), 4000);
+    };
 
     const fetchStoreData = () => {
         setLoading(true);
@@ -48,16 +83,21 @@ export default () => {
         setLoading(true);
         http.post('/api/client/store/pay', { amount, method })
             .then(({ data }) => { setPaymentData(data.payment_data); setLoading(false); })
-            .catch(error => { alert(error.response?.data?.error || 'Payment failed'); setLoading(false); });
+            .catch(error => { showToast('error', error.response?.data?.error || 'Payment failed'); setLoading(false); });
     };
 
     const onBuy = (product: any) => {
-        if (selectedEgg === 0) return alert('Silakan pilih tipe server (Egg) terlebih dahulu.');
-        if (!confirm('Beli ' + product.name + ' seharga Rp ' + Number(product.price).toLocaleString() + '?')) return;
+        if (selectedEgg === 0) return showToast('error', 'Silakan pilih tipe server (Egg) terlebih dahulu.');
+        setConfirmProduct(product);
+    };
+
+    const confirmBuy = () => {
+        if (!confirmProduct) return;
+        setConfirmProduct(null);
         setLoading(true);
-        http.post('/api/client/store/buy', { product_id: product.id, egg_id: selectedEgg })
-            .then(() => { alert('Server berhasil dipesan! Silakan cek dashboard.'); fetchStoreData(); })
-            .catch(error => { alert(error.response?.data?.error || 'Gagal memesan server.'); setLoading(false); });
+        http.post('/api/client/store/buy', { product_id: confirmProduct.id, egg_id: selectedEgg })
+            .then(() => { showToast('success', 'Server berhasil dipesan! Silakan cek dashboard.'); fetchStoreData(); })
+            .catch(error => { showToast('error', error.response?.data?.error || 'Gagal memesan server.'); setLoading(false); });
     };
 
     if (loading && !paymentData && balance === 0) return <Spinner centered />;
@@ -147,6 +187,33 @@ export default () => {
                     </ContentBox>
                 </div>
             </div>
+            {toast && (
+                <div className={'fixed top-5 right-5 z-50 animate__animated animate__fadeIn'}>
+                    <Toast $type={toast.type}>
+                        <FontAwesomeIcon icon={toast.type === 'success' ? faCheckCircle : faExclamationCircle} />
+                        <span className={'flex-1'}>{toast.message}</span>
+                        <button onClick={() => setToast(null)} className={'text-current opacity-60 hover:opacity-100'}><FontAwesomeIcon icon={faTimes} /></button>
+                    </Toast>
+                </div>
+            )}
+
+            {confirmProduct && (
+                <ConfirmOverlay>
+                    <ConfirmBox>
+                        <div className={'text-center space-y-4'}>
+                            <FontAwesomeIcon icon={faCubes} className={'text-4xl text-cyan-500'} />
+                            <h3 className={'text-xl font-bold font-header'}>{confirmProduct.name}</h3>
+                            <p className={'text-2xl text-yellow-500 font-header'}>Rp {Number(confirmProduct.price).toLocaleString()}</p>
+                            <p className={'text-sm text-neutral-400'}>Saldo akan dipotong setelah konfirmasi.</p>
+                            <div className={'flex gap-3'}>
+                                <Button isSecondary className={'flex-1'} onClick={() => setConfirmProduct(null)}>Batal</Button>
+                                <Button className={'flex-1'} onClick={confirmBuy}>Konfirmasi</Button>
+                            </div>
+                        </div>
+                    </ConfirmBox>
+                </ConfirmOverlay>
+            )}
+
             {paymentData && (
                 <div className={'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4'}>
                     <div className={'max-w-md w-full'}>
