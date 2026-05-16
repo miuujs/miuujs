@@ -178,7 +178,9 @@ determine_source() {
         REPO_DIR="/tmp/miuujs-repo"
         info "Downloading theme from GitHub..."
         rm -rf "$REPO_DIR"
-        curl -sL "https://github.com/miuujs/miuujs/archive/main.tar.gz" -o /tmp/miuujs.tar.gz
+        echo ""
+        curl -L "https://github.com/miuujs/miuujs/archive/main.tar.gz" -o /tmp/miuujs.tar.gz
+        echo ""
         tar -xzf /tmp/miuujs.tar.gz -C /tmp/
         mv /tmp/miuujs-main "$REPO_DIR"
         success "Theme downloaded to $REPO_DIR"
@@ -354,10 +356,6 @@ install_mustikapay() {
     echo ""
     echo -e "  ${CYAN}Adds:${RESET} Top-up saldo, pembelian server, pembayaran QRIS/VA"
     echo ""
-
-    if [ "$SOURCE" != "local" ]; then
-        determine_source
-    fi
 
     cd "$PANEL_DIR"
     SRC="$REPO_DIR"
@@ -622,6 +620,7 @@ plugins_menu() {
             ;;
         0)
             preflight
+            ensure_node22
             uninstall_plugins
             build_frontend
             info "Clearing caches..."
