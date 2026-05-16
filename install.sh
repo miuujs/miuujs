@@ -99,6 +99,10 @@ ensure_node22() {
         info "Node.js not found. Installing Node.js 22..."
         curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
         apt install nodejs -y
+        # Ensure /usr/bin/node takes precedence over any old node in /usr/local/bin
+        update-alternatives --remove node /usr/local/bin/node 2>/dev/null || true
+        update-alternatives --install /usr/local/bin/node node /usr/bin/node 100 2>/dev/null || true
+        hash -r
         success "Node.js installed: $(node -v)"
         return
     fi
@@ -108,9 +112,20 @@ ensure_node22() {
         info "Node.js v$(node -v) detected. Upgrading to v22..."
         curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
         apt install nodejs -y
-        success "Node.js upgraded: $(node -v)"
+        # Fix PATH: /usr/local/bin/node (old) might shadow /usr/bin/node (new)
+        update-alternatives --remove node /usr/local/bin/node 2>/dev/null || true
+        update-alternatives --install /usr/local/bin/node node /usr/bin/node 100 2>/dev/null || true
+        hash -r
+        # Verify upgrade
+        NEW_NODE=$(node -v 2>/dev/null || /usr/bin/node -v 2>/dev/null || echo "unknown")
+        success "Node.js upgraded: $NEW_NODE"
     else
         info "Node.js v$(node -v) meets requirements."
+    fi
+
+    # Ensure the correct Node is in PATH for subsequent commands
+    if [ -x /usr/bin/node ] && [ "$(node -v 2>/dev/null | cut -d'.' -f1 | sed 's/v//')" -lt 22 ]; then
+        export PATH="/usr/bin:$PATH"
     fi
 
     # Check yarn or npm
@@ -244,7 +259,17 @@ copy_theme() {
 
     [ -f "$SRC/config/miuujs.php" ] && cp "$SRC/config/miuujs.php" "$PANEL_DIR/config/"
 
+    # Save plugin routes before overwriting admin.php
+    MUSTIKAPAY_ROUTES=""
+    if grep -q "MIUUJS_PLUGIN_MUSTIKAPAY_START" "$PANEL_DIR/routes/admin.php" 2>/dev/null; then
+        MUSTIKAPAY_ROUTES=$(sed -n '/MIUUJS_PLUGIN_MUSTIKAPAY_START/,/MIUUJS_PLUGIN_MUSTIKAPAY_END/p' "$PANEL_DIR/routes/admin.php" 2>/dev/null)
+    fi
     [ -f "$SRC/routes/admin.php" ] && cp "$SRC/routes/admin.php" "$PANEL_DIR/routes/admin.php"
+    # Re-add plugin routes if they existed
+    if [ -n "$MUSTIKAPAY_ROUTES" ]; then
+        echo "" >> "$PANEL_DIR/routes/admin.php"
+        echo "$MUSTIKAPAY_ROUTES" >> "$PANEL_DIR/routes/admin.php"
+    fi
 
     if [ -d "$SRC/public/miuujs" ]; then
         cp -r "$SRC/public/miuujs" "$PANEL_DIR/public/"
@@ -291,16 +316,18 @@ build_frontend() {
     info "Building frontend assets (this may take a few minutes)..."
     echo ""
 
+    BUILD_LOG="/tmp/miuujs-build-$(date +%s).log"
     if [ "$PKG_MANAGER" = "yarn" ]; then
-        yarn run build:production 2>&1 | tail -20
+        yarn run build:production 2>&1 | tee "$BUILD_LOG" | tail -20
     else
-        npm run build:production 2>&1 | tail -20
+        npm run build:production 2>&1 | tee "$BUILD_LOG" | tail -20
     fi
+    BUILD_EXIT=${PIPESTATUS[0]}
 
-    if [ $? -eq 0 ]; then
+    if [ "$BUILD_EXIT" -eq 0 ]; then
         success "Frontend built successfully."
     else
-        error "Frontend build failed! Check the output above."
+        error "Frontend build failed! Full log: $BUILD_LOG"
         exit 1
     fi
     echo ""
@@ -332,9 +359,10 @@ finalize() {
     php artisan config:clear 2>/dev/null || true
     php artisan cache:clear 2>/dev/null || true
     php artisan optimize:clear 2>/dev/null || true
+    php artisan queue:restart 2>/dev/null || true
     success "Caches cleared."
 
-    BACKUP_PATH=$(cat /tmp/miuujs_backup_path 2>/dev/null || echo "$PANEL_DIR-backup-*")
+    BACKUP_PATH=$(cat /tmp/miuujs_backup_path 2>/dev/null || echo "")
 
     echo ""
     echo -e "  ${BOLD}==================== INSTALLATION COMPLETE ====================${RESET}"
@@ -343,8 +371,10 @@ finalize() {
     echo ""
     echo -e "  ${CYAN}Admin Config:${RESET}  ${BOLD}https://your-panel.com/admin/miuujs${RESET}"
     echo ""
-    echo -e "  ${CYAN}Backup:${RESET}        ${BOLD}$BACKUP_PATH${RESET}"
-    echo ""
+    if [ -n "$BACKUP_PATH" ] && [ -d "$BACKUP_PATH" ]; then
+        echo -e "  ${CYAN}Backup:${RESET}        ${BOLD}$BACKUP_PATH${RESET}"
+        echo ""
+    fi
     echo -e "  ${YELLOW}Note:${RESET} If you see any visual issues, clear your browser cache."
     echo ""
 }
