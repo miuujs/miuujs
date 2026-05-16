@@ -235,9 +235,6 @@ install_deps() {
     info "Installing Node.js dependencies with $PKG_MANAGER..."
     echo ""
 
-    # Use the repo's package.json so all deps (including path-browserify) match
-    # the repo's webpack.config.js and scripts
-    cp "$REPO_DIR/package.json" "$PANEL_DIR/package.json"
     cp "$REPO_DIR/tailwind.config.js" "$PANEL_DIR/tailwind.config.js"
     cp "$REPO_DIR/webpack.config.js" "$PANEL_DIR/webpack.config.js"
 
@@ -658,30 +655,27 @@ uninstall_theme() {
     info "Found backup: $BACKUP_DIR"
     echo ""
 
-    # Step 1: Remove theme-specific files (backup may not have them, so --delete won't catch)
-    info "Removing theme files..."
-    rm -f "$PANEL_DIR/config/miuujs.php"
-    rm -rf "$PANEL_DIR/app/Http/Controllers/Admin/MiuuJS"
-    rm -f "$PANEL_DIR/app/Http/Controllers/Base/LocaleController.php"
-    rm -f "$PANEL_DIR/app/Http/Requests/Base/LocaleRequest.php"
-    rm -f "$PANEL_DIR/app/Http/ViewComposers/AssetComposer.php"
-    rm -rf "$PANEL_DIR/public/miuujs"
-    rm -f "$PANEL_DIR/public/themes/pterodactyl/css/miuujs.css"
-    rm -f "$PANEL_DIR/public/themes/pterodactyl/css/pterodactyl.css"
-    rm -rf "$PANEL_DIR/resources/lang/en/miuujs"
-    rm -rf "$PANEL_DIR/resources/views/admin/miuujs"
-    success "Theme files removed."
-
-    # Step 2: Restore from backup (--delete removes plugin files not in backup)
+    # Step 1: Restore from backup (--delete auto-removes theme/plugin files,
+    # --exclude keeps user data like .env, storage, vendor, node_modules)
     info "Restoring original panel files from backup..."
-    rsync -a --delete \
+    rsync -av --delete \
         --exclude='.env' \
         --exclude='storage' \
         --exclude='node_modules' \
         --exclude='vendor' \
         --exclude='bootstrap/cache' \
-        "$BACKUP_DIR/" "$PANEL_DIR/"
-    success "Original panel files restored."
+        "$BACKUP_DIR/" "$PANEL_DIR/" 2>&1 | tee /tmp/miuujs_rsync.log | tail -5
+    local RSYNC_EXIT=${PIPESTATUS[0]}
+    local DELETED_COUNT=$(grep -c "^deleting " /tmp/miuujs_rsync.log 2>/dev/null || echo 0)
+    if [ "$DELETED_COUNT" -gt 0 ]; then
+        success "Removed $DELETED_COUNT theme/plugin files automatically."
+    fi
+    rm -f /tmp/miuujs_rsync.log
+    if [ "$RSYNC_EXIT" -ne 0 ]; then
+        error "rsync restore failed (exit $RSYNC_EXIT)."
+        return
+    fi
+    success "All files restored to pre-theme state."
     echo ""
 
     # Step 3: Clean up plugin database tables if they exist
@@ -714,11 +708,15 @@ uninstall_theme() {
 
 # --- Detection ---
 is_theme_installed() {
-    [ -f "$PANEL_DIR/config/miuujs.php" ]
+    [ -f "$PANEL_DIR/config/miuujs.php" ] &&
+    [ -d "$PANEL_DIR/app/Http/Controllers/Admin/MiuuJS" ] &&
+    [ -d "$PANEL_DIR/public/miuujs" ] &&
+    grep -q "miuujs" "$PANEL_DIR/resources/views/layouts/admin.blade.php" 2>/dev/null
 }
 
 is_mustikapay_installed() {
-    [ -f "$PANEL_DIR/app/Http/Controllers/Admin/MustikaPayController.php" ]
+    [ -f "$PANEL_DIR/app/Http/Controllers/Admin/MustikaPayController.php" ] &&
+    grep -q "MIUUJS_PLUGIN_MUSTIKAPAY_START" "$PANEL_DIR/routes/admin.php" 2>/dev/null
 }
 
 # --- Plugins Menu ---
