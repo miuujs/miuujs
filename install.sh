@@ -462,11 +462,15 @@ MIUUJS_ROUTES
         sed -i $'/\'oom_disabled\' => \'boolean\',/a\\\t\t\'is_billed\' => \'boolean\',\\n\\t\t\'expires_at\' => \'datetime\',' "$PANEL_DIR/app/Models/Server.php"
     fi
 
-    # Admin sidebar menu — copy theme's admin.blade.php (has both MiuuJS + MustikaPay links)
+    # Admin sidebar: ensure MiuuJS link exists, then add MustikaPay link after it
     if ! grep -q "mustikapay" "$PANEL_DIR/resources/views/layouts/admin.blade.php" 2>/dev/null; then
-        if [ -f "$SRC/resources/views/layouts/admin.blade.php" ]; then
-            cp "$SRC/resources/views/layouts/admin.blade.php" "$PANEL_DIR/resources/views/layouts/admin.blade.php"
+        if ! grep -q "miuujs" "$PANEL_DIR/resources/views/layouts/admin.blade.php" 2>/dev/null; then
+            if [ -f "$SRC/resources/views/layouts/admin.blade.php" ]; then
+                cp "$SRC/resources/views/layouts/admin.blade.php" "$PANEL_DIR/resources/views/layouts/admin.blade.php"
+            fi
         fi
+        MUSTIKAPAY_LINK='                                <li><a href="{{ route('"'"'admin.mustikapay'"'"') }}" data-toggle="tooltip" data-placement="bottom" title="MustikaPay Billing"><i class="fa fa-credit-card"></i></a></li>'
+        sed -i "/route('admin.miuujs')/a\\${MUSTIKAPAY_LINK}" "$PANEL_DIR/resources/views/layouts/admin.blade.php"
     fi
 
     # Fallback: restore theme frontend files if missing or Products nav was removed by uninstall
