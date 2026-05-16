@@ -115,11 +115,11 @@ const SideBar = ({ children, type }: Props) => {
                 <NavLink to={'/'} exact>
                     <ServerIcon/> {t('servers')}
                 </NavLink>
-                <NavLink to={'/products'} exact>
-                    <ShoppingCartIcon/> Products
-                </NavLink>
                 <NavLink to={'/account'} exact>
                     <UserCircleIcon/> {t('account')}
+                </NavLink>
+                <NavLink to={'/products'} exact>
+                    <ShoppingCartIcon/> Products
                 </NavLink>
             </NavigationLinks>}
             <hr className={'border-b border-gray-500 mx-5'}/>

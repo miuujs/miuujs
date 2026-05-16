@@ -437,7 +437,7 @@ MIUUJS_ROUTES
 
     # Admin sidebar menu
     if ! grep -q "mustikapay" "$PANEL_DIR/resources/views/layouts/admin.blade.php" 2>/dev/null; then
-        sed -i 's|title="MiuuJS Config">|title="MiuuJS Config">\n\t\t\t\t\t\t\t\t<li><a href="{{ route('"'"'admin.mustikapay'"'"') }}" data-toggle="tooltip" data-placement="bottom" title="MustikaPay Billing"><i class="fa fa-credit-card"></i></a></li>|' "$PANEL_DIR/resources/views/layouts/admin.blade.php"
+        sed -i '/title="MiuuJS Config">.*fa-paint-brush"><\/a><\/li>/a \\t\t\t\t\t\t\t\t<li><a href="{{ route('"'"'admin.mustikapay'"'"') }}" data-toggle="tooltip" data-placement="bottom" title="MustikaPay Billing"><i class="fa fa-credit-card"><\/i><\/a><\/li>' "$PANEL_DIR/resources/views/layouts/admin.blade.php"
     fi
 
     # Composer autoload

@@ -94,7 +94,13 @@ export default () => {
                 setMyServers(data.servers);
                 setLoading(false);
             })
-            .catch(console.error);
+            .catch(() => {
+                setBalance(0);
+                setProducts([]);
+                setEggs({});
+                setMyServers([]);
+                setLoading(false);
+            });
     };
 
     useEffect(() => { fetchData(); }, []);

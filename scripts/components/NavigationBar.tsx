@@ -189,8 +189,8 @@ export default ({ children }: Props) => {
                     </div>
                 </div>
                 <RightNavigation>
-                    <NavLink to={'/products'}><ShoppingCartIcon className={'w-5'} />Products</NavLink>
                     {layout == 3 && <ClientDropdown />}
+                    <NavLink to={'/products'}><ShoppingCartIcon className={'w-5'} />Products</NavLink>
                 </RightNavigation>
                 <button onClick={() => setIsOpen((isOpen) => !isOpen)} className={'lg:hidden'}>
                     <MenuIcon className={'w-5'} />
@@ -215,11 +215,11 @@ export default ({ children }: Props) => {
                         <NavLink to={'/'} exact>
                             <ServerIcon/> {t`servers`}
                         </NavLink>
-                        <NavLink to={'/products'} exact>
-                            <ShoppingCartIcon/> Products
-                        </NavLink>
                         <NavLink to={'/account'} exact>
                             <UserCircleIcon/> {t`account`}
+                        </NavLink>
+                        <NavLink to={'/products'} exact>
+                            <ShoppingCartIcon/> Products
                         </NavLink>
                     </div>
                     {children}
