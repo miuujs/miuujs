@@ -20,7 +20,7 @@ import ServerSelector from '@/components/elements/ServerSelector';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import UserAvatar from '@/components/UserAvatar';
 import DropdownMenu, { DropdownLinkRow, DropdownButtonRow } from '@/components/elements/DropdownMenu';
-import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon } from '@heroicons/react/outline';
+import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon, ShoppingCartIcon } from '@heroicons/react/outline';
 
 import { useTranslation } from 'react-i18next';
 
@@ -189,6 +189,7 @@ export default ({ children }: Props) => {
                     </div>
                 </div>
                 <RightNavigation>
+                    <NavLink to={'/products'}><ShoppingCartIcon className={'w-5'} />Products</NavLink>
                     {layout == 3 && <ClientDropdown />}
                 </RightNavigation>
                 <button onClick={() => setIsOpen((isOpen) => !isOpen)} className={'lg:hidden'}>
@@ -213,6 +214,9 @@ export default ({ children }: Props) => {
                     <div>
                         <NavLink to={'/'} exact>
                             <ServerIcon/> {t`servers`}
+                        </NavLink>
+                        <NavLink to={'/products'} exact>
+                            <ShoppingCartIcon/> Products
                         </NavLink>
                         <NavLink to={'/account'} exact>
                             <UserCircleIcon/> {t`account`}

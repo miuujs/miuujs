@@ -393,12 +393,8 @@ install_mustikapay() {
     if [ -f "$SRC/plugins/resources/views/admin/mustikapay.blade.php" ]; then
         cp "$SRC/plugins/resources/views/admin/mustikapay.blade.php" "$PANEL_DIR/resources/views/admin/"
     fi
-    if [ -f "$SRC/plugins/resources/scripts/components/dashboard/StoreContainer.tsx" ]; then
-        mkdir -p "$PANEL_DIR/resources/scripts/components/dashboard"
-        cp "$SRC/plugins/resources/scripts/components/dashboard/StoreContainer.tsx" "$PANEL_DIR/resources/scripts/components/dashboard/"
-    fi
 
-    # Routes
+    # Admin routes
     if ! grep -q "MIUUJS_PLUGIN_MUSTIKAPAY_START" "$PANEL_DIR/routes/admin.php" 2>/dev/null; then
         cat >> "$PANEL_DIR/routes/admin.php" << 'MIUUJS_ROUTES'
 
@@ -415,11 +411,12 @@ Route::group(['prefix' => 'mustikapay'], function () {
 MIUUJS_ROUTES
     fi
 
+    # API Routes
     if ! grep -q "MIUUJS_PLUGIN_STORE_START" "$PANEL_DIR/routes/api-client.php" 2>/dev/null; then
         cat >> "$PANEL_DIR/routes/api-client.php" << 'MIUUJS_ROUTES'
 
 /* MIUUJS_PLUGIN_STORE_START */
-/* Store Routes */
+/* Store API Routes (MustikaPay) */
 Route::prefix('/store')->group(function () {
     Route::get('/', [Client\Store\StoreController::class, 'index']);
     Route::post('/pay', [Client\Store\StoreController::class, 'pay']);
@@ -428,28 +425,6 @@ Route::prefix('/store')->group(function () {
 });
 /* MIUUJS_PLUGIN_STORE_END */
 MIUUJS_ROUTES
-    fi
-
-    # DashboardRouter
-    DASHBOARD_ROUTER="$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx"
-    if ! grep -q "StoreContainer" "$DASHBOARD_ROUTER" 2>/dev/null; then
-        sed -i "s|import { NotFound } from '@/components/elements/ScreenBlock';|import { NotFound } from '@/components/elements/ScreenBlock';\nimport StoreContainer from '@/components/dashboard/StoreContainer';|" "$DASHBOARD_ROUTER"
-        sed -i "/<DashboardContainer \/>/a \\\n\\t\\t\\t\\t\\t\\t\\t\\t<Route path={'\\/store'} exact>\n\\t\\t\\t\\t\\t\\t\\t\\t\\t<StoreContainer />\n\\t\\t\\t\\t\\t\\t\\t\\t<\\/Route>" "$DASHBOARD_ROUTER"
-    fi
-
-    # SideBar
-    SIDEBAR="$PANEL_DIR/resources/scripts/components/SideBar.tsx"
-    if ! grep -q "ShoppingCartIcon" "$SIDEBAR" 2>/dev/null; then
-        sed -i "s|import { ServerIcon, UserCircleIcon, DotsVerticalIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon } from '@heroicons/react/outline';|import { ServerIcon, UserCircleIcon, DotsVerticalIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, ShoppingCartIcon } from '@heroicons/react/outline';|" "$SIDEBAR"
-        sed -i "/<NavLink to={'\\/account'} exact>/,/<\\/NavLink>/a \\t\\t\\t\\t\\t\\t<NavLink to={'\\/store'} exact>\n\\t\\t\\t\\t\\t\\t\\t<ShoppingCartIcon/> Store\n\\t\\t\\t\\t\\t\\t<\\/NavLink>" "$SIDEBAR"
-    fi
-
-    # NavigationBar
-    NAVBAR="$PANEL_DIR/resources/scripts/components/NavigationBar.tsx"
-    if ! grep -q "ShoppingCartIcon" "$NAVBAR" 2>/dev/null; then
-        sed -i "s|import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon } from '@heroicons/react/outline';|import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon, ShoppingCartIcon } from '@heroicons/react/outline';|" "$NAVBAR"
-        sed -i "s|{layout == 3 && <ClientDropdown />}|<NavLink to={'\\/store'}><ShoppingCartIcon className={'w-5'} \\/>Store<\\/NavLink>\n\\t\\t\\t\\t\\t{layout == 3 && <ClientDropdown />}|" "$NAVBAR"
-        sed -i "/<NavLink to={'\\/account'} exact>/,/<\\/NavLink> {t\`account\`}<\\/NavLink>/a \\n\\t\\t\\t\\t\\t\\t\\t\\t<NavLink to={'\\/store'} exact>\n\\t\\t\\t\\t\\t\\t\\t\\t\\t<ShoppingCartIcon\\/> Store\n\\t\\t\\t\\t\\t\\t\\t\\t<\\/NavLink>" "$NAVBAR"
     fi
 
     # Model modifications
