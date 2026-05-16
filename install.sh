@@ -399,9 +399,10 @@ install_mustikapay() {
     fi
 
     # Routes
-    if ! grep -q "MustikaPay" "$PANEL_DIR/routes/admin.php" 2>/dev/null; then
-        cat << 'ROUTES' >> "$PANEL_DIR/routes/admin.php"
+    if ! grep -q "MIUUJS_PLUGIN_MUSTIKAPAY_START" "$PANEL_DIR/routes/admin.php" 2>/dev/null; then
+        cat >> "$PANEL_DIR/routes/admin.php" << 'MIUUJS_ROUTES'
 
+/* MIUUJS_PLUGIN_MUSTIKAPAY_START */
 /* MustikaPay Billing Routes */
 Route::group(['prefix' => 'mustikapay'], function () {
     Route::get('/', [Admin\MustikaPayController::class, 'index'])->name('admin.mustikapay');
@@ -409,12 +410,14 @@ Route::group(['prefix' => 'mustikapay'], function () {
     Route::post('/product', [Admin\MustikaPayController::class, 'addProduct'])->name('admin.mustikapay.product.add');
     Route::delete('/product/{id}', [Admin\MustikaPayController::class, 'deleteProduct'])->name('admin.mustikapay.product.delete');
 });
-ROUTES
+/* MIUUJS_PLUGIN_MUSTIKAPAY_END */
+MIUUJS_ROUTES
     fi
 
-    if ! grep -q "/store" "$PANEL_DIR/routes/api-client.php" 2>/dev/null; then
-        cat << 'ROUTES' >> "$PANEL_DIR/routes/api-client.php"
+    if ! grep -q "MIUUJS_PLUGIN_STORE_START" "$PANEL_DIR/routes/api-client.php" 2>/dev/null; then
+        cat >> "$PANEL_DIR/routes/api-client.php" << 'MIUUJS_ROUTES'
 
+/* MIUUJS_PLUGIN_STORE_START */
 /* Store Routes */
 Route::prefix('/store')->group(function () {
     Route::get('/', [Client\Store\StoreController::class, 'index']);
@@ -422,7 +425,8 @@ Route::prefix('/store')->group(function () {
     Route::post('/buy', [Client\Store\StoreController::class, 'buy']);
     Route::post('/webhook', [Client\Store\StoreController::class, 'webhook']);
 });
-ROUTES
+/* MIUUJS_PLUGIN_STORE_END */
+MIUUJS_ROUTES
     fi
 
     # DashboardRouter
@@ -473,6 +477,107 @@ ROUTES
     echo ""
 }
 
+# --- Uninstall Plugins ---
+uninstall_plugins() {
+    print_banner
+    echo -e "  ${BOLD}Uninstall Plugins${RESET}"
+    echo ""
+
+    warning "This will remove all plugin files, routes, and database tables."
+    input "Are you sure? (y/N): "
+    read -r CONFIRM
+    if [[ ! "$CONFIRM" =~ [Yy] ]]; then
+        info "Cancelled."
+        return
+    fi
+
+    cd "$PANEL_DIR"
+
+    info "Removing plugin files..."
+
+    # Remove controllers
+    rm -f "$PANEL_DIR/app/Http/Controllers/Admin/MustikaPayController.php"
+    rm -rf "$PANEL_DIR/app/Http/Controllers/Api/Client/Store"
+    rm -rf "$PANEL_DIR/app/Extensions/Payment/MustikaPay"
+
+    # Remove models
+    rm -f "$PANEL_DIR/app/Models/MustikaPayProduct.php"
+    rm -f "$PANEL_DIR/app/Models/MustikaPayTransaction.php"
+
+    # Remove views
+    rm -f "$PANEL_DIR/resources/views/admin/mustikapay.blade.php"
+
+    # Remove migration files
+    rm -f "$PANEL_DIR/database/migrations/2026_05_11_043856_add_balance_to_users_table.php"
+    rm -f "$PANEL_DIR/database/migrations/2026_05_11_043900_create_mustikapay_transactions_table.php"
+    rm -f "$PANEL_DIR/database/migrations/2026_05_11_050142_add_billing_to_servers_table.php"
+    rm -f "$PANEL_DIR/database/migrations/2026_05_11_055912_create_mustikapay_products_table.php"
+
+    # Remove StoreContainer.tsx from plugins
+    rm -f "$PANEL_DIR/resources/scripts/components/dashboard/StoreContainer.tsx"
+
+    # Remove route entries from admin.php using markers
+    if [ -f "$PANEL_DIR/routes/admin.php" ]; then
+        sed -i '/MIUUJS_PLUGIN_MUSTIKAPAY_START/,/MIUUJS_PLUGIN_MUSTIKAPAY_END/d' "$PANEL_DIR/routes/admin.php"
+    fi
+
+    # Remove route entries from api-client.php using markers
+    if [ -f "$PANEL_DIR/routes/api-client.php" ]; then
+        sed -i '/MIUUJS_PLUGIN_STORE_START/,/MIUUJS_PLUGIN_STORE_END/d' "$PANEL_DIR/routes/api-client.php"
+    fi
+
+    # Revert DashboardRouter
+    DASHBOARD_ROUTER="$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx"
+    if [ -f "$DASHBOARD_ROUTER" ]; then
+        sed -i "/import StoreContainer from '@\/components\/dashboard\/StoreContainer';/d" "$DASHBOARD_ROUTER"
+        sed -i "/<Route path={'\/store'} exact>/,/<\/Route>/d" "$DASHBOARD_ROUTER"
+    fi
+
+    # Revert SideBar
+    SIDEBAR="$PANEL_DIR/resources/scripts/components/SideBar.tsx"
+    if [ -f "$SIDEBAR" ]; then
+        sed -i "s|, ShoppingCartIcon } from '@heroicons/react/outline'|} from '@heroicons/react/outline'|" "$SIDEBAR"
+        sed -i "/<NavLink to={'\/store'} exact>/,/<\/NavLink>/d" "$SIDEBAR"
+    fi
+
+    # Revert NavigationBar
+    NAVBAR="$PANEL_DIR/resources/scripts/components/NavigationBar.tsx"
+    if [ -f "$NAVBAR" ]; then
+        sed -i "s|, ShoppingCartIcon } from '@heroicons/react/outline'|} from '@heroicons/react/outline'|" "$NAVBAR"
+        sed -i "/<NavLink to={'\/store'}><ShoppingCartIcon/,/<\/NavLink>/d" "$NAVBAR"
+    fi
+
+    # Revert User.php fillable
+    if grep -q "'balance'" "$PANEL_DIR/app/Models/User.php" 2>/dev/null; then
+        sed -i "/'balance',/d" "$PANEL_DIR/app/Models/User.php"
+    fi
+
+    # Revert Server.php casts
+    if grep -q "'is_billed'" "$PANEL_DIR/app/Models/Server.php" 2>/dev/null; then
+        sed -i "/'is_billed' => 'boolean',/d" "$PANEL_DIR/app/Models/Server.php"
+        sed -i "/'expires_at' => 'datetime',/d" "$PANEL_DIR/app/Models/Server.php"
+    fi
+
+    # Revert admin sidebar
+    if grep -q "mustikapay" "$PANEL_DIR/resources/views/layouts/admin.blade.php" 2>/dev/null; then
+        sed -i '/mustikapay/d' "$PANEL_DIR/resources/views/layouts/admin.blade.php"
+    fi
+
+    # Remove MustikaPay namespace from composer.json
+    if grep -q "MustikaPay" "$PANEL_DIR/composer.json" 2>/dev/null; then
+        sed -i '/"MustikaPay\\\\": "app\/Extensions\/Payment\/MustikaPay\/",/d' "$PANEL_DIR/composer.json"
+    fi
+    composer dump-autoload 2>/dev/null || true
+
+    # Drop plugin tables
+    info "Dropping plugin database tables..."
+    php artisan tinker --execute='Schema::dropIfExists("mustikapay_products");' 2>/dev/null || true
+    php artisan tinker --execute='Schema::dropIfExists("mustikapay_transactions");' 2>/dev/null || true
+
+    success "All plugins uninstalled."
+    echo ""
+}
+
 # --- Detection ---
 is_theme_installed() {
     [ -f "$PANEL_DIR/config/miuujs.php" ]
@@ -482,13 +587,68 @@ is_mustikapay_installed() {
     [ -f "$PANEL_DIR/app/Http/Controllers/Admin/MustikaPayController.php" ]
 }
 
+# --- Plugins Menu ---
+plugins_menu() {
+    print_banner
+    echo -e "  ${BOLD}Plugins Menu${RESET}"
+    echo ""
+    echo "  Available plugins:"
+    echo "  [1] MustikaPay Payment Gateway"
+    echo ""
+    echo "  [0] Uninstall All Plugins"
+    echo "  [b] Back to Main Menu"
+    echo ""
+
+    input "Select option [0-1/b]: "
+    read -r PLUGIN_ACTION
+    case "$PLUGIN_ACTION" in
+        1)
+            preflight
+            if is_mustikapay_installed; then
+                warning "MustikaPay is already installed!"
+                input "Press Enter to return..."
+                read -r
+                plugins_menu
+                return
+            fi
+            determine_source
+            ensure_node22
+            install_mustikapay
+            build_frontend
+            finalize
+            ;;
+        0)
+            preflight
+            uninstall_plugins
+            build_frontend
+            info "Clearing caches..."
+            php artisan view:clear 2>/dev/null || true
+            php artisan config:clear 2>/dev/null || true
+            php artisan cache:clear 2>/dev/null || true
+            php artisan optimize:clear 2>/dev/null || true
+            success "Done."
+            echo ""
+            ;;
+        b|B)
+            main_menu
+            return
+            ;;
+        *)
+            error "Invalid option."
+            input "Press Enter to try again..."
+            read -r
+            plugins_menu
+            ;;
+    esac
+}
+
 # --- Main Menu ---
 main_menu() {
     print_banner
     echo -e "  ${BOLD}What would you like to do?${RESET}"
     echo ""
     echo "  [1] Install MiuuJS Theme"
-    echo "  [2] Install MustikaPay Plugin"
+    echo "  [2] Install Plugins"
     echo "  [3] Exit"
     echo ""
 
@@ -513,19 +673,7 @@ main_menu() {
             finalize
             ;;
         2)
-            preflight
-            if is_mustikapay_installed; then
-                warning "MustikaPay Plugin is already installed!"
-                input "Press Enter to return to menu..."
-                read -r
-                main_menu
-                return
-            fi
-            ensure_node22
-            determine_source
-            install_mustikapay
-            build_frontend
-            finalize
+            plugins_menu
             ;;
         3)
             exit 0
