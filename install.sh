@@ -464,6 +464,8 @@ MIUUJS_ROUTES
             sed -i "s|ServerIcon } from '@heroicons/react/outline'|ServerIcon, ShoppingCartIcon } from '@heroicons/react/outline'|" "$NAVBAR"
         fi
         sed -i "s|<RightNavigation>|<RightNavigation>\n\t\t\t\t\t<NavLink to={'\/products'}><ShoppingCartIcon className={'w-5'} \/>Products<\/NavLink>|" "$NAVBAR"
+        # Add mobile Products link inside MobileLinks (after Account)
+        sed -i "/<NavLink to={'\/account'} exact>/a \\\t\t\t\t\t\t<NavLink to={'\/products'} exact>\n\t\t\t\t\t\t\t<ShoppingCartIcon\/> Products\n\t\t\t\t\t\t<\/NavLink>" "$NAVBAR"
     fi
 
     # Composer autoload
