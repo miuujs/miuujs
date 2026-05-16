@@ -119,6 +119,7 @@ class StoreController extends ClientApiController
     public function webhook(Request $request): JsonResponse
     {
         $data = $request->all();
+        Log::info('MustikaPay webhook received', $data);
         $status = strtoupper($data['status'] ?? ($data['data']['status'] ?? ''));
         if ($status === 'SUCCESS' || $status === 'PAID') {
             $ref = $data['reference'] ?? ($data['data']['ref_no'] ?? ($data['data']['reference'] ?? null));
@@ -126,8 +127,10 @@ class StoreController extends ClientApiController
             if ($transaction && $transaction->status === 'pending') {
                 $transaction->update(['status' => 'success']);
                 $transaction->user->increment('balance', $transaction->amount);
+                Log::info("MustikaPay: transaction {$ref} confirmed, balance updated");
                 return new JsonResponse(['status' => 'OK']);
             }
+            Log::warning("MustikaPay: transaction {$ref} not found or already processed");
         }
         return new JsonResponse(['status' => 'ignored'], 200);
     }
