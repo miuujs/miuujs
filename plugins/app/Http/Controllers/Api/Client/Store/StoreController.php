@@ -22,22 +22,13 @@ class StoreController extends ClientApiController
     public function index(Request $request, SettingsRepositoryInterface $settings): JsonResponse
     {
         $user = $request->user();
-        
-        // Fetch nests and their eggs for user selection
-        $nests = Nest::with('eggs')->get()->map(function($nest) {
-            return [
-                'id' => $nest->id,
-                'name' => $nest->name,
-                'eggs' => $nest->eggs->map(function($egg) {
-                    return ['id' => $egg->id, 'name' => $egg->name];
-                })
-            ];
-        });
+
+        $eggs = Egg::with('nest')->get()->groupBy(fn($e) => $e->nest->name ?? 'Unknown');
 
         return new JsonResponse([
             'balance' => (float) $user->balance,
             'products' => MustikaPayProduct::all(),
-            'nests' => $nests,
+            'eggs' => $eggs,
             'transactions' => MustikaPayTransaction::where('user_id', $user->id)->orderBy('created_at', 'desc')->limit(5)->get(),
             'servers' => Server::where('owner_id', $user->id)->where('is_billed', true)->get(),
         ]);
@@ -71,7 +62,7 @@ class StoreController extends ClientApiController
     {
         $request->validate([
             'product_id' => 'required|integer',
-            'egg_id' => 'required|integer|exists:eggs,id',
+            'egg_id' => 'required|integer',
         ]);
 
         $user = $request->user();

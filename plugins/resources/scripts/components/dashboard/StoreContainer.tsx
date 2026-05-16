@@ -7,28 +7,45 @@ import Button from '@/components/elements/Button';
 import Input from '@/components/elements/Input';
 import Label from '@/components/elements/Label';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCoins, faServer, faCalendarTimes, faCubes, faCheckCircle, faExclamationCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCoins, faServer, faCalendarTimes, faTimes, faPlus, faWallet, faMicrochip, faMemory, faHdd } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components/macro';
 import tw from 'twin.macro';
+import { useStoreActions } from 'easy-peasy';
+import { Actions, ApplicationStore } from '@/state';
 
-const PlanCard = styled.div`
-    ${tw`bg-neutral-800 border-2 border-neutral-700 rounded-lg p-6 transition-all duration-200 hover:border-cyan-500`};
+const ProductCard = styled.div`
+    ${tw`bg-gray-700 rounded-box overflow-hidden`};
+
+    .card-banner {
+        ${tw`w-full relative px-4 pt-3 z-10`};
+
+        .banner-bg {
+            height: 48px;
+            ${tw`w-full absolute top-0 left-0 z-[-1]`};
+        }
+
+        .card-avatar {
+            ${tw`w-[44px] h-[44px] rounded-component border-4 border-gray-700 overflow-hidden bg-gray-700`};
+            
+            img, svg {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+    }
+
+    .card-body {
+        ${tw`px-4 py-3`};
+    }
 `;
 
-const Toast = styled.div<{ $type: 'success' | 'error' }>`
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem 1.25rem;
-    border-radius: var(--rounded-box, 0.5rem);
-    font-size: 0.875rem;
-    font-weight: 500;
-    background: ${props => props.$type === 'success' ? '#065f46' : '#7f1d1d'};
-    color: ${props => props.$type === 'success' ? '#6ee7b7' : '#fca5a5'};
-    border: 1px solid ${props => props.$type === 'success' ? '#10b981' : '#ef4444'};
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);
-    max-width: 28rem;
-    width: 100%;
+const SpecBadge = styled.div`
+    ${tw`inline-flex items-center gap-1 text-xs text-neutral-400 bg-neutral-900 px-2 py-0.5 rounded`};
+    
+    svg {
+        ${tw`text-cyan-500 text-[10px]`};
+    }
 `;
 
 const ConfirmOverlay = styled.div`
@@ -36,135 +53,101 @@ const ConfirmOverlay = styled.div`
 `;
 
 const ConfirmBox = styled.div`
+    ${tw`bg-neutral-800 border border-neutral-700 rounded-box p-6 shadow-2xl max-w-md w-full`};
+`;
+
+const TopUpOverlay = styled.div`
+    ${tw`fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4`};
+`;
+
+const TopUpBox = styled.div`
     ${tw`bg-neutral-800 border border-neutral-700 rounded-box p-6 shadow-2xl max-w-sm w-full`};
 `;
+
+const DEFAULT_PRODUCT_IMAGE = 'https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61';
+
+const ProductAvatar = ({ image, seed }: { image?: string; seed: string }) => {
+    const src = image || DEFAULT_PRODUCT_IMAGE;
+    return <img src={src} alt={seed} />;
+};
 
 export default () => {
     const [loading, setLoading] = useState(true);
     const [balance, setBalance] = useState(0);
     const [products, setProducts] = useState<any[]>([]);
-    const [nests, setNests] = useState<any[]>([]);
-    const [selectedEgg, setSelectedEgg] = useState<number>(0);
-    const [amount, setAmount] = useState(10000);
-    const [method, setMethod] = useState('QRIS');
-    const [paymentData, setPaymentData] = useState<any>(null);
+    const [eggs, setEggs] = useState<Record<string, any[]>>({});
+    const [selectedEggId, setSelectedEggId] = useState<number | null>(null);
     const [myServers, setMyServers] = useState<any[]>([]);
     const [confirmProduct, setConfirmProduct] = useState<any>(null);
-    const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+    const [topUpOpen, setTopUpOpen] = useState(false);
+    const [topUpAmount, setTopUpAmount] = useState(10000);
+    const [topUpMethod, setTopUpMethod] = useState('QRIS');
+    const [paymentData, setPaymentData] = useState<any>(null);
 
-    const showToast = (type: 'success' | 'error', message: string) => {
-        setToast({ type, message });
-        setTimeout(() => setToast(null), 4000);
-    };
+    const { addFlash } = useStoreActions((actions: Actions<ApplicationStore>) => actions.flashes);
 
-    const fetchStoreData = () => {
+    const fetchData = () => {
         setLoading(true);
-        http.get('/api/client/store')
+        http.get('/api/client/products')
             .then(({ data }) => {
                 setBalance(data.balance);
                 setProducts(data.products);
-                setNests(data.nests);
+                setEggs(data.eggs || {});
                 setMyServers(data.servers);
-                if (data.nests.length > 0 && data.nests[0].eggs.length > 0) {
-                    setSelectedEgg(data.nests[0].eggs[0].id);
-                }
                 setLoading(false);
             })
             .catch(console.error);
     };
 
-    useEffect(() => { fetchStoreData(); }, []);
-
-    const onPay = () => {
-        setLoading(true);
-        http.post('/api/client/store/pay', { amount, method })
-            .then(({ data }) => { setPaymentData(data.payment_data); setLoading(false); })
-            .catch(error => { showToast('error', error.response?.data?.error || 'Payment failed'); setLoading(false); });
-    };
-
-    const onBuy = (product: any) => {
-        if (selectedEgg === 0) return showToast('error', 'Silakan pilih tipe server (Egg) terlebih dahulu.');
-        setConfirmProduct(product);
-    };
+    useEffect(() => { fetchData(); }, []);
 
     const confirmBuy = () => {
-        if (!confirmProduct) return;
-        setConfirmProduct(null);
+        if (!confirmProduct || !selectedEggId) return;
         setLoading(true);
-        http.post('/api/client/store/buy', { product_id: confirmProduct.id, egg_id: selectedEgg })
-            .then(() => { showToast('success', 'Server berhasil dipesan! Silakan cek dashboard.'); fetchStoreData(); })
-            .catch(error => { showToast('error', error.response?.data?.error || 'Gagal memesan server.'); setLoading(false); });
+        setConfirmProduct(null);
+        http.post('/api/client/products/buy', { product_id: confirmProduct.id, egg_id: selectedEggId })
+            .then(() => {
+                addFlash({ type: 'success', title: 'Success', message: 'Server ordered successfully! Check your dashboard.' });
+                fetchData();
+            })
+            .catch(error => {
+                addFlash({ type: 'error', title: 'Error', message: error.response?.data?.error || 'Failed to order server.' });
+                setLoading(false);
+            });
     };
 
-    if (loading && !paymentData && balance === 0) return <Spinner centered />;
+    const onTopUp = () => {
+        setLoading(true);
+        setTopUpOpen(false);
+        http.post('/api/client/products/pay', { amount: topUpAmount, method: topUpMethod })
+            .then(({ data }) => { setPaymentData(data.payment_data); setLoading(false); })
+            .catch(error => {
+                addFlash({ type: 'error', title: 'Error', message: error.response?.data?.error || 'Payment failed' });
+                setLoading(false);
+            });
+    };
+
+    if (loading && balance === 0 && products.length === 0) return <Spinner centered />;
 
     return (
-        <PageContentBlock title={'Store & Billing'}>
+        <PageContentBlock title={'Products'}>
             <div className={'grid grid-cols-1 md:grid-cols-3 gap-6'}>
                 <div className={'md:col-span-1 space-y-6'}>
-                    <ContentBox title={'Saldo Saya'}>
+                    <ContentBox title={'My Balance'}>
                         <div className={'flex items-center justify-between'}>
                             <div>
-                                <p className={'text-sm text-neutral-400 uppercase'}>Saldo Saat Ini</p>
-                                <p className={'text-3xl font-bold font-header text-yellow-500'}>Rp {Number(balance).toLocaleString()}</p>
+                                <p className={'text-sm text-neutral-400 uppercase'}>Current Balance</p>
+                                <p className={'text-3xl font-bold text-yellow-500'}>Rp {Number(balance).toLocaleString()}</p>
                             </div>
                             <FontAwesomeIcon icon={faCoins} className={'text-4xl text-neutral-600'} />
                         </div>
+                        <Button className={'w-full mt-4'} onClick={() => setTopUpOpen(true)}>
+                            <FontAwesomeIcon icon={faPlus} className={'mr-2'} /> Top Up Balance
+                        </Button>
                     </ContentBox>
 
-                    <ContentBox title={'Tipe Server'}>
-                        <div className={'space-y-4'}>
-                            <Label>Pilih Jenis Server</Label>
-                            <select 
-                                className={'w-full p-2 bg-neutral-900 border border-neutral-700 rounded text-neutral-200'}
-                                value={selectedEgg}
-                                onChange={(e) => setSelectedEgg(Number(e.target.value))}
-                            >
-                                {nests.map(nest => (
-                                    <optgroup key={nest.id} label={nest.name}>
-                                        {nest.eggs.map((egg: any) => (
-                                            <option key={egg.id} value={egg.id}>{egg.name}</option>
-                                        ))}
-                                    </optgroup>
-                                ))}
-                            </select>
-                            <p className={'text-xs text-neutral-400 italic'}>Tipe server ini menentukan software yang akan diinstal (misal: Minecraft, NodeJS, dll).</p>
-                        </div>
-                    </ContentBox>
-
-                    <ContentBox title={'Top Up Saldo'}>
-                        <div className={'space-y-4'}>
-                            <Label>Nominal</Label>
-                            <Input type={'number'} value={amount} onChange={(e: any) => setAmount(Number(e.target.value))} />
-                            <Label>Metode Pembayaran</Label>
-                            <select className={'w-full p-2 bg-neutral-900 border border-neutral-700 rounded text-neutral-200'} value={method} onChange={(e: any) => setMethod(e.target.value)}>
-                                <option value={'QRIS'}>QRIS (OVO, Dana, Shopee, dll)</option>
-                                <option value={'BCA'}>BCA Virtual Account</option>
-                                <option value={'BNI'}>BNI Virtual Account</option>
-                                <option value={'BRI'}>BRI Virtual Account</option>
-                            </select>
-                            <Button className={'w-full'} onClick={onPay}>Deposit Sekarang</Button>
-                        </div>
-                    </ContentBox>
-                </div>
-
-                <div className={'md:col-span-2 space-y-6'}>
-                    <div className={'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'}>
-                        {products.map(p => (
-                            <PlanCard key={p.id}>
-                                <h3 className={'text-xl font-bold'}>{p.name}</h3>
-                                <p className={'text-2xl text-cyan-500 font-header mb-4'}>Rp {Number(p.price).toLocaleString()}</p>
-                                <ul className={'text-sm text-neutral-400 space-y-2 mb-6'}>
-                                    <li>{p.ram}MB RAM</li>
-                                    <li>{p.disk}MB SSD</li>
-                                    <li>{p.cpu}% CPU</li>
-                                </ul>
-                                <Button className={'w-full'} onClick={() => onBuy(p)}>Beli</Button>
-                            </PlanCard>
-                        ))}
-                    </div>
-                    <ContentBox title={'Server Aktif Saya'}>
-                        {myServers.length === 0 ? <p className={'text-center text-neutral-400 py-4'}>Belum ada server yang dibeli.</p> : (
+                    <ContentBox title={'My Active Servers'}>
+                        {myServers.length === 0 ? <p className={'text-center text-neutral-400 py-4'}>No servers purchased yet.</p> : (
                             <div className={'space-y-2'}>
                                 {myServers.map(s => (
                                     <div key={s.id} className={'flex items-center justify-between bg-neutral-900 p-3 rounded'}>
@@ -173,7 +156,7 @@ export default () => {
                                             <div><p className={'font-bold'}>{s.name}</p><p className={'text-xs text-neutral-400'}>{s.uuidShort}</p></div>
                                         </div>
                                         <div className={'text-right'}>
-                                            <p className={'text-xs text-neutral-400 uppercase'}>Berakhir Pada</p>
+                                            <p className={'text-xs text-neutral-400 uppercase'}>Expires On</p>
                                             <p className={'text-sm text-red-400'}><FontAwesomeIcon icon={faCalendarTimes} className={'mr-1'} />{new Date(s.expires_at).toLocaleDateString()}</p>
                                         </div>
                                     </div>
@@ -182,49 +165,119 @@ export default () => {
                         )}
                     </ContentBox>
                 </div>
-            </div>
-            {toast && (
-                <div className={'fixed bottom-0 left-0 right-0 z-50 flex justify-center p-4 pointer-events-none sm:bottom-5 sm:left-auto sm:right-5 sm:p-0'}>
-                    <Toast $type={toast.type} className={'pointer-events-auto'}>
-                        <FontAwesomeIcon icon={toast.type === 'success' ? faCheckCircle : faExclamationCircle} />
-                        <span className={'flex-1 text-sm sm:text-base'}>{toast.message}</span>
-                        <button onClick={() => setToast(null)} className={'text-current opacity-60 hover:opacity-100 ml-auto shrink-0'}><FontAwesomeIcon icon={faTimes} /></button>
-                    </Toast>
+
+                <div className={'md:col-span-2 space-y-6'}>
+                    <ContentBox title={'Available Products'}>
+                        {products.length === 0 ? <p className={'text-center text-neutral-400 py-8'}>No products available.</p> : (
+                            <div className={'grid lg:grid-cols-2 gap-4'}>
+                                {products.map(p => (
+                                    <ProductCard key={p.id}>
+                                        <div className={'card-banner'}>
+                                            <div className={'banner-bg'} style={{ background: p.image ? `url(${p.image}) center/cover` : `linear-gradient(90deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 25%, transparent) 100%)` }} />
+                                            <div className={'card-avatar'}>
+                                                <ProductAvatar image={p.image} seed={p.name} />
+                                            </div>
+                                        </div>
+                                        <div className={'card-body'}>
+                                            <h3 className={'text-gray-300 font-medium'}>{p.name}</h3>
+                                            {p.description && <p className={'text-xs text-neutral-400 mt-0.5'}>{p.description}</p>}
+                                            <p className={'text-lg text-cyan-500 font-bold mt-1 mb-2'}>Rp {Number(p.price).toLocaleString()}</p>
+                                            <div className={'flex flex-wrap gap-1.5 mb-3'}>
+                                                {p.ram > 0 && <SpecBadge><FontAwesomeIcon icon={faMemory} /> {p.ram}MB</SpecBadge>}
+                                                {p.disk > 0 && <SpecBadge><FontAwesomeIcon icon={faHdd} /> {p.disk}MB</SpecBadge>}
+                                                {p.cpu > 0 && <SpecBadge><FontAwesomeIcon icon={faMicrochip} /> {p.cpu}%</SpecBadge>}
+                                            </div>
+                                            <Button className={'w-full'} onClick={() => { setConfirmProduct(p); setSelectedEggId(null); }}>Buy Now</Button>
+                                        </div>
+                                    </ProductCard>
+                                ))}
+                            </div>
+                        )}
+                    </ContentBox>
                 </div>
-            )}
+            </div>
 
             {confirmProduct && (
                 <ConfirmOverlay>
                     <ConfirmBox>
-                        <div className={'text-center space-y-4'}>
-                            <FontAwesomeIcon icon={faCubes} className={'text-4xl text-cyan-500'} />
-                            <h3 className={'text-xl font-bold font-header'}>{confirmProduct.name}</h3>
-                            <p className={'text-2xl text-yellow-500 font-header'}>Rp {Number(confirmProduct.price).toLocaleString()}</p>
-                            <p className={'text-sm text-neutral-400'}>Saldo akan dipotong setelah konfirmasi.</p>
+                        <div className={'space-y-4'}>
+                            <div className={'flex items-center justify-between'}>
+                                <h3 className={'text-xl font-bold'}>Confirm Purchase</h3>
+                                <button onClick={() => setConfirmProduct(null)} className={'text-neutral-400 hover:text-white'}><FontAwesomeIcon icon={faTimes} /></button>
+                            </div>
+                            <div className={'bg-neutral-900 p-4 rounded-lg'}>
+                                <p className={'font-bold text-lg'}>{confirmProduct.name}</p>
+                                <p className={'text-xl text-yellow-500'}>Rp {Number(confirmProduct.price).toLocaleString()}</p>
+                            </div>
+                            <div>
+                                <Label>Server Type</Label>
+                                <select
+                                    className={'w-full p-2 bg-neutral-900 border border-neutral-700 rounded text-neutral-200'}
+                                    value={selectedEggId ?? ''}
+                                    onChange={(e: any) => setSelectedEggId(Number(e.target.value))}
+                                >
+                                    <option value={''} disabled>Select a server type...</option>
+                                    {Object.entries(eggs).map(([nestName, nestEggs]) => (
+                                        <optgroup key={nestName} label={nestName}>
+                                            {nestEggs.map((egg: any) => (
+                                                <option key={egg.id} value={egg.id}>{egg.name}</option>
+                                            ))}
+                                        </optgroup>
+                                    ))}
+                                </select>
+                            </div>
+                            <p className={'text-sm text-neutral-400'}>Your balance will be deducted after confirmation.</p>
                             <div className={'flex gap-3'}>
-                                <Button isSecondary className={'flex-1'} onClick={() => setConfirmProduct(null)}>Batal</Button>
-                                <Button className={'flex-1'} onClick={confirmBuy}>Konfirmasi</Button>
+                                <Button isSecondary className={'flex-1'} onClick={() => setConfirmProduct(null)}>Cancel</Button>
+                                <Button className={'flex-1'} onClick={confirmBuy} disabled={!selectedEggId}>Confirm</Button>
                             </div>
                         </div>
                     </ConfirmBox>
                 </ConfirmOverlay>
             )}
 
-            {paymentData && (
-                <div className={'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4'}>
-                    <div className={'max-w-md w-full'}>
-                        <div className={'bg-neutral-800 border border-neutral-700 rounded-box p-6 shadow-2xl'}>
-                            <h3 className={'text-xl font-bold font-header text-center mb-6'}>Selesaikan Pembayaran</h3>
-                            <div className={'text-center space-y-4'}>
-                                {method === 'QRIS'
-                                    ? <div className={'bg-white p-4 rounded-lg inline-block'}><img src={'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(paymentData.qr_content)} /></div>
-                                    : <><p className={'text-neutral-400'}>Transfer ke Virtual Account:</p><p className={'text-3xl sm:text-4xl font-mono font-bold text-cyan-500 break-all'}>{paymentData.va_number}</p><p className={'text-sm text-neutral-400'}>Bank: {method}</p></>}
-                                <p className={'text-xs text-yellow-500 italic'}>Saldo akan bertambah otomatis setelah pembayaran dikonfirmasi.</p>
-                                <Button isSecondary className={'w-full'} onClick={() => setPaymentData(null)}>Tutup</Button>
+            {topUpOpen && (
+                <TopUpOverlay>
+                    <TopUpBox>
+                        <div className={'space-y-4'}>
+                            <div className={'flex items-center justify-between'}>
+                                <h3 className={'text-xl font-bold'}>Top Up Balance</h3>
+                                <button onClick={() => setTopUpOpen(false)} className={'text-neutral-400 hover:text-white'}><FontAwesomeIcon icon={faTimes} /></button>
                             </div>
+                            <div>
+                                <Label>Amount (Rp)</Label>
+                                <Input type={'number'} value={topUpAmount} onChange={(e: any) => setTopUpAmount(Number(e.target.value))} />
+                            </div>
+                            <div>
+                                <Label>Payment Method</Label>
+                                <select className={'w-full p-2 bg-neutral-900 border border-neutral-700 rounded text-neutral-200'} value={topUpMethod} onChange={(e: any) => setTopUpMethod(e.target.value)}>
+                                    <option value={'QRIS'}>QRIS (OVO, Dana, Shopee, etc)</option>
+                                    <option value={'BCA'}>BCA Virtual Account</option>
+                                    <option value={'BNI'}>BNI Virtual Account</option>
+                                    <option value={'BRI'}>BRI Virtual Account</option>
+                                </select>
+                            </div>
+                            <Button className={'w-full'} onClick={onTopUp}>
+                                <FontAwesomeIcon icon={faWallet} className={'mr-2'} /> Proceed to Payment
+                            </Button>
                         </div>
-                    </div>
-                </div>
+                    </TopUpBox>
+                </TopUpOverlay>
+            )}
+
+            {paymentData && (
+                <TopUpOverlay>
+                    <TopUpBox>
+                        <div className={'text-center space-y-4'}>
+                            <h3 className={'text-xl font-bold'}>Complete Payment</h3>
+                            {topUpMethod === 'QRIS'
+                                ? <div className={'bg-white p-4 rounded-lg inline-block'}><img src={'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(paymentData.qr_content)} alt={'QR Code'} /></div>
+                                : <><p className={'text-neutral-400'}>Transfer to Virtual Account:</p><p className={'text-3xl font-mono font-bold text-cyan-500 break-all'}>{paymentData.va_number}</p><p className={'text-sm text-neutral-400'}>Bank: {topUpMethod}</p></>}
+                            <p className={'text-xs text-yellow-500 italic'}>Balance will be added automatically after payment is confirmed.</p>
+                            <Button isSecondary className={'w-full'} onClick={() => { setPaymentData(null); fetchData(); }}>Close</Button>
+                        </div>
+                    </TopUpBox>
+                </TopUpOverlay>
             )}
         </PageContentBlock>
     );

@@ -8,6 +8,8 @@ class MustikaPayProduct extends Model
 
     protected $fillable = [
         'name',
+        'image',
+        'description',
         'price',
         'cpu',
         'ram',

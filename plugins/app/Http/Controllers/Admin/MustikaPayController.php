@@ -34,7 +34,7 @@ class MustikaPayController extends Controller
 
     public function addProduct(Request $request)
     {
-        $data = $request->only(['name', 'price', 'cpu', 'ram', 'disk', 'egg_id']);
+        $data = $request->only(['name', 'image', 'description', 'price', 'cpu', 'ram', 'disk', 'egg_id']);
         // Extract nest_id from egg
         $egg = \Pterodactyl\Models\Egg::findOrFail($request->input('egg_id'));
         $data['nest_id'] = $egg->nest_id;

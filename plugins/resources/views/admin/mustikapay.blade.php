@@ -39,7 +39,9 @@
                 <table class="table table-hover">
                     <tr>
                         <th>ID</th>
+                        <th>Image</th>
                         <th>Name</th>
+                        <th>Description</th>
                         <th>Price</th>
                         <th>CPU</th>
                         <th>RAM</th>
@@ -49,7 +51,9 @@
                     @foreach($products as $product)
                     <tr>
                         <td>{{ $product->id }}</td>
+                        <td><img src="{{ $product->image ?? 'https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61' }}" alt="img" style="width:40px;height:40px;border-radius:6px;object-fit:cover;"></td>
                         <td>{{ $product->name }}</td>
+                        <td>{{ Str::limit($product->description, 40) }}</td>
                         <td>Rp {{ number_format($product->price) }}</td>
                         <td>{{ $product->cpu }}%</td>
                         <td>{{ $product->ram }}MB</td>
@@ -83,32 +87,28 @@
                         <input type="text" name="name" class="form-control" required placeholder="Hemat 1GB">
                     </div>
                     <div class="form-group col-md-2">
+                        <label>Image URL</label>
+                        <input type="text" name="image" class="form-control" placeholder="https://...">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>Description</label>
+                        <input type="text" name="description" class="form-control" placeholder="Perfect for small projects">
+                    </div>
+                    <div class="form-group col-md-1">
                         <label>Price (Rp)</label>
                         <input type="number" name="price" class="form-control" required placeholder="5000">
                     </div>
-                    <div class="form-group col-md-2">
+                    <div class="form-group col-md-1">
                         <label>CPU (%)</label>
                         <input type="number" name="cpu" class="form-control" required value="100">
                     </div>
-                    <div class="form-group col-md-2">
+                    <div class="form-group col-md-1">
                         <label>RAM (MB)</label>
                         <input type="number" name="ram" class="form-control" required value="1024">
                     </div>
                     <div class="form-group col-md-1">
                         <label>Disk (MB)</label>
                         <input type="number" name="disk" class="form-control" required value="5120">
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label>Select Server Type (Egg)</label>
-                        <select name="egg_id" class="form-control" required>
-                            @foreach($nests as $nest)
-                                <optgroup label="{{ $nest->name }}">
-                                    @foreach($nest->eggs as $egg)
-                                        <option value="{{ $egg->id }}">{{ $egg->name }}</option>
-                                    @endforeach
-                                </optgroup>
-                            @endforeach
-                        </select>
                     </div>
                 </div>
                 <div class="box-footer">
