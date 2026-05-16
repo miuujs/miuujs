@@ -184,7 +184,7 @@ export default () => {
                 </div>
             </div>
             {toast && (
-                <div className={'fixed top-0 left-0 right-0 z-50 flex justify-center p-4 pointer-events-none sm:top-5 sm:left-auto sm:right-5 sm:p-0'}>
+                <div className={'fixed bottom-0 left-0 right-0 z-50 flex justify-center p-4 pointer-events-none sm:bottom-5 sm:left-auto sm:right-5 sm:p-0'}>
                     <Toast $type={toast.type} className={'pointer-events-auto'}>
                         <FontAwesomeIcon icon={toast.type === 'success' ? faCheckCircle : faExclamationCircle} />
                         <span className={'flex-1 text-sm sm:text-base'}>{toast.message}</span>

@@ -600,9 +600,9 @@ ROUTES
     NAVBAR="$PANEL_DIR/resources/scripts/components/NavigationBar.tsx"
     if ! grep -q "ShoppingCartIcon" "$NAVBAR" 2>/dev/null; then
         # Desktop: add to import
-        sed -i "s|import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon, SupportIcon } from '@heroicons/react/outline';|import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon, SupportIcon, ShoppingCartIcon } from '@heroicons/react/outline';|" "$NAVBAR"
+        sed -i "s|import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon } from '@heroicons/react/outline';|import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon, ShoppingCartIcon } from '@heroicons/react/outline';|" "$NAVBAR"
         # Desktop: add store link before ClientDropdown
-        sed -i "s|{support && <a href={support}><SupportIcon className={'w-5'} />{t\`supportcenter\`}<\\/a>}\n\\t\\t\\t\\t\\t{layout == 3 && <ClientDropdown />}|{support && <a href={support}><SupportIcon className={'w-5'} />{t\`supportcenter\`}<\\/a>}\n\\t\\t\\t\\t\\t<NavLink to={'\\/store'}><ShoppingCartIcon className={'w-5'} \\/>Store<\\/NavLink>\n\\t\\t\\t\\t\\t{layout == 3 && <ClientDropdown />}|" "$NAVBAR"
+        sed -i "s|{layout == 3 && <ClientDropdown />}|<NavLink to={'\\/store'}><ShoppingCartIcon className={'w-5'} \\/>Store<\\/NavLink>\n\\t\\t\\t\\t\\t{layout == 3 && <ClientDropdown />}|" "$NAVBAR"
         # Mobile: add store link after account link
         sed -i "/<NavLink to={'\\/account'} exact>/,/<\\/NavLink> {t\`account\`}<\\/NavLink>/a \\n\\t\\t\\t\\t\\t\\t\\t\\t<NavLink to={'\\/store'} exact>\n\\t\\t\\t\\t\\t\\t\\t\\t\\t<ShoppingCartIcon\\/> Store\n\\t\\t\\t\\t\\t\\t\\t\\t<\\/NavLink>" "$NAVBAR"
     fi
