@@ -16,6 +16,7 @@
     background: #fff;
     box-shadow: 0 1px 3px rgba(0,0,0,.08);
     transition: box-shadow .2s;
+    margin-bottom: 16px;
 }
 .product-card:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,.12);
@@ -78,6 +79,9 @@
     background: #f3f4f6;
     color: #374151;
     font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
 }
 .product-card .card-actions {
     display: flex;
@@ -88,14 +92,6 @@
     flex: 1;
     font-size: 12px;
     padding: 4px 8px;
-}
-.egg-group-label {
-    font-weight: 600;
-    font-size: 12px;
-    color: #6b7280;
-    padding: 4px 8px;
-    background: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
 }
 </style>
 
@@ -139,7 +135,7 @@
                 @else
                     <div class="row">
                         @foreach($products as $product)
-                        <div class="col-md-6 col-lg-4" style="margin-bottom:16px">
+                        <div class="col-sm-6 col-lg-4">
                             <div class="product-card">
                                 <div class="card-banner" style="background:linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)"></div>
                                 <div class="card-avatar">
@@ -151,14 +147,6 @@
                                         <div class="desc">{{ $product->description }}</div>
                                     @endif
                                     <div class="price-tag">Rp {{ number_format($product->price) }}</div>
-                                    @php $egg = $product->egg; @endphp
-                                    @if($egg)
-                                        <div style="font-size:11px;color:#9ca3af;margin-bottom:6px">
-                                            <i class="fa fa-code-fork"></i> {{ $egg->name }}
-                                            <span style="color:#d1d5db">/</span>
-                                            <span style="color:#6b7280">{{ $egg->nest->name ?? 'Unknown' }}</span>
-                                        </div>
-                                    @endif
                                     <div class="specs">
                                         @if($product->cpu > 0) <span class="badge"><i class="fa fa-microchip"></i> {{ $product->cpu }}%</span> @endif
                                         @if($product->ram > 0) <span class="badge"><i class="fa fa-memory"></i> {{ $product->ram }}MB</span> @endif
@@ -187,48 +175,51 @@
                                         @csrf
                                         <div class="modal-header">
                                             <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                            <h4 class="modal-title">Edit Product: {{ $product->name }}</h4>
+                                            <h4 class="modal-title">Edit: {{ $product->name }}</h4>
                                         </div>
-                                        <div class="modal-body row">
-                                            <div class="form-group col-md-6">
+                                        <div class="modal-body">
+                                            <div class="form-group">
                                                 <label>Product Name</label>
                                                 <input type="text" name="name" class="form-control" required value="{{ $product->name }}">
                                             </div>
-                                            <div class="form-group col-md-6">
+                                            <div class="form-group">
                                                 <label>Image URL</label>
                                                 <input type="text" name="image" class="form-control" value="{{ $product->image }}" placeholder="https://...">
+                                                @if($product->image)
+                                                <div style="margin-top:6px"><img src="{{ $product->image }}" style="width:60px;height:60px;border-radius:6px;object-fit:cover"></div>
+                                                @endif
                                             </div>
-                                            <div class="form-group col-md-12">
+                                            <div class="form-group">
                                                 <label>Description</label>
                                                 <input type="text" name="description" class="form-control" value="{{ $product->description }}" placeholder="Product description">
                                             </div>
-                                            <div class="form-group col-md-3">
-                                                <label>Price (Rp)</label>
-                                                <input type="number" name="price" class="form-control" required value="{{ $product->price }}">
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label>Price (Rp)</label>
+                                                        <input type="number" name="price" class="form-control" required value="{{ $product->price }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label>CPU (%)</label>
+                                                        <input type="number" name="cpu" class="form-control" required value="{{ $product->cpu }}">
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="form-group col-md-3">
-                                                <label>CPU (%)</label>
-                                                <input type="number" name="cpu" class="form-control" required value="{{ $product->cpu }}">
-                                            </div>
-                                            <div class="form-group col-md-3">
-                                                <label>RAM (MB)</label>
-                                                <input type="number" name="ram" class="form-control" required value="{{ $product->ram }}">
-                                            </div>
-                                            <div class="form-group col-md-3">
-                                                <label>Disk (MB)</label>
-                                                <input type="number" name="disk" class="form-control" required value="{{ $product->disk }}">
-                                            </div>
-                                            <div class="form-group col-md-12">
-                                                <label>Server Type (Egg)</label>
-                                                <select name="egg_id" class="form-control" required>
-                                                    @foreach($nests as $nest)
-                                                    <optgroup label="{{ $nest->name }}">
-                                                        @foreach($nest->eggs as $egg)
-                                                        <option value="{{ $egg->id }}" {{ $product->egg_id == $egg->id ? 'selected' : '' }}>{{ $egg->name }}</option>
-                                                        @endforeach
-                                                    </optgroup>
-                                                    @endforeach
-                                                </select>
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label>RAM (MB)</label>
+                                                        <input type="number" name="ram" class="form-control" required value="{{ $product->ram }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label>Disk (MB)</label>
+                                                        <input type="number" name="disk" class="form-control" required value="{{ $product->disk }}">
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
@@ -257,47 +248,46 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Add New Product</h4>
                 </div>
-                <div class="modal-body row">
-                    <div class="form-group col-md-6">
+                <div class="modal-body">
+                    <div class="form-group">
                         <label>Product Name</label>
                         <input type="text" name="name" class="form-control" required placeholder="e.g. Hemat 1GB">
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group">
                         <label>Image URL</label>
-                        <input type="text" name="image" class="form-control" placeholder="https://...">
+                        <input type="text" name="image" class="form-control" placeholder="https://... (optional)">
                     </div>
-                    <div class="form-group col-md-12">
+                    <div class="form-group">
                         <label>Description</label>
                         <input type="text" name="description" class="form-control" placeholder="Perfect for small projects">
                     </div>
-                    <div class="form-group col-md-3">
-                        <label>Price (Rp)</label>
-                        <input type="number" name="price" class="form-control" required placeholder="5000">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Price (Rp)</label>
+                                <input type="number" name="price" class="form-control" required placeholder="5000">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>CPU (%)</label>
+                                <input type="number" name="cpu" class="form-control" required value="100">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group col-md-3">
-                        <label>CPU (%)</label>
-                        <input type="number" name="cpu" class="form-control" required value="100">
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label>RAM (MB)</label>
-                        <input type="number" name="ram" class="form-control" required value="1024">
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label>Disk (MB)</label>
-                        <input type="number" name="disk" class="form-control" required value="5120">
-                    </div>
-                    <div class="form-group col-md-12">
-                        <label>Server Type (Egg)</label>
-                        <select name="egg_id" class="form-control" required>
-                            <option value="">-- Select Server Type --</option>
-                            @foreach($nests as $nest)
-                            <optgroup label="{{ $nest->name }}">
-                                @foreach($nest->eggs as $egg)
-                                <option value="{{ $egg->id }}">{{ $egg->name }}</option>
-                                @endforeach
-                            </optgroup>
-                            @endforeach
-                        </select>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>RAM (MB)</label>
+                                <input type="number" name="ram" class="form-control" required value="1024">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Disk (MB)</label>
+                                <input type="number" name="disk" class="form-control" required value="5120">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

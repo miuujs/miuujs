@@ -14,7 +14,10 @@ import { useStoreActions } from 'easy-peasy';
 import { Actions, ApplicationStore } from '@/state';
 
 const ProductCard = styled.div`
-    ${tw`bg-gray-700 rounded-box overflow-hidden`};
+    ${tw`bg-gray-700 rounded-box overflow-hidden transition-all duration-200`};
+    &:hover {
+        ${tw`shadow-lg transform -translate-y-0.5`};
+    }
 
     .card-banner {
         ${tw`w-full relative px-4 pt-3 z-10`};
@@ -48,20 +51,15 @@ const SpecBadge = styled.div`
     }
 `;
 
-const ConfirmOverlay = styled.div`
+const ModalOverlay = styled.div`
     ${tw`fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4`};
 `;
 
-const ConfirmBox = styled.div`
-    ${tw`bg-neutral-800 border border-neutral-700 rounded-box p-6 shadow-2xl max-w-md w-full`};
-`;
-
-const TopUpOverlay = styled.div`
-    ${tw`fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4`};
-`;
-
-const TopUpBox = styled.div`
-    ${tw`bg-neutral-800 border border-neutral-700 rounded-box p-6 shadow-2xl max-w-sm w-full`};
+const ModalBox = styled.div<{ maxW?: string }>`
+    ${tw`bg-neutral-800 border border-neutral-700 rounded-box p-6 shadow-2xl w-full`};
+    max-width: ${props => props.maxW || '28rem'};
+    max-height: 90vh;
+    overflow-y: auto;
 `;
 
 const DEFAULT_PRODUCT_IMAGE = 'https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61';
@@ -126,6 +124,8 @@ export default () => {
                 setLoading(false);
             });
     };
+
+    const eggCount = Object.values(eggs).reduce((sum, arr) => sum + arr.length, 0);
 
     if (loading && balance === 0 && products.length === 0) return <Spinner centered />;
 
@@ -198,21 +198,34 @@ export default () => {
             </div>
 
             {confirmProduct && (
-                <ConfirmOverlay>
-                    <ConfirmBox>
-                        <div className={'space-y-4'}>
-                            <div className={'flex items-center justify-between'}>
-                                <h3 className={'text-xl font-bold'}>Confirm Purchase</h3>
-                                <button onClick={() => setConfirmProduct(null)} className={'text-neutral-400 hover:text-white'}><FontAwesomeIcon icon={faTimes} /></button>
+                <ModalOverlay>
+                    <ModalBox maxW={'32rem'}>
+                        <div className={'flex items-start gap-4 mb-5'}>
+                            <div className={'w-16 h-16 rounded-lg overflow-hidden bg-neutral-700 flex-shrink-0'}>
+                                <ProductAvatar image={confirmProduct.image} seed={confirmProduct.name} />
                             </div>
-                            <div className={'bg-neutral-900 p-4 rounded-lg'}>
-                                <p className={'font-bold text-lg'}>{confirmProduct.name}</p>
-                                <p className={'text-xl text-yellow-500'}>Rp {Number(confirmProduct.price).toLocaleString()}</p>
+                            <div className={'flex-1 min-w-0'}>
+                                <div className={'flex items-center justify-between'}>
+                                    <h3 className={'text-xl font-bold truncate'}>{confirmProduct.name}</h3>
+                                    <button onClick={() => setConfirmProduct(null)} className={'text-neutral-400 hover:text-white ml-2 flex-shrink-0'}><FontAwesomeIcon icon={faTimes} /></button>
+                                </div>
+                                {confirmProduct.description && <p className={'text-sm text-neutral-400 mt-0.5'}>{confirmProduct.description}</p>}
+                                <p className={'text-2xl text-yellow-500 font-bold mt-1'}>Rp {Number(confirmProduct.price).toLocaleString()}</p>
+                                <div className={'flex flex-wrap gap-1.5 mt-2'}>
+                                    {confirmProduct.cpu > 0 && <SpecBadge><FontAwesomeIcon icon={faMicrochip} /> {confirmProduct.cpu}%</SpecBadge>}
+                                    {confirmProduct.ram > 0 && <SpecBadge><FontAwesomeIcon icon={faMemory} /> {confirmProduct.ram}MB</SpecBadge>}
+                                    {confirmProduct.disk > 0 && <SpecBadge><FontAwesomeIcon icon={faHdd} /> {confirmProduct.disk}MB</SpecBadge>}
+                                </div>
                             </div>
-                            <div>
-                                <Label>Server Type</Label>
+                        </div>
+
+                        <div className={'border-t border-neutral-700 pt-4'}>
+                            <Label className={'text-sm mb-1.5 block'}>Choose Server Type</Label>
+                            {eggCount === 0 ? (
+                                <p className={'text-sm text-red-400'}>No server types available.</p>
+                            ) : (
                                 <select
-                                    className={'w-full p-2 bg-neutral-900 border border-neutral-700 rounded text-neutral-200'}
+                                    className={'w-full p-2.5 bg-neutral-900 border border-neutral-700 rounded text-neutral-200 text-sm'}
                                     value={selectedEggId ?? ''}
                                     onChange={(e: any) => setSelectedEggId(Number(e.target.value))}
                                 >
@@ -225,32 +238,32 @@ export default () => {
                                         </optgroup>
                                     ))}
                                 </select>
-                            </div>
-                            <p className={'text-sm text-neutral-400'}>Your balance will be deducted after confirmation.</p>
-                            <div className={'flex gap-3'}>
-                                <Button isSecondary className={'flex-1'} onClick={() => setConfirmProduct(null)}>Cancel</Button>
-                                <Button className={'flex-1'} onClick={confirmBuy} disabled={!selectedEggId}>Confirm</Button>
-                            </div>
+                            )}
                         </div>
-                    </ConfirmBox>
-                </ConfirmOverlay>
+
+                        <div className={'flex gap-3 mt-5'}>
+                            <Button isSecondary className={'flex-1'} onClick={() => setConfirmProduct(null)}>Cancel</Button>
+                            <Button className={'flex-1'} onClick={confirmBuy} disabled={!selectedEggId}>Confirm Purchase</Button>
+                        </div>
+                    </ModalBox>
+                </ModalOverlay>
             )}
 
             {topUpOpen && (
-                <TopUpOverlay>
-                    <TopUpBox>
+                <ModalOverlay>
+                    <ModalBox>
+                        <div className={'flex items-center justify-between mb-4'}>
+                            <h3 className={'text-xl font-bold'}>Top Up Balance</h3>
+                            <button onClick={() => setTopUpOpen(false)} className={'text-neutral-400 hover:text-white'}><FontAwesomeIcon icon={faTimes} /></button>
+                        </div>
                         <div className={'space-y-4'}>
-                            <div className={'flex items-center justify-between'}>
-                                <h3 className={'text-xl font-bold'}>Top Up Balance</h3>
-                                <button onClick={() => setTopUpOpen(false)} className={'text-neutral-400 hover:text-white'}><FontAwesomeIcon icon={faTimes} /></button>
-                            </div>
                             <div>
                                 <Label>Amount (Rp)</Label>
                                 <Input type={'number'} value={topUpAmount} onChange={(e: any) => setTopUpAmount(Number(e.target.value))} />
                             </div>
                             <div>
                                 <Label>Payment Method</Label>
-                                <select className={'w-full p-2 bg-neutral-900 border border-neutral-700 rounded text-neutral-200'} value={topUpMethod} onChange={(e: any) => setTopUpMethod(e.target.value)}>
+                                <select className={'w-full p-2.5 bg-neutral-900 border border-neutral-700 rounded text-neutral-200 text-sm'} value={topUpMethod} onChange={(e: any) => setTopUpMethod(e.target.value)}>
                                     <option value={'QRIS'}>QRIS (OVO, Dana, Shopee, etc)</option>
                                     <option value={'BCA'}>BCA Virtual Account</option>
                                     <option value={'BNI'}>BNI Virtual Account</option>
@@ -261,13 +274,13 @@ export default () => {
                                 <FontAwesomeIcon icon={faWallet} className={'mr-2'} /> Proceed to Payment
                             </Button>
                         </div>
-                    </TopUpBox>
-                </TopUpOverlay>
+                    </ModalBox>
+                </ModalOverlay>
             )}
 
             {paymentData && (
-                <TopUpOverlay>
-                    <TopUpBox>
+                <ModalOverlay>
+                    <ModalBox>
                         <div className={'text-center space-y-4'}>
                             <h3 className={'text-xl font-bold'}>Complete Payment</h3>
                             {topUpMethod === 'QRIS'
@@ -276,8 +289,8 @@ export default () => {
                             <p className={'text-xs text-yellow-500 italic'}>Balance will be added automatically after payment is confirmed.</p>
                             <Button isSecondary className={'w-full'} onClick={() => { setPaymentData(null); fetchData(); }}>Close</Button>
                         </div>
-                    </TopUpBox>
-                </TopUpOverlay>
+                    </ModalBox>
+                </ModalOverlay>
             )}
         </PageContentBlock>
     );
