@@ -473,6 +473,15 @@ ROUTES
     echo ""
 }
 
+# --- Detection ---
+is_theme_installed() {
+    [ -f "$PANEL_DIR/config/miuujs.php" ]
+}
+
+is_mustikapay_installed() {
+    [ -f "$PANEL_DIR/app/Http/Controllers/Admin/MustikaPayController.php" ]
+}
+
 # --- Main Menu ---
 main_menu() {
     print_banner
@@ -488,6 +497,13 @@ main_menu() {
     case "$ACTION" in
         1)
             preflight
+            if is_theme_installed; then
+                warning "MiuuJS Theme is already installed!"
+                input "Press Enter to return to menu..."
+                read -r
+                main_menu
+                return
+            fi
             ensure_node22
             determine_source
             backup_panel
@@ -498,6 +514,13 @@ main_menu() {
             ;;
         2)
             preflight
+            if is_mustikapay_installed; then
+                warning "MustikaPay Plugin is already installed!"
+                input "Press Enter to return to menu..."
+                read -r
+                main_menu
+                return
+            fi
             ensure_node22
             determine_source
             install_mustikapay
