@@ -69,11 +69,7 @@
                             </li>
                             <li>
                                 <li><a href="{{ route('admin.miuujs') }}" data-toggle="tooltip" data-placement="bottom" title="MiuuJS Config"><i class="fa fa-paint-brush"></i></a></li>
-                            </li>
-                            <li>
                                 <li><a href="{{ route('index') }}" data-toggle="tooltip" data-placement="bottom" title="Exit Admin"><i class="fa fa-server"></i></a></li>
-                            </li>
-                            <li>
                                 <li><a href="{{ route('auth.logout') }}" id="logoutButton" data-toggle="tooltip" data-placement="bottom" title="Logout"><i class="fa fa-sign-out"></i></a></li>
                             </li>
                         </ul>
