@@ -94,33 +94,61 @@ preflight() {
     echo ""
 }
 
-# --- Backup ---
+# --- Auto-upgrade Node.js to v22 ---
+ensure_node22() {
+    if ! [ -x "$(command -v node)" ]; then
+        info "Node.js not found. Installing Node.js 22..."
+        curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+        apt install nodejs -y
+        success "Node.js installed: $(node -v)"
+        return
+    fi
+
+    NODE_VERSION=$(node -v | sed 's/v//' | cut -d'.' -f1)
+    if [ "$NODE_VERSION" -lt 22 ]; then
+        info "Node.js v$(node -v) detected. Upgrading to v22..."
+        curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+        apt install nodejs -y
+        success "Node.js upgraded: $(node -v)"
+    else
+        info "Node.js v$(node -v) meets requirements."
+    fi
+
+    # Check yarn or npm
+    if [ -x "$(command -v yarn)" ]; then
+        PKG_MANAGER="yarn"
+    elif [ -x "$(command -v npm)" ]; then
+        PKG_MANAGER="npm"
+    else
+        error "Neither yarn nor npm found."
+        info "Install yarn: npm install -g yarn"
+        exit 1
+    fi
+    info "Using $PKG_MANAGER for package installation."
+}
+
+# --- Backup (skip if any backup already exists) ---
 backup_panel() {
     print_banner
     echo -e "  ${BOLD}Step 1: Backup Panel${RESET}"
     echo ""
 
-    BACKUP_DIR="${PANEL_DIR}-backup-$(date +%Y%m%d-%H%M%S)"
-
-    warning "This will create a full backup of your panel."
-    warning "Backup location: ${YELLOW}$BACKUP_DIR${RESET}"
-    echo ""
-
-    input "Proceed with backup? (y/N): "
-    read -r CONFIRM
-    if [[ ! "$CONFIRM" =~ [Yy] ]]; then
-        error "Backup aborted. Installation cannot continue without backup."
-        exit 1
+    EXISTING_BACKUPS=($(ls -d "${PANEL_DIR}-backup-"* 2>/dev/null || true))
+    if [ ${#EXISTING_BACKUPS[@]} -gt 0 ]; then
+        info "Existing backup found: ${EXISTING_BACKUPS[0]}"
+        info "Skipping backup (backup already exists)."
+        echo "${EXISTING_BACKUPS[0]}" > /tmp/miuujs_backup_path
+        return
     fi
+
+    BACKUP_DIR="${PANEL_DIR}-backup-$(date +%Y%m%d-%H%M%S)"
 
     echo ""
     info "Creating backup, please wait..."
 
-    # Backup files
     cp -a "$PANEL_DIR" "$BACKUP_DIR"
     success "Panel files backed up to: $BACKUP_DIR"
 
-    # Backup database info
     if [ -f "$PANEL_DIR/.env" ]; then
         DB_DATABASE=$(grep DB_DATABASE "$PANEL_DIR/.env" 2>/dev/null | cut -d '=' -f2 || echo "unknown")
     else
@@ -138,46 +166,11 @@ backup_panel() {
     echo "$BACKUP_DIR" > /tmp/miuujs_backup_path
 }
 
-# --- Detect Package Manager ---
-detect_node() {
-    # Check node
-    if ! [ -x "$(command -v node)" ]; then
-        error "Node.js is not installed."
-        info "Install Node.js 22 with: curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt install nodejs -y"
-        exit 1
-    fi
-
-    NODE_VERSION=$(node -v | sed 's/v//' | cut -d'.' -f1)
-    if [ "$NODE_VERSION" -lt 22 ]; then
-        warning "Node.js v$(node -v | sed 's/v//') detected, v22+ recommended."
-        info "Upgrade with: n 22  (if 'n' is installed) or install Node.js 22 from nodesource."
-        input "Continue anyway? (y/N): "
-        read -r CONFIRM
-        if [[ ! "$CONFIRM" =~ [Yy] ]]; then
-            exit 1
-        fi
-    fi
-
-    # Check yarn or npm
-    if [ -x "$(command -v yarn)" ]; then
-        PKG_MANAGER="yarn"
-        info "Using yarn for package installation."
-    elif [ -x "$(command -v npm)" ]; then
-        PKG_MANAGER="npm"
-        info "Using npm for package installation."
-    else
-        error "Neither yarn nor npm found."
-        info "Install yarn: npm install -g yarn  (requires Node.js)"
-        exit 1
-    fi
-}
-
 # --- Source Files ---
 determine_source() {
-    # Check if running from the cloned repo or from curl
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
-    if [ -f "$SCRIPT_DIR/package.json" ] && grep -q "miuujs" "$SCRIPT_DIR/README.md" 2>/dev/null; then
+    if [ -f "$SCRIPT_DIR/package.json" ] && [ -f "$SCRIPT_DIR/README.md" ] && grep -q "miuujs" "$SCRIPT_DIR/README.md" 2>/dev/null; then
         SOURCE="local"
         REPO_DIR="$SCRIPT_DIR"
         info "Using local repository: $REPO_DIR"
@@ -202,7 +195,6 @@ install_deps() {
 
     cd "$PANEL_DIR"
 
-    # Composer dependencies
     if [ -x "$(command -v composer)" ]; then
         info "Checking Composer dependencies..."
         composer install --no-dev --quiet 2>/dev/null || composer install --no-dev 2>&1 | tail -5
@@ -211,20 +203,14 @@ install_deps() {
         warning "Composer not found. Skipping PHP dependency check."
     fi
 
-    # Node dependencies
     info "Installing Node.js dependencies with $PKG_MANAGER..."
 
-    # Ensure correct package.json from theme (overwrites panel's original)
-    cp "$REPO_DIR/package.json" "$PANEL_DIR/package.json"
     cp "$REPO_DIR/tailwind.config.js" "$PANEL_DIR/tailwind.config.js"
     cp "$REPO_DIR/webpack.config.js" "$PANEL_DIR/webpack.config.js"
 
-    # Remove old lock file and node_modules if incompatible
     if [ "$PKG_MANAGER" = "yarn" ]; then
-        [ -f yarn.lock ] && rm -f yarn.lock
         yarn install --frozen-lockfile 2>/dev/null || yarn install
     else
-        [ -f package-lock.json ] && rm -f package-lock.json
         npm install
     fi
 
@@ -243,10 +229,8 @@ copy_theme() {
 
     info "Copying theme files to panel..."
 
-    # Create directories if needed
     mkdir -p "$PANEL_DIR/resources/views/admin/miuujs"
 
-    # Copy app/ files
     if [ -d "$SRC/app/Http/Controllers/Admin/MiuuJS" ]; then
         cp -r "$SRC/app/Http/Controllers/Admin/MiuuJS" "$PANEL_DIR/app/Http/Controllers/Admin/"
     fi
@@ -257,14 +241,10 @@ copy_theme() {
     [ -f "$SRC/app/Http/ViewComposers/AssetComposer.php" ] && \
         cp "$SRC/app/Http/ViewComposers/AssetComposer.php" "$PANEL_DIR/app/Http/ViewComposers/"
 
-    # Copy config/
-    [ -f "$SRC/config/miuujs.php" ] && cp "$SRC/config/miuujs.php" "$PANEL_DIR/config/"
     [ -f "$SRC/config/miuujs.php" ] && cp "$SRC/config/miuujs.php" "$PANEL_DIR/config/"
 
-    # Copy routes/
     [ -f "$SRC/routes/admin.php" ] && cp "$SRC/routes/admin.php" "$PANEL_DIR/routes/admin.php"
 
-    # Copy public/
     if [ -d "$SRC/public/miuujs" ]; then
         cp -r "$SRC/public/miuujs" "$PANEL_DIR/public/"
     fi
@@ -276,12 +256,10 @@ copy_theme() {
         cp "$SRC/public/themes/pterodactyl/css/pterodactyl.css" "$PANEL_DIR/public/themes/pterodactyl/css/"
     fi
 
-    # Copy resources/lang/
     if [ -d "$SRC/resources/lang/en/miuujs" ]; then
         cp -r "$SRC/resources/lang/en/miuujs" "$PANEL_DIR/resources/lang/en/"
     fi
 
-    # Copy resources/views/
     [ -f "$SRC/resources/views/admin/miuujs/index.blade.php" ] && \
         cp "$SRC/resources/views/admin/miuujs/index.blade.php" "$PANEL_DIR/resources/views/admin/miuujs/"
     [ -f "$SRC/resources/views/layouts/admin.blade.php" ] && \
@@ -293,7 +271,6 @@ copy_theme() {
     [ -f "$SRC/resources/views/templates/wrapper.blade.php" ] && \
         cp "$SRC/resources/views/templates/wrapper.blade.php" "$PANEL_DIR/resources/views/templates/"
 
-    # Copy scripts/ (React frontend)
     if [ -d "$SRC/scripts" ]; then
         rsync -a "$SRC/scripts/" "$PANEL_DIR/resources/scripts/"
     fi
@@ -328,6 +305,15 @@ build_frontend() {
     echo ""
 }
 
+# --- Run Migrations ---
+run_migrations() {
+    info "Running database migrations..."
+    cd "$PANEL_DIR"
+    php artisan migrate --force 2>&1
+    success "Migrations complete."
+    echo ""
+}
+
 # --- Finalize ---
 finalize() {
     print_banner
@@ -336,30 +322,10 @@ finalize() {
 
     cd "$PANEL_DIR"
 
-    # Set permissions
     info "Setting file permissions..."
     chown -R www-data:www-data "$PANEL_DIR/storage" "$PANEL_DIR/bootstrap/cache" "$PANEL_DIR/public/assets" 2>/dev/null || true
-    chown www-data:www-data \
-        "$PANEL_DIR/app/Http/Controllers/Admin/MiuuJS" \
-        "$PANEL_DIR/app/Http/Controllers/Base/LocaleController.php" \
-        "$PANEL_DIR/app/Http/Requests/Base/LocaleRequest.php" \
-        "$PANEL_DIR/app/Http/ViewComposers/AssetComposer.php" \
-        "$PANEL_DIR/config/miuujs.php" \
-        "$PANEL_DIR/config/miuujs.php" \
-        "$PANEL_DIR/public/miuujs" \
-        "$PANEL_DIR/public/themes/pterodactyl/css/miuujs.css" \
-        "$PANEL_DIR/resources/lang/en/miuujs" \
-        "$PANEL_DIR/resources/views/admin/miuujs" \
-        "$PANEL_DIR/resources/views/layouts/admin.blade.php" \
-        "$PANEL_DIR/resources/views/templates/auth/core.blade.php" \
-        "$PANEL_DIR/resources/views/templates/base/core.blade.php" \
-        "$PANEL_DIR/resources/views/templates/wrapper.blade.php" \
-        "$PANEL_DIR/package.json" \
-        "$PANEL_DIR/tailwind.config.js" \
-        "$PANEL_DIR/webpack.config.js" 2>/dev/null || true
     success "Permissions set."
 
-    # Clear caches
     info "Clearing Laravel caches..."
     php artisan view:clear 2>/dev/null || true
     php artisan config:clear 2>/dev/null || true
@@ -367,142 +333,37 @@ finalize() {
     php artisan optimize:clear 2>/dev/null || true
     success "Caches cleared."
 
-    # Create restore script
     BACKUP_PATH=$(cat /tmp/miuujs_backup_path 2>/dev/null || echo "$PANEL_DIR-backup-*")
-    cat > "$PANEL_DIR/miuujs-restore.sh" << 'RESTORE_EOF'
-#!/bin/bash
-# MiuuJS Restore Script
-# Restores panel from backup created during installation
-
-set -e
-
-
-RESET="\e[0m"
-RED="\e[31m"
-GREEN="\e[32m"
-YELLOW="\e[33m"
-CYAN="\e[36m"
-BOLD="\e[1m"
-
-echo ""
-echo "  MiuuJS Theme Restore"
-echo ""
-
-if [[ $EUID -ne 0 ]]; then
-    echo -e "* ${RED}ERROR${RESET}: Must run as root (sudo)."
-    exit 1
-fi
-
-BACKUP_DIR="$1"
-PANEL_DIR="/var/www/pterodactyl"
-
-if [ -z "$BACKUP_DIR" ]; then
-    echo -e "* ${YELLOW}Usage${RESET}: $0 <backup-directory>"
-    echo ""
-    BACKUPS=($(ls -d /var/www/pterodactyl-backup-* 2>/dev/null || true))
-    if [ ${#BACKUPS[@]} -gt 0 ]; then
-        echo "  Available backups:"
-        for i in "${!BACKUPS[@]}"; do
-            echo "  [$i] ${BACKUPS[$i]}"
-        done
-        echo ""
-        echo -n "  Select backup to restore (0-$((${#BACKUPS[@]}-1))): "
-        read -r SELECTION
-        if [[ "$SELECTION" =~ ^[0-9]+$ ]] && [ "$SELECTION" -lt "${#BACKUPS[@]}" ]; then
-            BACKUP_DIR="${BACKUPS[$SELECTION]}"
-        else
-            echo -e "* ${RED}ERROR${RESET}: Invalid selection."
-            exit 1
-        fi
-    else
-        echo -e "* ${RED}ERROR${RESET}: No backups found."
-        exit 1
-    fi
-fi
-
-if [ ! -d "$BACKUP_DIR" ]; then
-    echo -e "* ${RED}ERROR${RESET}: Backup directory not found: $BACKUP_DIR"
-    exit 1
-fi
-
-echo -e "* ${CYAN}INFO${RESET}: Restoring from: $BACKUP_DIR"
-echo -n "  Are you sure? This will OVERWRITE your current panel. (y/N): "
-read -r CONFIRM
-if [[ ! "$CONFIRM" =~ [Yy] ]]; then
-    echo -e "* ${YELLOW}Cancelled${RESET}."
-    exit 0
-fi
-
-echo ""
-echo -e "* ${CYAN}Restoring...${RESET}"
-
-# Remove current panel files (except storage)
-cd "$PANEL_DIR"
-for f in * .[!.]* 2>/dev/null; do
-    [ "$f" = "storage" ] && continue
-    [ "$f" = "miuujs-restore.sh" ] && continue
-    rm -rf "$f"
-done
-
-# Restore from backup
-cp -a "$BACKUP_DIR"/* "$PANEL_DIR/"
-cp -a "$BACKUP_DIR"/.[!.]* "$PANEL_DIR/" 2>/dev/null || true
-
-# Rebuild assets
-cd "$PANEL_DIR"
-if [ -x "$(command -v yarn)" ]; then
-    yarn install --frozen-lockfile 2>/dev/null || yarn install
-    yarn run build:production 2>&1 | tail -5
-elif [ -x "$(command -v npm)" ]; then
-    npm install
-    npm run build:production 2>&1 | tail -5
-fi
-
-php artisan view:clear 2>/dev/null || true
-php artisan config:clear 2>/dev/null || true
-php artisan optimize:clear 2>/dev/null || true
-
-chown -R www-data:www-data "$PANEL_DIR/storage" "$PANEL_DIR/bootstrap/cache" 2>/dev/null || true
-
-echo ""
-echo -e "* ${GREEN}SUCCESS${RESET}: Panel restored from backup."
-echo ""
-RESTORE_EOF
-    chmod +x "$PANEL_DIR/miuujs-restore.sh"
-    success "Restore script created at: ${BOLD}$PANEL_DIR/miuujs-restore.sh${RESET}"
 
     echo ""
     echo -e "  ${BOLD}==================== INSTALLATION COMPLETE ====================${RESET}"
     echo ""
     echo -e "  ${GREEN}MiuuJS theme has been installed successfully!${RESET}"
     echo ""
-    echo -e "  ${CYAN}Store:${RESET}         ${BOLD}https://your-panel.com/store${RESET}"
     echo -e "  ${CYAN}Admin Config:${RESET}  ${BOLD}https://your-panel.com/admin/miuujs${RESET}"
-    echo -e "  ${CYAN}Admin Billing:${RESET} ${BOLD}https://your-panel.com/admin/mustikapay${RESET}"
     echo ""
-    echo -e "  ${CYAN}Restore:${RESET}       ${BOLD}sudo bash $PANEL_DIR/miuujs-restore.sh${RESET}"
     echo -e "  ${CYAN}Backup:${RESET}        ${BOLD}$BACKUP_PATH${RESET}"
     echo ""
     echo -e "  ${YELLOW}Note:${RESET} If you see any visual issues, clear your browser cache."
     echo ""
 }
 
-# --- Install MustikaPay Mod ---
-install_mod() {
+# --- Install MustikaPay Plugin ---
+install_mustikapay() {
     print_banner
-    echo -e "  ${BOLD}Optional: Install Payment Gateway MustikaPay${RESET}"
+    echo -e "  ${BOLD}Install MustikaPay Payment Gateway Plugin${RESET}"
     echo ""
     echo -e "  ${CYAN}Adds:${RESET} Top-up saldo, pembelian server, pembayaran QRIS/VA"
     echo ""
 
-    input "Install payment gateway MustikaPay? (y/N): "
-    read -r CONFIRM
-    if [[ ! "$CONFIRM" =~ [Yy] ]]; then
-        info "Skipping mod installation."
-        return
+    if [ "$SOURCE" != "local" ]; then
+        determine_source
     fi
 
-    if [ ! -d "$REPO_DIR/plugins" ]; then
+    cd "$PANEL_DIR"
+    SRC="$REPO_DIR"
+
+    if [ ! -d "$SRC/plugins" ]; then
         warning "plugins/ not found in $REPO_DIR. Re-cloning repository..."
         rm -rf "$REPO_DIR"
         git clone https://github.com/miuujs/miuujs.git "$REPO_DIR" 2>/dev/null || {
@@ -511,17 +372,11 @@ install_mod() {
         }
     fi
 
-    cd "$PANEL_DIR"
-    SRC="$REPO_DIR"
+    info "Installing MustikaPay plugin..."
 
-    info "Installing MustikaPay mod..."
-
-    # Copy Extensions
     if [ -d "$SRC/plugins/app/Extensions" ]; then
         cp -r "$SRC/plugins/app/Extensions" "$PANEL_DIR/app/"
     fi
-
-    # Copy Controllers
     if [ -d "$SRC/plugins/app/Http/Controllers/Admin" ]; then
         cp "$SRC/plugins/app/Http/Controllers/Admin/MustikaPayController.php" "$PANEL_DIR/app/Http/Controllers/Admin/"
     fi
@@ -529,31 +384,21 @@ install_mod() {
         mkdir -p "$PANEL_DIR/app/Http/Controllers/Api/Client/Store"
         cp "$SRC/plugins/app/Http/Controllers/Api/Client/Store/StoreController.php" "$PANEL_DIR/app/Http/Controllers/Api/Client/Store/"
     fi
-
-    # Copy Models
     if [ -d "$SRC/plugins/app/Models" ]; then
         cp "$SRC/plugins/app/Models/"*.php "$PANEL_DIR/app/Models/"
     fi
-
-    # Copy Migrations
     if [ -d "$SRC/plugins/database/migrations" ]; then
         cp "$SRC/plugins/database/migrations/"*.php "$PANEL_DIR/database/migrations/"
     fi
-
-    # Copy Views
     if [ -f "$SRC/plugins/resources/views/admin/mustikapay.blade.php" ]; then
         cp "$SRC/plugins/resources/views/admin/mustikapay.blade.php" "$PANEL_DIR/resources/views/admin/"
     fi
-
-    # Copy the miuujs-upgraded StoreContainer if exists
     if [ -f "$SRC/plugins/resources/scripts/components/dashboard/StoreContainer.tsx" ]; then
         mkdir -p "$PANEL_DIR/resources/scripts/components/dashboard"
         cp "$SRC/plugins/resources/scripts/components/dashboard/StoreContainer.tsx" "$PANEL_DIR/resources/scripts/components/dashboard/"
     fi
 
-    # --- Route modifications ---
-    info "Adding MustikaPay routes..."
-
+    # Routes
     if ! grep -q "MustikaPay" "$PANEL_DIR/routes/admin.php" 2>/dev/null; then
         cat << 'ROUTES' >> "$PANEL_DIR/routes/admin.php"
 
@@ -580,36 +425,29 @@ Route::prefix('/store')->group(function () {
 ROUTES
     fi
 
-    # --- DashboardRouter route ---
-    info "Adding /store route to DashboardRouter..."
+    # DashboardRouter
     DASHBOARD_ROUTER="$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx"
     if ! grep -q "StoreContainer" "$DASHBOARD_ROUTER" 2>/dev/null; then
         sed -i "s|import { NotFound } from '@/components/elements/ScreenBlock';|import { NotFound } from '@/components/elements/ScreenBlock';\nimport StoreContainer from '@/components/dashboard/StoreContainer';|" "$DASHBOARD_ROUTER"
         sed -i "/<DashboardContainer \/>/a \\\n\\t\\t\\t\\t\\t\\t\\t\\t<Route path={'\\/store'} exact>\n\\t\\t\\t\\t\\t\\t\\t\\t\\t<StoreContainer />\n\\t\\t\\t\\t\\t\\t\\t\\t<\\/Route>" "$DASHBOARD_ROUTER"
     fi
 
-    # --- SideBar store link ---
-    info "Adding Store link to SideBar..."
+    # SideBar
     SIDEBAR="$PANEL_DIR/resources/scripts/components/SideBar.tsx"
     if ! grep -q "ShoppingCartIcon" "$SIDEBAR" 2>/dev/null; then
         sed -i "s|import { ServerIcon, UserCircleIcon, DotsVerticalIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon } from '@heroicons/react/outline';|import { ServerIcon, UserCircleIcon, DotsVerticalIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, ShoppingCartIcon } from '@heroicons/react/outline';|" "$SIDEBAR"
         sed -i "/<NavLink to={'\\/account'} exact>/,/<\\/NavLink>/a \\t\\t\\t\\t\\t\\t<NavLink to={'\\/store'} exact>\n\\t\\t\\t\\t\\t\\t\\t<ShoppingCartIcon/> Store\n\\t\\t\\t\\t\\t\\t<\\/NavLink>" "$SIDEBAR"
     fi
 
-    # --- NavigationBar store links ---
-    info "Adding Store link to NavigationBar..."
+    # NavigationBar
     NAVBAR="$PANEL_DIR/resources/scripts/components/NavigationBar.tsx"
     if ! grep -q "ShoppingCartIcon" "$NAVBAR" 2>/dev/null; then
-        # Desktop: add to import
         sed -i "s|import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon } from '@heroicons/react/outline';|import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon, ShoppingCartIcon } from '@heroicons/react/outline';|" "$NAVBAR"
-        # Desktop: add store link before ClientDropdown
         sed -i "s|{layout == 3 && <ClientDropdown />}|<NavLink to={'\\/store'}><ShoppingCartIcon className={'w-5'} \\/>Store<\\/NavLink>\n\\t\\t\\t\\t\\t{layout == 3 && <ClientDropdown />}|" "$NAVBAR"
-        # Mobile: add store link after account link
         sed -i "/<NavLink to={'\\/account'} exact>/,/<\\/NavLink> {t\`account\`}<\\/NavLink>/a \\n\\t\\t\\t\\t\\t\\t\\t\\t<NavLink to={'\\/store'} exact>\n\\t\\t\\t\\t\\t\\t\\t\\t\\t<ShoppingCartIcon\\/> Store\n\\t\\t\\t\\t\\t\\t\\t\\t<\\/NavLink>" "$NAVBAR"
     fi
 
-    # --- Model modifications ---
-    info "Updating models..."
+    # Model modifications
     if ! grep -q "'balance'" "$PANEL_DIR/app/Models/User.php" 2>/dev/null; then
         sed -i "/'root_admin',/a \\\t'balance'," "$PANEL_DIR/app/Models/User.php"
     fi
@@ -617,54 +455,22 @@ ROUTES
         sed -i "/'oom_disabled' => 'boolean',/a \\\t'is_billed' => 'boolean',\n\\t'expires_at' => 'datetime'," "$PANEL_DIR/app/Models/Server.php"
     fi
 
-    # --- Admin sidebar menu link ---
-    info "Adding admin menu link..."
+    # Admin sidebar menu
     if ! grep -q "mustikapay" "$PANEL_DIR/resources/views/layouts/admin.blade.php" 2>/dev/null; then
         sed -i 's|title="MiuuJS Config">|title="MiuuJS Config">\n\t\t\t\t\t\t\t\t<li><a href="{{ route('"'"'admin.mustikapay'"'"') }}" data-toggle="tooltip" data-placement="bottom" title="MustikaPay Billing"><i class="fa fa-credit-card"></i></a></li>|' "$PANEL_DIR/resources/views/layouts/admin.blade.php"
     fi
 
-    # --- Composer autoload ---
-    info "Registering MustikaPay namespace in composer autoload..."
+    # Composer autoload
     if ! grep -q "MustikaPay" "$PANEL_DIR/composer.json" 2>/dev/null; then
         sed -i 's|"Pterodactyl\\\\": "app/",|"Pterodactyl\\\\": "app/",\n            "MustikaPay\\\\": "app/Extensions/Payment/MustikaPay/",|' "$PANEL_DIR/composer.json"
     fi
     composer dump-autoload 2>/dev/null || true
 
-    success "MustikaPay mod installed."
+    # Run migrations
+    run_migrations
+
+    success "MustikaPay plugin installed."
     echo ""
-}
-
-# --- Run Migrations ---
-run_migrations() {
-    info "Running database migrations..."
-    cd "$PANEL_DIR"
-    php artisan migrate --force 2>&1
-    success "Migrations complete."
-    echo ""
-}
-
-# --- Uninstall ---
-uninstall_theme() {
-    print_banner
-    echo -e "  ${BOLD}Uninstall MiuuJS Theme${RESET}"
-    echo ""
-
-    if [ ! -f /tmp/miuujs_backup_path ] && [ -z "$(ls -d /var/www/pterodactyl-backup-* 2>/dev/null)" ]; then
-        error "No backup found. Cannot uninstall safely."
-        echo "  Use the restore script: sudo bash $PANEL_DIR/miuujs-restore.sh"
-        exit 1
-    fi
-
-    BACKUP_PATH=$(cat /tmp/miuujs_backup_path 2>/dev/null || ls -d /var/www/pterodactyl-backup-* 2>/dev/null | tail -1)
-
-    warning "This will restore the panel from backup: ${YELLOW}$BACKUP_PATH${RESET}"
-    input "Continue? (y/N): "
-    read -r CONFIRM
-    if [[ ! "$CONFIRM" =~ [Yy] ]]; then
-        exit 0
-    fi
-
-    bash "$PANEL_DIR/miuujs-restore.sh" "$BACKUP_PATH"
 }
 
 # --- Main Menu ---
@@ -672,31 +478,33 @@ main_menu() {
     print_banner
     echo -e "  ${BOLD}What would you like to do?${RESET}"
     echo ""
-    echo "  [0] Install MiuuJS Theme"
-    echo "  [1] Uninstall (restore from backup)"
-    echo "  [2] Exit"
+    echo "  [1] Install MiuuJS Theme"
+    echo "  [2] Install MustikaPay Plugin"
+    echo "  [3] Exit"
     echo ""
 
-    input "Select option [0-2]: "
+    input "Select option [1-3]: "
     read -r ACTION
     case "$ACTION" in
-        0)
+        1)
             preflight
-            detect_node
+            ensure_node22
             determine_source
             backup_panel
             install_deps
             copy_theme
-            install_mod
             build_frontend
-            run_migrations
             finalize
             ;;
-        1)
-            preflight
-            uninstall_theme
-            ;;
         2)
+            preflight
+            ensure_node22
+            determine_source
+            install_mustikapay
+            build_frontend
+            finalize
+            ;;
+        3)
             exit 0
             ;;
         *)
