@@ -498,12 +498,15 @@ uninstall_plugins() {
     cd "$PANEL_DIR"
 
     info "Removing Products nav links from theme..."
-    # NavigationBar: remove ShoppingCartIcon from import + remove Products NavLink blocks
+    # Must use two-step sed: one-liner first, then multi-line blocks
+    # (single range delete would eat following lines if start+end match on same line)
     sed -i 's/, ShoppingCartIcon//' "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" 2>/dev/null || true
-    sed -i '/<NavLink.*\/products/,/<\/NavLink>/d' "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" 2>/dev/null || true
-    # SideBar: remove ShoppingCartIcon from import + remove Products NavLink block
+    sed -i '/<NavLink[^>]*\/products[^>]*>.*<\/NavLink>/d' "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" 2>/dev/null || true
+    sed -i '/<NavLink[^>]*\/products[^>]*>/,/<\/NavLink>/d' "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" 2>/dev/null || true
+    # SideBar
     sed -i 's/, ShoppingCartIcon//' "$PANEL_DIR/resources/scripts/components/SideBar.tsx" 2>/dev/null || true
-    sed -i '/<NavLink.*\/products/,/<\/NavLink>/d' "$PANEL_DIR/resources/scripts/components/SideBar.tsx" 2>/dev/null || true
+    sed -i '/<NavLink[^>]*\/products[^>]*>.*<\/NavLink>/d' "$PANEL_DIR/resources/scripts/components/SideBar.tsx" 2>/dev/null || true
+    sed -i '/<NavLink[^>]*\/products[^>]*>/,/<\/NavLink>/d' "$PANEL_DIR/resources/scripts/components/SideBar.tsx" 2>/dev/null || true
     # DashboardRouter: remove StoreContainer import + Products route block
     sed -i '/StoreContainer/d' "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx" 2>/dev/null || true
     sed -i '/<Route.*\/products/,/<\/Route>/d' "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx" 2>/dev/null || true
