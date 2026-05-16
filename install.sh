@@ -72,6 +72,14 @@ preflight() {
         exit 1
     fi
 
+    if ! [ -x "$(command -v rsync)" ]; then
+        info "rsync not found. Installing..."
+        apt-get install rsync -y 2>/dev/null || {
+            error "Failed to install rsync. Install it with: apt install rsync -y"
+            exit 1
+        }
+    fi
+
     # Detect panel
     PANEL_DIR=""
     if [ -d "/var/www/pterodactyl" ] && [ -f "/var/www/pterodactyl/artisan" ]; then
@@ -608,6 +616,88 @@ uninstall_plugins() {
     echo ""
 }
 
+# --- Uninstall Theme ---
+uninstall_theme() {
+    print_banner
+    echo -e "  ${BOLD}Uninstall MiuuJS Theme${RESET}"
+    echo ""
+
+    warning "This will restore your panel to its original Pterodactyl state."
+    warning "All theme and plugin modifications will be removed."
+    echo ""
+    input "Are you sure? (y/N): "
+    read -r CONFIRM
+    if [[ ! "$CONFIRM" =~ [Yy] ]]; then
+        info "Cancelled."
+        return
+    fi
+
+    cd "$PANEL_DIR"
+
+    # Find latest backup
+    BACKUP_DIR=$(ls -dt "${PANEL_DIR}-backup-"* 2>/dev/null | head -1)
+    if [ -z "$BACKUP_DIR" ] || [ ! -d "$BACKUP_DIR" ]; then
+        error "No backup found at ${PANEL_DIR}-backup-*"
+        info "Run the theme install first to create a backup."
+        return
+    fi
+    info "Found backup: $BACKUP_DIR"
+    echo ""
+
+    # Step 1: Remove theme-specific files (backup may not have them, so --delete won't catch)
+    info "Removing theme files..."
+    rm -f "$PANEL_DIR/config/miuujs.php"
+    rm -rf "$PANEL_DIR/app/Http/Controllers/Admin/MiuuJS"
+    rm -f "$PANEL_DIR/app/Http/Controllers/Base/LocaleController.php"
+    rm -f "$PANEL_DIR/app/Http/Requests/Base/LocaleRequest.php"
+    rm -f "$PANEL_DIR/app/Http/ViewComposers/AssetComposer.php"
+    rm -rf "$PANEL_DIR/public/miuujs"
+    rm -f "$PANEL_DIR/public/themes/pterodactyl/css/miuujs.css"
+    rm -f "$PANEL_DIR/public/themes/pterodactyl/css/pterodactyl.css"
+    rm -rf "$PANEL_DIR/resources/lang/en/miuujs"
+    rm -rf "$PANEL_DIR/resources/views/admin/miuujs"
+    success "Theme files removed."
+
+    # Step 2: Restore from backup (--delete removes plugin files not in backup)
+    info "Restoring original panel files from backup..."
+    rsync -a --delete \
+        --exclude='.env' \
+        --exclude='storage' \
+        --exclude='node_modules' \
+        --exclude='vendor' \
+        --exclude='bootstrap/cache' \
+        "$BACKUP_DIR/" "$PANEL_DIR/"
+    success "Original panel files restored."
+    echo ""
+
+    # Step 3: Clean up plugin database tables if they exist
+    if php artisan tinker --execute='echo Schema::hasTable("mustikapay_products") ? "1" : "0";' 2>/dev/null | grep -q "1"; then
+        info "Cleaning up plugin database tables..."
+        php artisan tinker --execute='Schema::dropIfExists("mustikapay_products");' 2>/dev/null || true
+        php artisan tinker --execute='Schema::dropIfExists("mustikapay_transactions");' 2>/dev/null || true
+        php artisan tinker --execute='DB::table("migrations")->where("migration", "like", "%2026_05_11%")->delete();' 2>/dev/null || true
+        success "Plugin database tables removed."
+        echo ""
+    fi
+
+    # Step 4: Rebuild frontend
+    ensure_node22
+    build_frontend
+
+    # Step 5: Clear caches
+    info "Clearing caches..."
+    php artisan view:clear 2>/dev/null || true
+    php artisan config:clear 2>/dev/null || true
+    php artisan cache:clear 2>/dev/null || true
+    php artisan optimize:clear 2>/dev/null || true
+    php artisan queue:restart 2>/dev/null || true
+    composer dump-autoload 2>/dev/null || true
+    echo ""
+
+    success "Theme uninstalled. Panel restored to original Pterodactyl state."
+    echo ""
+}
+
 # --- Detection ---
 is_theme_installed() {
     [ -f "$PANEL_DIR/config/miuujs.php" ]
@@ -680,8 +770,10 @@ main_menu() {
     echo -e "  ${BOLD}What would you like to do?${RESET}"
     echo ""
     echo "  [1] Install MiuuJS Theme"
-    echo "  [2] Install Plugins"
-    echo "  [3] Exit"
+    echo "  [2] Uninstall MiuuJS Theme"
+    echo "  [3] Install Plugins"
+    echo ""
+    echo -e "  ${DIM}Press Ctrl+C to exit${RESET}"
     echo ""
 
     input "Select option [1-3]: "
@@ -705,14 +797,25 @@ main_menu() {
             finalize
             ;;
         2)
-            plugins_menu
+            preflight
+            if ! is_theme_installed; then
+                warning "MiuuJS Theme is not installed!"
+                input "Press Enter to return to menu..."
+                read -r
+                main_menu
+                return
+            fi
+            ensure_node22
+            uninstall_theme
             ;;
         3)
-            exit 0
+            plugins_menu
             ;;
         *)
             error "Invalid option."
-            exit 1
+            input "Press Enter to return to menu..."
+            read -r
+            main_menu
             ;;
     esac
 }
