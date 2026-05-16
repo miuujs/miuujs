@@ -54,7 +54,7 @@ const MobileLinks = styled.div`
                 ${tw`text-gray-50`};
 
                 & > svg{
-                    ${tw`text-arix`}
+                    ${tw`text-miuujs`}
                 }
             }
         }

@@ -15,7 +15,7 @@ const Banner = () => {
 
     return(
         <div className={'lg:col-span-2'}>
-            <div className={'bg-center bg-no-repeat bg-cover w-full h-[25vh] rounded-box max-h-[250px]'} css={`background-image:url(${eggImage ? eggImage : '/arix/minecraft-banner.png'})`} />
+            <div className={'bg-center bg-no-repeat bg-cover w-full h-[25vh] rounded-box max-h-[250px]'} css={`background-image:url(${eggImage ? eggImage : '/miuujs/minecraft-banner.png'})`} />
         </div>
     )
 }

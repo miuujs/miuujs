@@ -66,10 +66,10 @@ export default () => {
                                 && t('sshkey')}
                             </p>
                             <div className={'flex gap-x-4'}>
-                                <button onClick={() => setIsTab('api')} className={`pb-2 border-b duration-300 ${isTab === 'api' ? 'border-arix text-gray-50' : 'border-transparent hover:text-gray-50'}`}>
+                                <button onClick={() => setIsTab('api')} className={`pb-2 border-b duration-300 ${isTab === 'api' ? 'border-miuujs text-gray-50' : 'border-transparent hover:text-gray-50'}`}>
                                     {t('apikey')}
                                 </button>
-                                <button onClick={() => setIsTab('ssh')} className={`pb-2 border-b duration-300 ${isTab === 'ssh' ? 'border-arix text-gray-50' : 'border-transparent hover:text-gray-50'}`}>
+                                <button onClick={() => setIsTab('ssh')} className={`pb-2 border-b duration-300 ${isTab === 'ssh' ? 'border-miuujs text-gray-50' : 'border-transparent hover:text-gray-50'}`}>
                                     {t('sshkey')}
                                 </button>
                             </div>

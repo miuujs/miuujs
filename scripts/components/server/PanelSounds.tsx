@@ -20,11 +20,11 @@ const PanelSounds = () => {
 
         if (prevStatusRef.current !== null && (status === 'running' || status === 'offline') && panelSoundsEnabled) {
             if (status === 'running') {
-                const runningSound = new Audio('/arix/online.mp3');
+                const runningSound = new Audio('/miuujs/online.mp3');
                 runningSound.volume = 1;
                 runningSound.play();
             } else if (status === 'offline') {
-                const offlineSound = new Audio('/arix/offline.mp3');
+                const offlineSound = new Audio('/miuujs/offline.mp3');
                 offlineSound.volume = 0.2;
                 offlineSound.play();
             }

@@ -101,10 +101,10 @@ const NavigationLinks = styled.div`
         }
 
         &.active {
-            ${tw`text-gray-50 border-arix`}
+            ${tw`text-gray-50 border-miuujs`}
 
             & > svg {
-                ${tw`text-arix`};
+                ${tw`text-miuujs`};
             }
 
             &::after {

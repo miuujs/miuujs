@@ -263,7 +263,7 @@ export default ({ fullConsole }: Props) => {
             const responseData = await response.json();
             await copy(responseData['url']);
             if (localStorage.getItem('panelSounds') === 'true'){
-                const copySound = new Audio('/arix/copy.mp3');
+                const copySound = new Audio('/miuujs/copy.mp3');
                 copySound.volume = 0.2;
                 copySound.play();
             }

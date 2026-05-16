@@ -63,7 +63,7 @@ export default ({ server }: { server: Server }) => {
     return (
         <>
         <div className="bg-gray-700 backdrop overflow-hidden rounded-box">
-            <div className="flex z-10 items-center justify-between bg-center bg-cover bg-no-repeat px-6 pt-5 pb-10 relative" css={`background-image:url(${server.eggImage ? server.eggImage : '/arix/minecraft-banner.png'})`}>
+            <div className="flex z-10 items-center justify-between bg-center bg-cover bg-no-repeat px-6 pt-5 pb-10 relative" css={`background-image:url(${server.eggImage ? server.eggImage : '/miuujs/minecraft-banner.png'})`}>
                 <div className="z-[-1] absolute inset-0" css={'background-color:color-mix(in srgb, var(--gray700-default) 65%, transparent);'}/>
                 <p className="text-lg font-semibold text-gray-50">{server.name}</p>
                 <span className={`py-1 px-2 rounded

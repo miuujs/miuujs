@@ -258,7 +258,7 @@ copy_theme() {
         cp "$SRC/app/Http/ViewComposers/AssetComposer.php" "$PANEL_DIR/app/Http/ViewComposers/"
 
     # Copy config/
-    [ -f "$SRC/config/arix.php" ] && cp "$SRC/config/arix.php" "$PANEL_DIR/config/"
+    [ -f "$SRC/config/miuujs.php" ] && cp "$SRC/config/miuujs.php" "$PANEL_DIR/config/"
     [ -f "$SRC/config/miuujs.php" ] && cp "$SRC/config/miuujs.php" "$PANEL_DIR/config/"
 
     # Copy routes/
@@ -344,7 +344,7 @@ finalize() {
         "$PANEL_DIR/app/Http/Controllers/Base/LocaleController.php" \
         "$PANEL_DIR/app/Http/Requests/Base/LocaleRequest.php" \
         "$PANEL_DIR/app/Http/ViewComposers/AssetComposer.php" \
-        "$PANEL_DIR/config/arix.php" \
+        "$PANEL_DIR/config/miuujs.php" \
         "$PANEL_DIR/config/miuujs.php" \
         "$PANEL_DIR/public/miuujs" \
         "$PANEL_DIR/public/themes/pterodactyl/css/miuujs.css" \

@@ -15,7 +15,7 @@ import { CSSTransition } from 'react-transition-group';
 import tw from 'twin.macro';
 
 const BarFill = styled.div`
-    ${tw`h-full bg-arix opacity-50`};
+    ${tw`h-full bg-miuujs opacity-50`};
     transition: 250ms ease-in-out;
     box-shadow: 0 -2px 10px 2px var(--primary);
 `;

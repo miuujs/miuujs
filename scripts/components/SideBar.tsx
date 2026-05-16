@@ -89,14 +89,14 @@ const SideBar = ({ children, type }: Props) => {
             &:hover,
             &:focus,
             &.active{
-                ${tw`text-gray-100 border-arix`}
+                ${tw`text-gray-100 border-miuujs`}
 
                 &::after{
                     ${tw`opacity-100`}
                 }
 
                 & > svg{
-                    ${layout == 5 ? tw`text-gray-100` : tw`text-arix duration-300`}
+                    ${layout == 5 ? tw`text-gray-100` : tw`text-miuujs duration-300`}
                 }
             }
         }

@@ -74,7 +74,7 @@ const ServerDetailsBlock = () => {
                         <span className={'text-gray-300 font-medium'}>/ {textLimits.cpu}</span>
                     </div>
                 </div>
-                <div className={'text-white bg-arix rounded-component w-16 h-16 flex items-center justify-center'}>
+                <div className={'text-white bg-miuujs rounded-component w-16 h-16 flex items-center justify-center'}>
                     <ChipIcon className={'w-10'}/>
                 </div>
             </div>
@@ -86,7 +86,7 @@ const ServerDetailsBlock = () => {
                         <span className={'text-gray-300 font-medium'}>/ {textLimits.memory}</span>
                     </div>
                 </div>
-                <div className={'text-white bg-arix rounded-component w-16 h-16 flex items-center justify-center'}>
+                <div className={'text-white bg-miuujs rounded-component w-16 h-16 flex items-center justify-center'}>
                     <LuMemoryStick className={'text-[2.5rem]'}/>
                 </div>
             </div>
@@ -98,7 +98,7 @@ const ServerDetailsBlock = () => {
                         <span className={'text-gray-300 font-medium'}>/ {textLimits.disk}</span>
                     </div>
                 </div>
-                <div className={'text-white bg-arix rounded-component w-16 h-16 flex items-center justify-center'}>
+                <div className={'text-white bg-miuujs rounded-component w-16 h-16 flex items-center justify-center'}>
                     <LuSave className={'text-[2.5rem]'}/>
                 </div>
             </div>

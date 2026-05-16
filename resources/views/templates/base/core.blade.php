@@ -3,7 +3,7 @@
 ])
 
 @section('container')
-    <style id="arix-dashboard-fixes">
+    <style id="miuujs-dashboard-fixes">
       html, body {
         background-color: var(--gray900) !important;
       }

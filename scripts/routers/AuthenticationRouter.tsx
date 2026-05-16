@@ -98,7 +98,7 @@ const AuthContainer = () => {
                     <TopBar />
                     <Switches />
                 </div>
-                <div className={'h-full bg-center bg-no-repeat bg-cover bg-arix z-10 relative'} css={`background-image:url(${loginBackground});`}>
+                <div className={'h-full bg-center bg-no-repeat bg-cover bg-miuujs z-10 relative'} css={`background-image:url(${loginBackground});`}>
                     <Gradient />
                 </div>
             </div>
@@ -109,7 +109,7 @@ const AuthContainer = () => {
                     <Switches />
                 </div>
                 <div className={'h-full lg:p-5'}>
-                    <div className={'h-full bg-center bg-no-repeat bg-cover bg-arix rounded-box overflow-hidden relative z-10'} css={`background-image:url(${loginBackground});`}>
+                    <div className={'h-full bg-center bg-no-repeat bg-cover bg-miuujs rounded-box overflow-hidden relative z-10'} css={`background-image:url(${loginBackground});`}>
                         <Gradient />
                     </div>
                 </div>

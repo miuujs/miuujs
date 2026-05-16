@@ -46,7 +46,7 @@ export default ({ type, title, legend, usage, limit, inbound, outbound, children
                     <span className={'text-gray-300 font-medium'}>{limit && '/ ' + limit}</span>
                 </div>
             </div>
-            <div className={'text-white bg-arix rounded-component w-16 h-16 flex items-center justify-center'}>
+            <div className={'text-white bg-miuujs rounded-component w-16 h-16 flex items-center justify-center'}>
                 {type == 'cpu'
                 ? <ChipIcon className={'w-10'}/>
                 : type == 'network'
