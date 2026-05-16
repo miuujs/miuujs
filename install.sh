@@ -476,12 +476,141 @@ RESTORE_EOF
     echo ""
     echo -e "  ${GREEN}MiuuJS theme has been installed successfully!${RESET}"
     echo ""
+    echo -e "  ${CYAN}Store:${RESET}         ${BOLD}https://your-panel.com/store${RESET}"
     echo -e "  ${CYAN}Admin Config:${RESET}  ${BOLD}https://your-panel.com/admin/miuujs${RESET}"
+    echo -e "  ${CYAN}Admin Billing:${RESET} ${BOLD}https://your-panel.com/admin/mustikapay${RESET}"
     echo ""
     echo -e "  ${CYAN}Restore:${RESET}       ${BOLD}sudo bash $PANEL_DIR/miuujs-restore.sh${RESET}"
     echo -e "  ${CYAN}Backup:${RESET}        ${BOLD}$BACKUP_PATH${RESET}"
     echo ""
     echo -e "  ${YELLOW}Note:${RESET} If you see any visual issues, clear your browser cache."
+    echo ""
+}
+
+# --- Install MustikaPay Mod ---
+install_mod() {
+    print_banner
+    echo -e "  ${BOLD}Optional: Install MustikaPay Store Mod${RESET}"
+    echo ""
+    echo -e "  ${CYAN}Adds:${RESET} Balance top-up, server store, payment gateway (QRIS/VA)"
+    echo ""
+
+    input "Install MustikaPay Store mod? (y/N): "
+    read -r CONFIRM
+    if [[ ! "$CONFIRM" =~ [Yy] ]]; then
+        info "Skipping mod installation."
+        return
+    fi
+
+    if [ ! -d "$REPO_DIR/pteromod" ]; then
+        warning "pteromod/ not found in $REPO_DIR. Re-cloning repository..."
+        rm -rf "$REPO_DIR"
+        git clone https://github.com/miuujs/miuujs.git "$REPO_DIR" 2>/dev/null || {
+            error "Failed to clone repo. Ensure git is installed."
+            return
+        }
+    fi
+
+    cd "$PANEL_DIR"
+    SRC="$REPO_DIR"
+
+    info "Installing MustikaPay mod..."
+
+    # Copy Extensions
+    if [ -d "$SRC/pteromod/app/Extensions" ]; then
+        cp -r "$SRC/pteromod/app/Extensions" "$PANEL_DIR/app/"
+    fi
+
+    # Copy Controllers
+    if [ -d "$SRC/pteromod/app/Http/Controllers/Admin" ]; then
+        cp "$SRC/pteromod/app/Http/Controllers/Admin/MustikaPayController.php" "$PANEL_DIR/app/Http/Controllers/Admin/"
+    fi
+    if [ -d "$SRC/pteromod/app/Http/Controllers/Api/Client/Store" ]; then
+        mkdir -p "$PANEL_DIR/app/Http/Controllers/Api/Client/Store"
+        cp "$SRC/pteromod/app/Http/Controllers/Api/Client/Store/StoreController.php" "$PANEL_DIR/app/Http/Controllers/Api/Client/Store/"
+    fi
+
+    # Copy Models
+    if [ -d "$SRC/pteromod/app/Models" ]; then
+        cp "$SRC/pteromod/app/Models/"*.php "$PANEL_DIR/app/Models/"
+    fi
+
+    # Copy Migrations
+    if [ -d "$SRC/pteromod/database/migrations" ]; then
+        cp "$SRC/pteromod/database/migrations/"*.php "$PANEL_DIR/database/migrations/"
+    fi
+
+    # Copy Views
+    if [ -f "$SRC/pteromod/resources/views/admin/mustikapay.blade.php" ]; then
+        cp "$SRC/pteromod/resources/views/admin/mustikapay.blade.php" "$PANEL_DIR/resources/views/admin/"
+    fi
+
+    # Copy the miuujs-upgraded StoreContainer if exists
+    if [ -f "$SRC/pteromod/resources/scripts/components/dashboard/StoreContainer.tsx" ]; then
+        mkdir -p "$PANEL_DIR/resources/scripts/components/dashboard"
+        cp "$SRC/pteromod/resources/scripts/components/dashboard/StoreContainer.tsx" "$PANEL_DIR/resources/scripts/components/dashboard/"
+    fi
+
+    # --- Route modifications ---
+    info "Adding MustikaPay routes..."
+
+    if ! grep -q "MustikaPay" "$PANEL_DIR/routes/admin.php" 2>/dev/null; then
+        cat << 'ROUTES' >> "$PANEL_DIR/routes/admin.php"
+
+/* MustikaPay Billing Routes */
+Route::group(['prefix' => 'mustikapay'], function () {
+    Route::get('/', [Admin\MustikaPayController::class, 'index'])->name('admin.mustikapay');
+    Route::post('/', [Admin\MustikaPayController::class, 'update'])->name('admin.mustikapay.update');
+    Route::post('/product', [Admin\MustikaPayController::class, 'addProduct'])->name('admin.mustikapay.product.add');
+    Route::delete('/product/{id}', [Admin\MustikaPayController::class, 'deleteProduct'])->name('admin.mustikapay.product.delete');
+});
+ROUTES
+    fi
+
+    if ! grep -q "/store" "$PANEL_DIR/routes/api-client.php" 2>/dev/null; then
+        cat << 'ROUTES' >> "$PANEL_DIR/routes/api-client.php"
+
+/* Store Routes */
+Route::prefix('/store')->group(function () {
+    Route::get('/', [Client\Store\StoreController::class, 'index']);
+    Route::post('/pay', [Client\Store\StoreController::class, 'pay']);
+    Route::post('/buy', [Client\Store\StoreController::class, 'buy']);
+});
+ROUTES
+    fi
+
+    # --- Model modifications ---
+    info "Updating models..."
+    if ! grep -q "'balance'" "$PANEL_DIR/app/Models/User.php" 2>/dev/null; then
+        sed -i "/'root_admin',/a \\\t'balance'," "$PANEL_DIR/app/Models/User.php"
+    fi
+    if ! grep -q "'is_billed'" "$PANEL_DIR/app/Models/Server.php" 2>/dev/null; then
+        sed -i "/'oom_disabled' => 'boolean',/a \\\t'is_billed' => 'boolean',\n\\t'expires_at' => 'datetime'," "$PANEL_DIR/app/Models/Server.php"
+    fi
+
+    # --- Admin sidebar menu link ---
+    info "Adding admin menu link..."
+    if ! grep -q "mustikapay" "$PANEL_DIR/resources/views/layouts/admin.blade.php" 2>/dev/null; then
+        sed -i 's|title="MiuuJS Config">|title="MiuuJS Config">\n\t\t\t\t\t\t\t\t<li><a href="{{ route('"'"'admin.mustikapay'"'"') }}" data-toggle="tooltip" data-placement="bottom" title="MustikaPay Billing"><i class="fa fa-credit-card"></i></a></li>|' "$PANEL_DIR/resources/views/layouts/admin.blade.php"
+    fi
+
+    # --- Composer autoload ---
+    info "Registering MustikaPay namespace in composer autoload..."
+    if ! grep -q "MustikaPay" "$PANEL_DIR/composer.json" 2>/dev/null; then
+        sed -i 's|"Pterodactyl\\\\": "app/",|"Pterodactyl\\\\": "app/",\n            "MustikaPay\\\\": "app/Extensions/Payment/MustikaPay/",|' "$PANEL_DIR/composer.json"
+    fi
+    composer dump-autoload 2>/dev/null || true
+
+    success "MustikaPay mod installed."
+    echo ""
+}
+
+# --- Run Migrations ---
+run_migrations() {
+    info "Running database migrations..."
+    cd "$PANEL_DIR"
+    php artisan migrate --force 2>&1
+    success "Migrations complete."
     echo ""
 }
 
@@ -529,7 +658,9 @@ main_menu() {
             backup_panel
             install_deps
             copy_theme
+            install_mod
             build_frontend
+            run_migrations
             finalize
             ;;
         1)
