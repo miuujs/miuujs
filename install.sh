@@ -417,7 +417,7 @@ MIUUJS_ROUTES
 
 /* MIUUJS_PLUGIN_STORE_START */
 /* Store API Routes (MustikaPay) */
-Route::prefix('/store')->group(function () {
+Route::prefix('/products')->group(function () {
     Route::get('/', [Client\Store\StoreController::class, 'index']);
     Route::post('/pay', [Client\Store\StoreController::class, 'pay']);
     Route::post('/buy', [Client\Store\StoreController::class, 'buy']);
