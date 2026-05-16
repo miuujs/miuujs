@@ -86,7 +86,11 @@ class StoreController extends ClientApiController
 
             $environment = [];
             foreach ($egg->variables as $variable) {
-                $environment[$variable->env_variable] = $variable->default_value;
+                $val = $variable->default_value;
+                if (empty($val) && str_contains($variable->rules ?? '', 'required')) {
+                    $val = str_contains($variable->env_variable, 'PASS') ? bin2hex(random_bytes(8)) : $variable->name;
+                }
+                $environment[$variable->env_variable] = $val;
             }
 
             $images = $egg->docker_images;
