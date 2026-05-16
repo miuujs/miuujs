@@ -19,14 +19,16 @@ const Toast = styled.div<{ $type: 'success' | 'error' }>`
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.75rem 1.25rem;
-    margin-bottom: 1rem;
+    padding: 1rem 1.25rem;
     border-radius: var(--rounded-box, 0.5rem);
     font-size: 0.875rem;
     font-weight: 500;
-    background: ${props => props.$type === 'success' ? 'color-mix(in srgb, var(--green) 20%, transparent)' : 'color-mix(in srgb, var(--red) 20%, transparent)'};
-    color: ${props => props.$type === 'success' ? 'var(--green)' : 'var(--red)'};
-    border: 1px solid ${props => props.$type === 'success' ? 'color-mix(in srgb, var(--green) 40%, transparent)' : 'color-mix(in srgb, var(--red) 40%, transparent)'};
+    background: ${props => props.$type === 'success' ? '#065f46' : '#7f1d1d'};
+    color: ${props => props.$type === 'success' ? '#6ee7b7' : '#fca5a5'};
+    border: 1px solid ${props => props.$type === 'success' ? '#10b981' : '#ef4444'};
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);
+    max-width: 28rem;
+    width: 100%;
 `;
 
 const ConfirmOverlay = styled.div`
@@ -34,13 +36,7 @@ const ConfirmOverlay = styled.div`
 `;
 
 const ConfirmBox = styled.div`
-    background: var(--bg-secondary, #262626);
-    border: 1px solid var(--border, #404040);
-    border-radius: var(--rounded-box, 0.5rem);
-    padding: 1.5rem;
-    max-width: 24rem;
-    width: 100%;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    ${tw`bg-neutral-800 border border-neutral-700 rounded-box p-6 shadow-2xl max-w-sm w-full`};
 `;
 
 export default () => {
@@ -188,11 +184,11 @@ export default () => {
                 </div>
             </div>
             {toast && (
-                <div className={'fixed top-5 right-5 z-50 animate__animated animate__fadeIn'}>
-                    <Toast $type={toast.type}>
+                <div className={'fixed top-0 left-0 right-0 z-50 flex justify-center p-4 pointer-events-none sm:top-5 sm:left-auto sm:right-5 sm:p-0'}>
+                    <Toast $type={toast.type} className={'pointer-events-auto'}>
                         <FontAwesomeIcon icon={toast.type === 'success' ? faCheckCircle : faExclamationCircle} />
-                        <span className={'flex-1'}>{toast.message}</span>
-                        <button onClick={() => setToast(null)} className={'text-current opacity-60 hover:opacity-100'}><FontAwesomeIcon icon={faTimes} /></button>
+                        <span className={'flex-1 text-sm sm:text-base'}>{toast.message}</span>
+                        <button onClick={() => setToast(null)} className={'text-current opacity-60 hover:opacity-100 ml-auto shrink-0'}><FontAwesomeIcon icon={faTimes} /></button>
                     </Toast>
                 </div>
             )}
@@ -217,14 +213,16 @@ export default () => {
             {paymentData && (
                 <div className={'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4'}>
                     <div className={'max-w-md w-full'}>
-                        <ContentBox title={'Selesaikan Pembayaran'}>
+                        <div className={'bg-neutral-800 border border-neutral-700 rounded-box p-6 shadow-2xl'}>
+                            <h3 className={'text-xl font-bold font-header text-center mb-6'}>Selesaikan Pembayaran</h3>
                             <div className={'text-center space-y-4'}>
-                                {method === 'QRIS' ? <div className={'bg-white p-4 inline-block rounded'}><img src={'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(paymentData.qr_content)} /></div> :
-                                    <><p>Transfer ke Virtual Account:</p><p className={'text-4xl font-mono font-bold text-cyan-500'}>{paymentData.va_number}</p><p className={'text-sm text-neutral-400'}>Bank: {method}</p></>}
-                                <p className={'text-xs text-yellow-500 italic'}>Saldo akan bertambah otomatis.</p>
+                                {method === 'QRIS'
+                                    ? <div className={'bg-white p-4 rounded-lg inline-block'}><img src={'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(paymentData.qr_content)} /></div>
+                                    : <><p className={'text-neutral-400'}>Transfer ke Virtual Account:</p><p className={'text-3xl sm:text-4xl font-mono font-bold text-cyan-500 break-all'}>{paymentData.va_number}</p><p className={'text-sm text-neutral-400'}>Bank: {method}</p></>}
+                                <p className={'text-xs text-yellow-500 italic'}>Saldo akan bertambah otomatis setelah pembayaran dikonfirmasi.</p>
                                 <Button isSecondary className={'w-full'} onClick={() => setPaymentData(null)}>Tutup</Button>
                             </div>
-                        </ContentBox>
+                        </div>
                     </div>
                 </div>
             )}
