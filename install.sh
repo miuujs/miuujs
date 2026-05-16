@@ -235,6 +235,8 @@ install_deps() {
     info "Installing Node.js dependencies with $PKG_MANAGER..."
     echo ""
 
+    # Copy repo's package.json so theme deps (react-icons, i18next-*, etc.) are available
+    cp "$REPO_DIR/package.json" "$PANEL_DIR/package.json"
     cp "$REPO_DIR/tailwind.config.js" "$PANEL_DIR/tailwind.config.js"
     cp "$REPO_DIR/webpack.config.js" "$PANEL_DIR/webpack.config.js"
 

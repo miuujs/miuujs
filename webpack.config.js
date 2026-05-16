@@ -93,7 +93,7 @@ module.exports = {
             '@feature': path.join(__dirname, '/resources/scripts/components/server/features'),
         },
         fallback: {
-            path: false,
+            path: require.resolve('path-browserify'),
         },
         symlinks: false,
     },
