@@ -43,7 +43,7 @@ export default forwardRef<HTMLFormElement, Props>(({ title, ...props }, ref) => 
         <div className={'my-auto mx-auto w-full'}>
             <FlashMessageRender css={tw`mb-2 px-1`} />
             <Form {...props} ref={ref}>
-                <div className={`max-w-[450px] w-screen lg:p-6 p-5 ${loginLayout == 1 ? 'bg-gray-700 rounded-box' : ''}`}>
+                <div className={`max-w-[450px] w-full mx-auto lg:p-6 p-5 ${loginLayout == 1 ? 'bg-gray-700 rounded-box' : ''}`}>
                     {logoPosition == 1 &&
                     <div className='flex gap-x-2 items-center font-semibold text-lg text-gray-50 pb-5'>
                         <img src={logo} alt={name + 'logo'} css={`height:${logoHeight};`} />
