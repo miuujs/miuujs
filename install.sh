@@ -238,6 +238,16 @@ install_deps() {
     else
         npm install --no-progress 2>&1 | tail -10
     fi
+
+    # webpack 5 needs path-browserify polyfill; panel's package.json doesn't have it
+    if ! grep -q "path-browserify" "$PANEL_DIR/package.json" 2>/dev/null; then
+        info "Installing path-browserify (webpack polyfill)..."
+        if [ "$PKG_MANAGER" = "yarn" ]; then
+            yarn add --dev path-browserify --no-progress 2>&1 | tail -3
+        else
+            npm install --save-dev path-browserify --no-progress 2>&1 | tail -3
+        fi
+    fi
     echo ""
 
     success "Dependencies installed."
