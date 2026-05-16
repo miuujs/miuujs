@@ -424,46 +424,34 @@ Route::prefix('/products')->group(function () {
 MIUUJS_ROUTES
     fi
 
-    # Model modifications
+    # Model modifications (use $'...' ANSI-C quoting so \t is actual tab, \\n is sed newline)
     if ! grep -q "'balance'" "$PANEL_DIR/app/Models/User.php" 2>/dev/null; then
-        sed -i "/'root_admin',/a \\\t'balance'," "$PANEL_DIR/app/Models/User.php"
+        sed -i $'/\'root_admin\',/a\\\t\t\'balance\',' "$PANEL_DIR/app/Models/User.php"
     fi
     if ! grep -q "'is_billed'" "$PANEL_DIR/app/Models/Server.php" 2>/dev/null; then
-        sed -i "/'oom_disabled' => 'boolean',/a \\\t'is_billed' => 'boolean',\n\\t'expires_at' => 'datetime'," "$PANEL_DIR/app/Models/Server.php"
+        sed -i $'/\'oom_disabled\' => \'boolean\',/a\\\t\t\'is_billed\' => \'boolean\',\\n\\t\t\'expires_at\' => \'datetime\',' "$PANEL_DIR/app/Models/Server.php"
     fi
 
-    # Admin sidebar menu
+    # Admin sidebar menu — copy theme's admin.blade.php (has both MiuuJS + MustikaPay links)
     if ! grep -q "mustikapay" "$PANEL_DIR/resources/views/layouts/admin.blade.php" 2>/dev/null; then
-        sed -i '/title="MiuuJS Config">.*fa-paint-brush"><\/a><\/li>/a \\t\t\t\t\t\t\t\t<li><a href="{{ route('"'"'admin.mustikapay'"'"') }}" data-toggle="tooltip" data-placement="bottom" title="MustikaPay Billing"><i class="fa fa-credit-card"><\/i><\/a><\/li>' "$PANEL_DIR/resources/views/layouts/admin.blade.php"
+        if [ -f "$SRC/resources/views/layouts/admin.blade.php" ]; then
+            cp "$SRC/resources/views/layouts/admin.blade.php" "$PANEL_DIR/resources/views/layouts/admin.blade.php"
+        fi
     fi
 
-    # Fallback: copy StoreContainer + nav links if theme not installed
+    # Fallback: restore theme frontend files if missing or Products nav was removed by uninstall
     if [ ! -f "$PANEL_DIR/resources/scripts/components/dashboard/StoreContainer.tsx" ]; then
-        if [ -f "$SRC/scripts/components/dashboard/StoreContainer.tsx" ]; then
-            mkdir -p "$PANEL_DIR/resources/scripts/components/dashboard"
-            cp "$SRC/scripts/components/dashboard/StoreContainer.tsx" "$PANEL_DIR/resources/scripts/components/dashboard/"
-        fi
+        mkdir -p "$PANEL_DIR/resources/scripts/components/dashboard"
+        [ -f "$SRC/scripts/components/dashboard/StoreContainer.tsx" ] && cp "$SRC/scripts/components/dashboard/StoreContainer.tsx" "$PANEL_DIR/resources/scripts/components/dashboard/"
     fi
-    if ! grep -q "StoreContainer" "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx" 2>/dev/null; then
-        DASHBOARD_ROUTER="$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx"
-        sed -i "s|import { NotFound } from '@/components/elements/ScreenBlock';|import { NotFound } from '@/components/elements/ScreenBlock';\nimport StoreContainer from '@/components/dashboard/StoreContainer';|" "$DASHBOARD_ROUTER"
-        sed -i "/<Route path={'\/'} exact>/a \\\t\t\t\t\t\t\t<Route path={'\/products'} exact>\n\t\t\t\t\t\t\t\t<StoreContainer />\n\t\t\t\t\t\t\t</Route>" "$DASHBOARD_ROUTER"
+    if [ ! -f "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" ] || ! grep -q "ShoppingCartIcon" "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" 2>/dev/null; then
+        [ -f "$SRC/scripts/components/NavigationBar.tsx" ] && cp "$SRC/scripts/components/NavigationBar.tsx" "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx"
     fi
-    if ! grep -q "ShoppingCartIcon" "$PANEL_DIR/resources/scripts/components/SideBar.tsx" 2>/dev/null; then
-        SIDEBAR="$PANEL_DIR/resources/scripts/components/SideBar.tsx"
-        if grep -q "LogoutIcon } from" "$SIDEBAR" 2>/dev/null; then
-            sed -i "s|LogoutIcon } from '@heroicons/react/outline'|LogoutIcon, ShoppingCartIcon } from '@heroicons/react/outline'|" "$SIDEBAR"
-        fi
-        sed -i "/<NavLink to={'\/account'} exact>/a \\\t\t\t\t<NavLink to={'\/products'} exact>\n\t\t\t\t\t<ShoppingCartIcon/> Products\n\t\t\t\t</NavLink>" "$SIDEBAR"
+    if [ ! -f "$PANEL_DIR/resources/scripts/components/SideBar.tsx" ] || ! grep -q "ShoppingCartIcon" "$PANEL_DIR/resources/scripts/components/SideBar.tsx" 2>/dev/null; then
+        [ -f "$SRC/scripts/components/SideBar.tsx" ] && cp "$SRC/scripts/components/SideBar.tsx" "$PANEL_DIR/resources/scripts/components/SideBar.tsx"
     fi
-    if ! grep -q "ShoppingCartIcon" "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" 2>/dev/null; then
-        NAVBAR="$PANEL_DIR/resources/scripts/components/NavigationBar.tsx"
-        if grep -q "ServerIcon } from" "$NAVBAR" 2>/dev/null; then
-            sed -i "s|ServerIcon } from '@heroicons/react/outline'|ServerIcon, ShoppingCartIcon } from '@heroicons/react/outline'|" "$NAVBAR"
-        fi
-        sed -i "s|<RightNavigation>|<RightNavigation>\n\t\t\t\t\t<NavLink to={'\/products'}><ShoppingCartIcon className={'w-5'} \/>Products<\/NavLink>|" "$NAVBAR"
-        # Add mobile Products link inside MobileLinks (after Account)
-        sed -i "/<NavLink to={'\/account'} exact>/a \\\t\t\t\t\t\t<NavLink to={'\/products'} exact>\n\t\t\t\t\t\t\t<ShoppingCartIcon\/> Products\n\t\t\t\t\t\t<\/NavLink>" "$NAVBAR"
+    if [ ! -f "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx" ] || ! grep -q "StoreContainer" "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx" 2>/dev/null; then
+        [ -f "$SRC/scripts/routers/DashboardRouter.tsx" ] && cp "$SRC/scripts/routers/DashboardRouter.tsx" "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx"
     fi
 
     # Composer autoload
@@ -614,6 +602,7 @@ plugins_menu() {
             fi
             determine_source
             ensure_node22
+            install_deps
             install_mustikapay
             build_frontend
             finalize
