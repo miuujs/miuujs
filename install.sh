@@ -42,12 +42,11 @@ input() { echo -ne "* ${MAGENTA}$*${RESET}"; }
 print_banner() {
     clear
     echo -e ""
-    echo -e "  ${MAGENTA}███╗   ███╗██╗██╗   ██╗██╗   ██╗${BOLD}${CYAN}███████╗${RESET}"
-    echo -e "  ${MAGENTA}████╗ ████║██║██║   ██║██║   ██║${BOLD}${CYAN}██╔════╝${RESET}"
-    echo -e "  ${MAGENTA}██╔████╔██║██║██║   ██║██║   ██║${BOLD}${CYAN}███████╗${RESET}"
-    echo -e "  ${MAGENTA}██║╚██╔╝██║██║██║   ██║██║   ██║${BOLD}${CYAN}╚════██║${RESET}"
-    echo -e "  ${MAGENTA}██║ ╚═╝ ██║██║╚██████╔╝╚██████╔╝${BOLD}${CYAN}███████║${RESET}"
-    echo -e "  ${MAGENTA}╚═╝     ╚═╝╚═╝ ╚═════╝  ╚═════╝ ${BOLD}${CYAN}╚══════╝${RESET}"
+    echo -e "  ${MAGENTA}███    ███ ██ ██    ██ ██    ██      ██ ███████ ${RESET}"
+    echo -e "  ${MAGENTA}████  ████ ██ ██    ██ ██    ██      ██ ██      ${RESET}"
+    echo -e "  ${MAGENTA}██ ████ ██ ██ ██    ██ ██    ██      ██ ███████ ${RESET}"
+    echo -e "  ${MAGENTA}██  ██  ██ ██ ██    ██ ██    ██ ██   ██      ██ ${RESET}"
+    echo -e "  ${MAGENTA}██      ██ ██  ██████   ██████   █████  ███████ ${RESET}"
     echo -e ""
     echo -e "  ${BOLD}Pterodactyl Theme Installer v${MIUUJS_VERSION}${RESET}"
     echo -e "  ${DIM}Modern dark theme for Pterodactyl panel${RESET}"
@@ -498,18 +497,16 @@ uninstall_plugins() {
 
     cd "$PANEL_DIR"
 
-    info "Restoring theme original files..."
-    # Restore NavigationBar, SideBar, DashboardRouter from theme source
-    determine_source
-    if [ -f "$REPO_DIR/scripts/components/NavigationBar.tsx" ]; then
-        cp "$REPO_DIR/scripts/components/NavigationBar.tsx" "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx"
-    fi
-    if [ -f "$REPO_DIR/scripts/components/SideBar.tsx" ]; then
-        cp "$REPO_DIR/scripts/components/SideBar.tsx" "$PANEL_DIR/resources/scripts/components/SideBar.tsx"
-    fi
-    if [ -f "$REPO_DIR/scripts/routers/DashboardRouter.tsx" ]; then
-        cp "$REPO_DIR/scripts/routers/DashboardRouter.tsx" "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx"
-    fi
+    info "Removing Products nav links from theme..."
+    # NavigationBar: remove ShoppingCartIcon from import + remove Products NavLink blocks
+    sed -i 's/, ShoppingCartIcon//' "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" 2>/dev/null || true
+    sed -i '/<NavLink.*\/products/,/<\/NavLink>/d' "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" 2>/dev/null || true
+    # SideBar: remove ShoppingCartIcon from import + remove Products NavLink block
+    sed -i 's/, ShoppingCartIcon//' "$PANEL_DIR/resources/scripts/components/SideBar.tsx" 2>/dev/null || true
+    sed -i '/<NavLink.*\/products/,/<\/NavLink>/d' "$PANEL_DIR/resources/scripts/components/SideBar.tsx" 2>/dev/null || true
+    # DashboardRouter: remove StoreContainer import + Products route block
+    sed -i '/StoreContainer/d' "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx" 2>/dev/null || true
+    sed -i '/<Route.*\/products/,/<\/Route>/d' "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx" 2>/dev/null || true
 
     info "Removing plugin files..."
 
