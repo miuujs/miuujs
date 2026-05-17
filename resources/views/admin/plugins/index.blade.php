@@ -13,134 +13,6 @@
 @endsection
 
 @section('content')
-<style>
-.plugin-card {
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    transition: box-shadow 0.2s, transform 0.2s;
-}
-.plugin-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    transform: translateY(-2px);
-}
-.plugin-card .box-header {
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-    border-bottom: 1px solid #bbf7d0;
-    padding: 12px 16px;
-}
-.plugin-card .box-header h3 {
-    font-size: 16px;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-.plugin-card .box-header .label {
-    font-size: 11px;
-    padding: 2px 8px;
-}
-.plugin-card .box-body {
-    padding: 16px;
-}
-.plugin-card .box-body p {
-    margin: 0 0 12px;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #4b5563;
-}
-.plugin-card .features {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 12px;
-}
-.plugin-card .features li {
-    font-size: 13px;
-    padding: 4px 0;
-    color: #374151;
-}
-.plugin-card .installed-at {
-    font-size: 12px;
-    color: #9ca3af;
-    margin: 0;
-}
-.plugin-card .box-footer {
-    background: #f9fafb;
-    border-top: 1px solid #e5e7eb;
-    padding: 12px 16px;
-}
-.plugin-card .box-footer .btn {
-    width: 100%;
-    font-weight: 500;
-}
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-}
-.empty-state i {
-    font-size: 64px;
-    color: #d1d5db;
-    margin-bottom: 16px;
-}
-.empty-state h4 {
-    color: #6b7280;
-    margin: 0 0 8px;
-    font-size: 18px;
-}
-.empty-state p {
-    color: #9ca3af;
-    margin: 0;
-    font-size: 14px;
-}
-.log-output {
-    background: #0f172a;
-    color: #e2e8f0;
-    padding: 16px;
-    border-radius: 6px;
-    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-    font-size: 13px;
-    max-height: 500px;
-    overflow-y: auto;
-    white-space: pre-wrap;
-    line-height: 1.6;
-    word-break: break-word;
-}
-@media (max-width: 767px) {
-    .plugin-card .box-header h3 {
-        font-size: 15px;
-    }
-    .plugin-card .box-body {
-        padding: 12px;
-    }
-    .plugin-card .box-footer {
-        padding: 10px 12px;
-    }
-    .modal-dialog {
-        margin: 10px;
-    }
-    .log-output {
-        max-height: 350px;
-        font-size: 12px;
-        padding: 12px;
-    }
-}
-@media (max-width: 480px) {
-    .content-header h1 {
-        font-size: 22px;
-    }
-    .content-header small {
-        display: block;
-        font-size: 13px;
-        margin-top: 4px;
-    }
-    .breadcrumb {
-        margin-top: 8px;
-    }
-}
-</style>
-
 <div class="row">
     <div class="col-xs-12">
         <div class="box box-default">
@@ -148,7 +20,7 @@
                 <h3 class="box-title">Installed Plugins</h3>
                 <div class="box-tools pull-right">
                     <button class="btn btn-primary btn-sm" onclick="showAddPlugin()">
-                        <i class="fa fa-plus"></i> <span class="hidden-xs">Add Plugin</span>
+                        <i class="fa fa-plus"></i> Add Plugin
                     </button>
                 </div>
             </div>
@@ -156,25 +28,25 @@
                 @if(count($plugins) > 0)
                 <div class="row">
                     @foreach($plugins as $plugin)
-                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-                        <div class="plugin-card box box-solid box-success">
+                    <div class="col-xs-12 col-sm-6 col-md-4">
+                        <div class="box box-solid box-success">
                             <div class="box-header with-border">
                                 <h3 class="box-title">
                                     <i class="fa {{ $plugin['icon'] }}"></i>
-                                    <span>{{ $plugin['name'] }}</span>
-                                    <span class="label label-success pull-right" style="margin-top: 2px;">v{{ $plugin['version'] }}</span>
+                                    {{ $plugin['name'] }}
+                                    <span class="label label-success pull-right">v{{ $plugin['version'] }}</span>
                                 </h3>
                             </div>
                             <div class="box-body">
                                 <p>{{ $plugin['desc'] }}</p>
                                 @if(count($plugin['features']) > 0)
-                                <ul class="features">
+                                <ul class="list-unstyled" style="margin-bottom: 16px;">
                                     @foreach($plugin['features'] as $feature)
                                     <li><i class="fa fa-check text-success"></i> {{ $feature }}</li>
                                     @endforeach
                                 </ul>
                                 @endif
-                                <p class="installed-at"><i class="fa fa-clock-o"></i> {{ $plugin['installed_at'] }}</p>
+                                <p class="text-muted text-sm"><i class="fa fa-clock-o"></i> Installed: {{ $plugin['installed_at'] }}</p>
                             </div>
                             <div class="box-footer">
                                 <button class="btn btn-danger btn-sm" onclick="uninstallPlugin('{{ $plugin['id'] }}')">
@@ -186,10 +58,10 @@
                     @endforeach
                 </div>
                 @else
-                <div class="empty-state">
-                    <i class="fa fa-puzzle-piece"></i>
-                    <h4>No plugins installed</h4>
-                    <p>Click "Add Plugin" to install a plugin from a URL.</p>
+                <div class="text-center" style="padding: 40px;">
+                    <i class="fa fa-puzzle-piece" style="font-size: 48px; color: #42425b;"></i>
+                    <h4 style="color: #8282a4; margin-top: 16px;">No plugins installed</h4>
+                    <p style="color: #5e5e7f;">Click "Add Plugin" to install a plugin from a URL.</p>
                 </div>
                 @endif
             </div>
@@ -207,10 +79,7 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Plugin URL</label>
-                    <input type="text" id="plugin-url" class="form-control" placeholder="https://github.com/username/repo/tree/branch/plugin">
-                    <p class="help-block" style="margin-top: 8px; font-size: 12px; color: #6b7280;">
-                        Enter a GitHub tree URL pointing to the plugin directory.
-                    </p>
+                    <input type="text" id="plugin-url" class="form-control" placeholder="https://github.com/...">
                 </div>
             </div>
             <div class="modal-footer">
@@ -229,7 +98,7 @@
                 <h4 class="modal-title" id="modal-title">Installing Plugin...</h4>
             </div>
             <div class="modal-body">
-                <div id="install-output" class="log-output"></div>
+                <div id="install-output" style="background: #1a1a2e; color: #e0e0e0; padding: 16px; border-radius: 4px; font-family: monospace; font-size: 13px; max-height: 500px; overflow-y: auto; white-space: pre-wrap; line-height: 1.6;"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
