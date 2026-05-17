@@ -1,0 +1,24 @@
+{
+    "id": "register",
+    "name": "User Registration",
+    "version": "1.0.0",
+    "description": "Allow users to register accounts from the login page with email verification and configurable settings.",
+    "icon": "fa-user-plus",
+    "features": [
+        "Public registration form",
+        "Email verification",
+        "reCAPTCHA support",
+        "Configurable from admin panel"
+    ],
+    "frontend": {
+        "routes": [],
+        "nav": [],
+        "adminLinks": [
+            {
+                "route": "admin.register",
+                "title": "Registration Settings",
+                "icon": "fa-user-plus"
+            }
+        ]
+    }
+}
