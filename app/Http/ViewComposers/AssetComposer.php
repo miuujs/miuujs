@@ -20,9 +20,9 @@ class AssetComposer
         $dbSettings = [];
         $prefix = 'miuujs::';
         $allSettings = $this->settings->all();
-        foreach ($allSettings as $key => $value) {
-            if (str_starts_with($key, $prefix)) {
-                $dbSettings[substr($key, strlen($prefix))] = $value;
+        foreach ($allSettings as $setting) {
+            if (str_starts_with($setting->key, $prefix)) {
+                $dbSettings[substr($setting->key, strlen($prefix))] = $setting->value;
             }
         }
 
