@@ -113,6 +113,13 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                             {t('login.login')}
                         </Button>
                     </div>
+                    {String(useStoreState((state) => state.settings.data!.miuujs?.registrationEnabled)) === '1' && (
+                        <div css={tw`mt-4 text-center`}>
+                            <a href={'/auth/register'} css={tw`text-sm text-neutral-400 hover:text-neutral-200`}>
+                                Don't have an account? <span css={tw`text-cyan-400 font-medium`}>Register</span>
+                            </a>
+                        </div>
+                    )}
                     <div className={'z-50 relative'}>
                         {recaptchaEnabled && (
                             <Reaptcha
