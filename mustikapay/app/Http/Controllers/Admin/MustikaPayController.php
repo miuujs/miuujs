@@ -20,7 +20,7 @@ class MustikaPayController extends Controller
     {
         return view('admin.mustikapay', [
             'api_key' => $this->settings->get('mustikapay:api_key', ''),
-            'products' => MustikaPayProduct::with('egg.nest')->get(),
+            'products' => MustikaPayProduct::all(),
             'nests' => Nest::with('eggs')->get(),
         ]);
     }

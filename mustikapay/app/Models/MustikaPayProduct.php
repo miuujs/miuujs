@@ -29,4 +29,9 @@ class MustikaPayProduct extends Model
     {
         return $this->belongsTo(Egg::class, 'egg_id');
     }
+
+    public function nest()
+    {
+        return $this->belongsTo(Nest::class, 'nest_id');
+    }
 }
