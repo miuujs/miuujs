@@ -1,6 +1,0 @@
-| MustikaPay Billing Routes
-    Route::get('/', [Admin\MustikaPayController::class, 'index'])->name('admin.mustikapay');
-    Route::post('/', [Admin\MustikaPayController::class, 'update'])->name('admin.mustikapay.update');
-/* MustikaPay Product Routes */
-    Route::post('/product', [Admin\MustikaPayController::class, 'addProduct'])->name('admin.mustikapay.product.add');
-    Route::delete('/product/{id}', [Admin\MustikaPayController::class, 'deleteProduct'])->name('admin.mustikapay.product.delete');
