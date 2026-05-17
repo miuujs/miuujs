@@ -4,7 +4,6 @@
  */
 import React from 'react';
 import { registerPlugin } from '@/plugins';
-import StoreContainer from './components/dashboard/StoreContainer';
 
 registerPlugin({
     id: 'mustikapay',
