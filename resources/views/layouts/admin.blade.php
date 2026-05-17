@@ -69,6 +69,19 @@
                             </li>
                             <li>
                                 <li><a href="{{ route('admin.miuujs') }}" data-toggle="tooltip" data-placement="bottom" title="MiuuJS Config"><i class="fa fa-paint-brush"></i></a></li>
+                                @php
+                                    $pluginFile = storage_path('miuujs-plugins.json');
+                                    if (file_exists($pluginFile)) {
+                                        $installedPlugins = json_decode(file_get_contents($pluginFile), true) ?? [];
+                                        foreach ($installedPlugins as $pluginId => $pluginData) {
+                                            if (isset($pluginData['admin_links'])) {
+                                                foreach ($pluginData['admin_links'] as $link) {
+                                                    echo '<li><a href="' . route($link['route']) . '" data-toggle="tooltip" data-placement="bottom" title="' . e($link['title']) . '"><i class="fa ' . e($link['icon']) . '"></i></a></li>';
+                                                }
+                                            }
+                                        }
+                                    }
+                                @endphp
                                 <li><a href="{{ route('index') }}" data-toggle="tooltip" data-placement="bottom" title="Exit Admin"><i class="fa fa-server"></i></a></li>
                                 <li><a href="{{ route('auth.logout') }}" id="logoutButton" data-toggle="tooltip" data-placement="bottom" title="Logout"><i class="fa fa-sign-out"></i></a></li>
                             </li>
@@ -79,6 +92,12 @@
             <aside class="main-sidebar">
                 <section class="sidebar">
                     <ul class="sidebar-menu">
+                        <li class="header">THEME</li>
+                        <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.plugins') ?: 'active' }}">
+                            <a href="{{ route('admin.plugins') }}">
+                                <i class="fa fa-puzzle-piece"></i> <span>Plugins</span>
+                            </a>
+                        </li>
                         <li class="header">BASIC ADMINISTRATION</li>
                         <li class="{{ Route::currentRouteName() !== 'admin.index' ?: 'active' }}">
                             <a href="{{ route('admin.index') }}">

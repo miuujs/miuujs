@@ -23,6 +23,7 @@ import DropdownMenu, { DropdownLinkRow, DropdownButtonRow } from '@/components/e
 import { UserCircleIcon, CogIcon, EyeIcon, MoonIcon, LogoutIcon, MenuIcon, XIcon, ServerIcon } from '@heroicons/react/outline';
 
 import { useTranslation } from 'react-i18next';
+import { PluginNavItems, PluginNavItemsMobile } from '@/plugins/PluginNav';
 
 interface Props {
     children?: React.ReactNode;
@@ -190,6 +191,7 @@ export default ({ children }: Props) => {
                 </div>
                 <RightNavigation>
                     {layout == 3 && <ClientDropdown />}
+                    <PluginNavItems />
                 </RightNavigation>
                 <button onClick={() => setIsOpen((isOpen) => !isOpen)} className={'lg:hidden'}>
                     <MenuIcon className={'w-5'} />
@@ -217,6 +219,7 @@ export default ({ children }: Props) => {
                         <NavLink to={'/account'} exact>
                             <UserCircleIcon/> {t`account`}
                         </NavLink>
+                        <PluginNavItemsMobile />
                     </div>
                     {children}
                 </MobileLinks>

@@ -19,6 +19,7 @@ import http from '@/api/http';
 import styled from 'styled-components/macro';
 import tw from 'twin.macro';
 import { useTranslation } from 'react-i18next';
+import { PluginNavItemsMobile } from '@/plugins/PluginNav';
 
 interface Props {
     children?: React.ReactNode;
@@ -118,6 +119,7 @@ const SideBar = ({ children, type }: Props) => {
                 <NavLink to={'/account'} exact>
                     <UserCircleIcon/> {t('account')}
                 </NavLink>
+                <PluginNavItemsMobile />
             </NavigationLinks>}
             <hr className={'border-b border-gray-500 mx-5'}/>
         </div>

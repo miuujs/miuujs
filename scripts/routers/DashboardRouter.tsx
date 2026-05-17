@@ -21,6 +21,7 @@ import { useLocation } from 'react-router';
 import Spinner from '@/components/elements/Spinner';
 import SideBar from '@/components/SideBar';
 import routes from '@/routers/routes';
+import PluginRoutes from '@/plugins/PluginRoutes';
 
 export default () => {
     const location = useLocation();
@@ -40,6 +41,7 @@ export default () => {
                             <Route path={'/'} exact>
                                 <DashboardContainer />
                             </Route>
+                            <PluginRoutes />
                             {routes.account.map(({ path, component: Component }) => (
                                 <Route key={path} path={`/account/${path}`.replace('//', '/')} exact>
                                     <Component />
