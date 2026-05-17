@@ -14,7 +14,6 @@ import { Route, Switch } from 'react-router-dom';
 import NavigationBar from '@/components/NavigationBar';
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { NotFound } from '@/components/elements/ScreenBlock';
-import StoreContainer from '@/components/dashboard/StoreContainer';
 import Alert from '@/components/elements/Alert';
 import TransitionRouter from '@/TransitionRouter';
 import SideBarIcon from '@/components/SideBarIcon';
@@ -40,9 +39,6 @@ export default () => {
                         <Switch location={location}>
                             <Route path={'/'} exact>
                                 <DashboardContainer />
-                            </Route>
-                            <Route path={'/products'} exact>
-                                <StoreContainer />
                             </Route>
                             {routes.account.map(({ path, component: Component }) => (
                                 <Route key={path} path={`/account/${path}`.replace('//', '/')} exact>

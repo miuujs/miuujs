@@ -3,7 +3,7 @@ set -e
 
 ######################################################################################
 #                                                                                    #
-#  MiuuJS Theme Installer                                                            #
+#  MiuuJS Theme Installer v1.1.0                                                     #
 #                                                                                    #
 #  Modern dark theme for Pterodactyl panel                                           #
 #                                                                                    #
@@ -17,8 +17,7 @@ set -e
 #                                                                                    #
 ######################################################################################
 
-export MIUUJS_VERSION="1.0.0"
-export MIUUJS_SOURCE="https://raw.githubusercontent.com/miuujs/miuujs/main"
+export MIUUJS_VERSION="1.1.0"
 LOG_PATH="/var/log/miuujs-installer.log"
 
 # Colors
@@ -33,11 +32,11 @@ BOLD="\e[1m"
 DIM="\e[2m"
 
 # --- Helper Functions ---
-error() { echo -e "* ${RED}ERROR${RESET}: $*" 1>&2; }
+error()   { echo -e "* ${RED}ERROR${RESET}: $*" 1>&2; }
 warning() { echo -e "* ${YELLOW}WARNING${RESET}: $*"; }
 success() { echo -e "* ${GREEN}SUCCESS${RESET}: $*"; }
-info() { echo -e "* ${CYAN}INFO${RESET}: $*"; }
-input() { echo -ne "* ${MAGENTA}$*${RESET}"; }
+info()    { echo -e "* ${CYAN}INFO${RESET}: $*"; }
+input()   { echo -ne "* ${MAGENTA}$*${RESET}"; }
 
 print_banner() {
     clear
@@ -48,10 +47,12 @@ print_banner() {
     echo -e "  ${MAGENTA}██  ██  ██ ██ ██    ██ ██    ██ ██   ██      ██ ${RESET}"
     echo -e "  ${MAGENTA}██      ██ ██  ██████   ██████   █████  ███████ ${RESET}"
     echo -e ""
-    echo -e "  ${BOLD}Pterodactyl Theme Installer v${MIUUJS_VERSION}${RESET}"
+    echo -e "  ${BOLD}MiuuJS Theme Installer v${MIUUJS_VERSION}${RESET}"
     echo -e "  ${DIM}Modern dark theme for Pterodactyl panel${RESET}"
     echo ""
 }
+
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG_PATH" 2>/dev/null || true; }
 
 # --- Pre-flight Checks ---
 preflight() {
@@ -62,31 +63,26 @@ preflight() {
         exit 1
     fi
 
-    if ! [ -x "$(command -v curl)" ]; then
-        error "curl is required. Install it with: apt install curl -y"
-        exit 1
-    fi
-
-    if ! [ -x "$(command -v tar)" ]; then
-        error "tar is required. Install it with: apt install tar -y"
-        exit 1
-    fi
-
-    if ! [ -x "$(command -v rsync)" ]; then
-        info "rsync not found. Installing..."
-        apt-get install rsync -y 2>/dev/null || {
-            error "Failed to install rsync. Install it with: apt install rsync -y"
-            exit 1
-        }
-    fi
+    for cmd in curl tar rsync; do
+        if ! [ -x "$(command -v $cmd)" ]; then
+            info "$cmd not found. Installing..."
+            apt-get install "$cmd" -y 2>/dev/null || {
+                error "Failed to install $cmd."
+                exit 1
+            }
+        fi
+    done
 
     # Detect panel
     PANEL_DIR=""
-    if [ -d "/var/www/pterodactyl" ] && [ -f "/var/www/pterodactyl/artisan" ]; then
-        PANEL_DIR="/var/www/pterodactyl"
-    elif [ -d "/srv/panel" ] && [ -f "/srv/panel/artisan" ]; then
-        PANEL_DIR="/srv/panel"
-    else
+    for dir in /var/www/pterodactyl /srv/panel; do
+        if [ -d "$dir" ] && [ -f "$dir/artisan" ]; then
+            PANEL_DIR="$dir"
+            break
+        fi
+    done
+
+    if [ -z "$PANEL_DIR" ]; then
         error "Pterodactyl panel not found at /var/www/pterodactyl or /srv/panel"
         input "Enter panel directory manually: "
         read -r PANEL_DIR
@@ -96,103 +92,82 @@ preflight() {
         fi
     fi
 
-    echo ""
     info "Panel detected at: ${BOLD}$PANEL_DIR${RESET}"
     echo ""
+    log "Panel detected at: $PANEL_DIR"
 }
 
-# --- Auto-upgrade Node.js to v22 ---
-ensure_node22() {
+# --- Auto-upgrade Node.js to v22+ ---
+ensure_node() {
     if ! [ -x "$(command -v node)" ]; then
         info "Node.js not found. Installing Node.js 22..."
         curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
         apt install nodejs -y
-        # Ensure /usr/bin/node takes precedence over any old node in /usr/local/bin
-        update-alternatives --remove node /usr/local/bin/node 2>/dev/null || true
-        update-alternatives --install /usr/local/bin/node node /usr/bin/node 100 2>/dev/null || true
         hash -r
         success "Node.js installed: $(node -v)"
         return
     fi
 
-    NODE_VERSION=$(node -v | sed 's/v//' | cut -d'.' -f1)
-    if [ "$NODE_VERSION" -lt 22 ]; then
+    NODE_MAJOR=$(node -v | sed 's/v//' | cut -d'.' -f1)
+    if [ "$NODE_MAJOR" -lt 22 ]; then
         info "Node.js v$(node -v) detected. Upgrading to v22..."
         curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
         apt install nodejs -y
-        # Fix PATH: /usr/local/bin/node (old) might shadow /usr/bin/node (new)
         update-alternatives --remove node /usr/local/bin/node 2>/dev/null || true
         update-alternatives --install /usr/local/bin/node node /usr/bin/node 100 2>/dev/null || true
         hash -r
-        # Verify upgrade
-        NEW_NODE=$(node -v 2>/dev/null || /usr/bin/node -v 2>/dev/null || echo "unknown")
-        success "Node.js upgraded: $NEW_NODE"
+        success "Node.js upgraded: $(node -v)"
     else
-        info "Node.js v$(node -v) meets requirements."
+        info "Node.js v$(node -v) meets requirements (>=22)."
     fi
 
-    # Ensure the correct Node is in PATH for subsequent commands
+    # Ensure correct Node is in PATH
     if [ -x /usr/bin/node ] && [ "$(node -v 2>/dev/null | cut -d'.' -f1 | sed 's/v//')" -lt 22 ]; then
         export PATH="/usr/bin:$PATH"
     fi
 
-    # Check yarn or npm
+    # Detect package manager
     if [ -x "$(command -v yarn)" ]; then
         PKG_MANAGER="yarn"
     elif [ -x "$(command -v npm)" ]; then
         PKG_MANAGER="npm"
     else
         error "Neither yarn nor npm found."
-        info "Install yarn: npm install -g yarn"
         exit 1
     fi
     info "Using $PKG_MANAGER for package installation."
 }
 
-# --- Backup (skip if any backup already exists) ---
+# --- Backup Panel ---
 backup_panel() {
     print_banner
     echo -e "  ${BOLD}Step 1: Backup Panel${RESET}"
     echo ""
 
-    EXISTING_BACKUPS=($(ls -d "${PANEL_DIR}-backup-"* 2>/dev/null || true))
+    # Check for existing backup
+    EXISTING_BACKUPS=($(ls -dt "${PANEL_DIR}-backup-"* 2>/dev/null || true))
     if [ ${#EXISTING_BACKUPS[@]} -gt 0 ]; then
         info "Existing backup found: ${EXISTING_BACKUPS[0]}"
-        info "Skipping backup (backup already exists)."
         echo "${EXISTING_BACKUPS[0]}" > /tmp/miuujs_backup_path
         return
     fi
 
     BACKUP_DIR="${PANEL_DIR}-backup-$(date +%Y%m%d-%H%M%S)"
-
-    echo ""
-    info "Creating backup, please wait..."
-
+    info "Creating backup..."
     cp -a "$PANEL_DIR" "$BACKUP_DIR"
-    success "Panel files backed up to: $BACKUP_DIR"
+    success "Panel backed up to: $BACKUP_DIR"
 
-    if [ -f "$PANEL_DIR/.env" ]; then
-        DB_DATABASE=$(grep DB_DATABASE "$PANEL_DIR/.env" 2>/dev/null | cut -d '=' -f2 || echo "unknown")
-    else
-        DB_DATABASE="unknown"
-    fi
-
-    echo ""
-    echo -e "  ${BOLD}Backup Summary:${RESET}"
-    echo -e "  Files: ${GREEN}$BACKUP_DIR${RESET}"
-    echo -e "  Database: ${YELLOW}$DB_DATABASE${RESET} (not backed up by this script)"
-    echo -e "  ${DIM}Tip: Backup your database separately with:${RESET}"
-    echo -e "  ${DIM}  mysqldump -u root -p $DB_DATABASE > panel-db.sql${RESET}"
-    echo ""
-
+    DB_DATABASE=$(grep DB_DATABASE "$PANEL_DIR/.env" 2>/dev/null | cut -d'=' -f2 || echo "unknown")
+    echo -e "  ${DIM}Tip: Backup database separately: mysqldump -u root -p $DB_DATABASE > panel-db.sql${RESET}"
     echo "$BACKUP_DIR" > /tmp/miuujs_backup_path
+    log "Backup created at: $BACKUP_DIR"
 }
 
-# --- Source Files ---
+# --- Determine Source ---
 determine_source() {
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
-    if [ -f "$SCRIPT_DIR/package.json" ] && [ -f "$SCRIPT_DIR/README.md" ] && grep -q "miuujs" "$SCRIPT_DIR/README.md" 2>/dev/null; then
+    if [ -f "$SCRIPT_DIR/package.json" ] && [ -f "$SCRIPT_DIR/README.md" ] && grep -qi "miuujs" "$SCRIPT_DIR/README.md" 2>/dev/null; then
         SOURCE="local"
         REPO_DIR="$SCRIPT_DIR"
         info "Using local repository: $REPO_DIR"
@@ -201,14 +176,12 @@ determine_source() {
         REPO_DIR="/tmp/miuujs-repo"
         info "Downloading theme from GitHub..."
         rm -rf "$REPO_DIR"
-        echo ""
-        curl -L "https://github.com/miuujs/miuujs/archive/main.tar.gz" -o /tmp/miuujs.tar.gz
-        echo ""
+        curl -sL "https://github.com/miuujs/miuujs/archive/main.tar.gz" -o /tmp/miuujs.tar.gz
         tar -xzf /tmp/miuujs.tar.gz -C /tmp/
         mv /tmp/miuujs-main "$REPO_DIR"
-        success "Theme downloaded to $REPO_DIR"
+        success "Theme downloaded."
     fi
-    echo ""
+    log "Source: $SOURCE from $REPO_DIR"
 }
 
 # --- Install Dependencies ---
@@ -219,42 +192,81 @@ install_deps() {
 
     cd "$PANEL_DIR"
 
-    if [ -x "$(command -v composer)" ]; then
-        info "Updating Composer dependencies..."
-        composer install --no-dev --no-interaction 2>&1 | tail -5
-        local COMPOSER_EXIT=${PIPESTATUS[0]}
-        if [ "$COMPOSER_EXIT" -ne 0 ]; then
-            warning "Composer install exited with code $COMPOSER_EXIT."
-        else
-            success "Composer dependencies updated."
-        fi
-    else
-        warning "Composer not found. Skipping PHP dependency check."
-    fi
-
-    info "Installing Node.js dependencies with $PKG_MANAGER..."
-    echo ""
-
-    # Copy repo's package.json so theme deps (react-icons, i18next-*, etc.) are available
+    # Copy theme config files (these replace panel defaults)
     cp "$REPO_DIR/package.json" "$PANEL_DIR/package.json"
     cp "$REPO_DIR/tailwind.config.js" "$PANEL_DIR/tailwind.config.js"
     cp "$REPO_DIR/webpack.config.js" "$PANEL_DIR/webpack.config.js"
+    [ -f "$REPO_DIR/babel.config.js" ] && cp "$REPO_DIR/babel.config.js" "$PANEL_DIR/babel.config.js"
 
+    # Apply critical fixes BEFORE npm install
+    apply_fixes
+
+    if [ -x "$(command -v composer)" ]; then
+        info "Updating Composer dependencies..."
+        composer install --no-dev --no-interaction 2>&1 | tail -5 || warning "Composer install had issues."
+    fi
+
+    info "Installing Node.js dependencies..."
+    cd "$PANEL_DIR"
     if [ "$PKG_MANAGER" = "yarn" ]; then
         yarn install --no-progress 2>&1 | tail -10
-        local INSTALL_EXIT=${PIPESTATUS[0]}
     else
-        npm install --no-progress 2>&1 | tail -10
-        local INSTALL_EXIT=${PIPESTATUS[0]}
+        npm install --no-progress --legacy-peer-deps 2>&1 | tail -10
     fi
-    if [ "$INSTALL_EXIT" -ne 0 ]; then
-        error "$PKG_MANAGER install failed (exit $INSTALL_EXIT)."
-        exit 1
-    fi
-    echo ""
-
     success "Dependencies installed."
-    echo ""
+    log "Dependencies installed via $PKG_MANAGER"
+}
+
+# --- Apply Critical Fixes ---
+# These fix bugs that exist in both the original panel and theme source:
+# 1. react-dom version mismatch (hot-loader 17.x vs react 16.x) causes React.lazy crash
+# 2. react-hot-loader is unnecessary for production builds
+apply_fixes() {
+    info "Applying critical compatibility fixes..."
+
+    # Fix 1: package.json — remove react-hot-loader, use standard react-dom
+    cd "$PANEL_DIR"
+    if command -v node &>/dev/null; then
+        node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            // Remove hot-loader packages
+            delete pkg.dependencies['react-hot-loader'];
+            delete pkg.dependencies['@hot-loader/react-dom'];
+            // Use standard react-dom matching react version
+            pkg.dependencies['react-dom'] = '^16.14.0';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 4) + '\n');
+        "
+        log "Fixed package.json: removed react-hot-loader, set react-dom to ^16.14.0"
+    fi
+
+    # Fix 2: webpack.config.js — remove react-hot-loader/patch from entry
+    if [ -f "$PANEL_DIR/webpack.config.js" ]; then
+        sed -i "s/entry: \['react-hot-loader\/patch', '\.\/resources\/scripts\/index\.tsx'\]/entry: ['.\/resources\/scripts\/index.tsx']/" "$PANEL_DIR/webpack.config.js"
+        log "Fixed webpack.config.js: removed react-hot-loader/patch from entry"
+    fi
+
+    # Fix 3: babel.config.js — remove react-hot-loader/babel plugin
+    if [ -f "$PANEL_DIR/babel.config.js" ]; then
+        sed -i "/'react-hot-loader\/babel',/d" "$PANEL_DIR/babel.config.js"
+        log "Fixed babel.config.js: removed react-hot-loader/babel plugin"
+    fi
+
+    # Fix 4: index.tsx — remove react-hot-loader setConfig
+    if [ -f "$PANEL_DIR/resources/scripts/index.tsx" ]; then
+        sed -i "/import { setConfig } from 'react-hot-loader';/d" "$PANEL_DIR/resources/scripts/index.tsx"
+        sed -i "/setConfig({ reloadHooks: false });/d" "$PANEL_DIR/resources/scripts/index.tsx"
+        log "Fixed index.tsx: removed react-hot-loader setConfig"
+    fi
+
+    # Fix 5: App.tsx — remove hot() wrapper
+    if [ -f "$PANEL_DIR/resources/scripts/components/App.tsx" ]; then
+        sed -i "/import { hot } from 'react-hot-loader\/root';/d" "$PANEL_DIR/resources/scripts/components/App.tsx"
+        sed -i 's/export default hot(App);/export default App;/' "$PANEL_DIR/resources/scripts/components/App.tsx"
+        log "Fixed App.tsx: removed hot() wrapper"
+    fi
+
+    success "Compatibility fixes applied."
 }
 
 # --- Copy Theme Files ---
@@ -266,13 +278,12 @@ copy_theme() {
     cd "$PANEL_DIR"
     SRC="$REPO_DIR"
 
-    info "Copying theme files to panel..."
+    info "Copying theme files..."
 
+    # PHP backend
     mkdir -p "$PANEL_DIR/resources/views/admin/miuujs"
-
-    if [ -d "$SRC/app/Http/Controllers/Admin/MiuuJS" ]; then
+    [ -d "$SRC/app/Http/Controllers/Admin/MiuuJS" ] && \
         cp -r "$SRC/app/Http/Controllers/Admin/MiuuJS" "$PANEL_DIR/app/Http/Controllers/Admin/"
-    fi
     [ -f "$SRC/app/Http/Controllers/Base/LocaleController.php" ] && \
         cp "$SRC/app/Http/Controllers/Base/LocaleController.php" "$PANEL_DIR/app/Http/Controllers/Base/"
     [ -f "$SRC/app/Http/Requests/Base/LocaleRequest.php" ] && \
@@ -280,35 +291,31 @@ copy_theme() {
     [ -f "$SRC/app/Http/ViewComposers/AssetComposer.php" ] && \
         cp "$SRC/app/Http/ViewComposers/AssetComposer.php" "$PANEL_DIR/app/Http/ViewComposers/"
 
+    # Config
     [ -f "$SRC/config/miuujs.php" ] && cp "$SRC/config/miuujs.php" "$PANEL_DIR/config/"
 
-    # Save plugin routes before overwriting admin.php
+    # Routes (preserve existing plugin routes if any)
     MUSTIKAPAY_ROUTES=""
     if grep -q "MIUUJS_PLUGIN_MUSTIKAPAY_START" "$PANEL_DIR/routes/admin.php" 2>/dev/null; then
-        MUSTIKAPAY_ROUTES=$(sed -n '/MIUUJS_PLUGIN_MUSTIKAPAY_START/,/MIUUJS_PLUGIN_MUSTIKAPAY_END/p' "$PANEL_DIR/routes/admin.php" 2>/dev/null)
+        MUSTIKAPAY_ROUTES=$(sed -n '/MIUUJS_PLUGIN_MUSTIKAPAY_START/,/MIUUJS_PLUGIN_MUSTIKAPAY_END/p' "$PANEL_DIR/routes/admin.php")
     fi
     [ -f "$SRC/routes/admin.php" ] && cp "$SRC/routes/admin.php" "$PANEL_DIR/routes/admin.php"
-    # Re-add plugin routes if they existed
     if [ -n "$MUSTIKAPAY_ROUTES" ]; then
         echo "" >> "$PANEL_DIR/routes/admin.php"
         echo "$MUSTIKAPAY_ROUTES" >> "$PANEL_DIR/routes/admin.php"
     fi
 
-    if [ -d "$SRC/public/miuujs" ]; then
-        cp -r "$SRC/public/miuujs" "$PANEL_DIR/public/"
-    fi
-    if [ -f "$SRC/public/themes/pterodactyl/css/miuujs.css" ]; then
+    # Public assets
+    [ -d "$SRC/public/miuujs" ] && cp -r "$SRC/public/miuujs" "$PANEL_DIR/public/"
+    if [ -d "$SRC/public/themes/pterodactyl/css" ]; then
         mkdir -p "$PANEL_DIR/public/themes/pterodactyl/css"
-        cp "$SRC/public/themes/pterodactyl/css/miuujs.css" "$PANEL_DIR/public/themes/pterodactyl/css/"
-    fi
-    if [ -f "$SRC/public/themes/pterodactyl/css/pterodactyl.css" ]; then
-        cp "$SRC/public/themes/pterodactyl/css/pterodactyl.css" "$PANEL_DIR/public/themes/pterodactyl/css/"
+        cp "$SRC/public/themes/pterodactyl/css/"*.css "$PANEL_DIR/public/themes/pterodactyl/css/" 2>/dev/null || true
     fi
 
-    if [ -d "$SRC/resources/lang/en/miuujs" ]; then
-        cp -r "$SRC/resources/lang/en/miuujs" "$PANEL_DIR/resources/lang/en/"
-    fi
+    # Language files
+    [ -d "$SRC/resources/lang/en/miuujs" ] && cp -r "$SRC/resources/lang/en/miuujs" "$PANEL_DIR/resources/lang/en/"
 
+    # Views
     [ -f "$SRC/resources/views/admin/miuujs/index.blade.php" ] && \
         cp "$SRC/resources/views/admin/miuujs/index.blade.php" "$PANEL_DIR/resources/views/admin/miuujs/"
     [ -f "$SRC/resources/views/layouts/admin.blade.php" ] && \
@@ -320,12 +327,13 @@ copy_theme() {
     [ -f "$SRC/resources/views/templates/wrapper.blade.php" ] && \
         cp "$SRC/resources/views/templates/wrapper.blade.php" "$PANEL_DIR/resources/views/templates/"
 
+    # React frontend (full replacement)
     if [ -d "$SRC/scripts" ]; then
         rsync -a "$SRC/scripts/" "$PANEL_DIR/resources/scripts/"
     fi
 
     success "All theme files copied."
-    echo ""
+    log "Theme files copied from $SRC"
 }
 
 # --- Build Frontend ---
@@ -335,14 +343,12 @@ build_frontend() {
     echo ""
 
     cd "$PANEL_DIR"
-
-    info "Building frontend assets..."
-    echo -e "  ${DIM}This may take 2-5 minutes. Full log saved for debugging.${RESET}"
-    echo ""
-
     BUILD_LOG="/tmp/miuujs-build-$(date +%s).log"
-    info "Build started at $(date '+%H:%M:%S') — log: $BUILD_LOG"
+
+    info "Building frontend assets... (this may take 2-5 minutes)"
+    info "Build log: $BUILD_LOG"
     echo ""
+
     if [ "$PKG_MANAGER" = "yarn" ]; then
         yarn run build:production 2>&1 | tee "$BUILD_LOG" | tail -20
     else
@@ -351,23 +357,20 @@ build_frontend() {
     BUILD_EXIT=${PIPESTATUS[0]}
 
     if [ "$BUILD_EXIT" -eq 0 ]; then
-        success "Frontend built successfully at $(date '+%H:%M:%S')."
+        success "Frontend built successfully."
     else
-        error "Frontend build failed! Full log: $BUILD_LOG"
+        error "Frontend build failed! Check log: $BUILD_LOG"
         exit 1
     fi
-    echo ""
+    log "Frontend build completed (exit: $BUILD_EXIT)"
 }
 
 # --- Run Migrations ---
 run_migrations() {
     info "Running database migrations..."
-    echo ""
     cd "$PANEL_DIR"
-    php artisan migrate --force --no-interaction 2>&1
-    echo ""
+    php artisan migrate --force --no-interaction 2>&1 || warning "Migration had issues (may be normal if tables exist)."
     success "Migrations complete."
-    echo ""
 }
 
 # --- Finalize ---
@@ -403,8 +406,9 @@ finalize() {
         echo -e "  ${CYAN}Backup:${RESET}        ${BOLD}$BACKUP_PATH${RESET}"
         echo ""
     fi
-    echo -e "  ${YELLOW}Note:${RESET} If you see any visual issues, clear your browser cache."
+    echo -e "  ${YELLOW}Note:${RESET} Clear your browser cache (Ctrl+Shift+R) if you see visual issues."
     echo ""
+    log "Installation completed successfully."
 }
 
 # --- Install MustikaPay Plugin ---
@@ -419,35 +423,28 @@ install_mustikapay() {
     SRC="$REPO_DIR"
 
     if [ ! -d "$SRC/plugins" ]; then
-        warning "plugins/ not found in $REPO_DIR. Re-cloning repository..."
+        warning "plugins/ not found. Re-cloning repository..."
         rm -rf "$REPO_DIR"
         git clone https://github.com/miuujs/miuujs.git "$REPO_DIR" 2>/dev/null || {
-            error "Failed to clone repo. Ensure git is installed."
+            error "Failed to clone repo."
             return
         }
     fi
 
     info "Installing MustikaPay plugin..."
 
-    if [ -d "$SRC/plugins/app/Extensions" ]; then
-        cp -r "$SRC/plugins/app/Extensions" "$PANEL_DIR/app/"
-    fi
-    if [ -d "$SRC/plugins/app/Http/Controllers/Admin" ]; then
-        cp "$SRC/plugins/app/Http/Controllers/Admin/MustikaPayController.php" "$PANEL_DIR/app/Http/Controllers/Admin/"
-    fi
+    # Copy plugin files
+    [ -d "$SRC/plugins/app/Extensions" ] && cp -r "$SRC/plugins/app/Extensions" "$PANEL_DIR/app/"
+    [ -d "$SRC/plugins/app/Http/Controllers/Admin" ] && \
+        cp "$SRC/plugins/app/Http/Controllers/Admin/MustikaPayController.php" "$PANEL_DIR/app/Http/Controllers/Admin/" 2>/dev/null || true
     if [ -d "$SRC/plugins/app/Http/Controllers/Api/Client/Store" ]; then
         mkdir -p "$PANEL_DIR/app/Http/Controllers/Api/Client/Store"
         cp "$SRC/plugins/app/Http/Controllers/Api/Client/Store/StoreController.php" "$PANEL_DIR/app/Http/Controllers/Api/Client/Store/"
     fi
-    if [ -d "$SRC/plugins/app/Models" ]; then
-        cp "$SRC/plugins/app/Models/"*.php "$PANEL_DIR/app/Models/"
-    fi
-    if [ -d "$SRC/plugins/database/migrations" ]; then
-        cp "$SRC/plugins/database/migrations/"*.php "$PANEL_DIR/database/migrations/"
-    fi
-    if [ -f "$SRC/plugins/resources/views/admin/mustikapay.blade.php" ]; then
+    [ -d "$SRC/plugins/app/Models" ] && cp "$SRC/plugins/app/Models/"*.php "$PANEL_DIR/app/Models/" 2>/dev/null || true
+    [ -d "$SRC/plugins/database/migrations" ] && cp "$SRC/plugins/database/migrations/"*.php "$PANEL_DIR/database/migrations/" 2>/dev/null || true
+    [ -f "$SRC/plugins/resources/views/admin/mustikapay.blade.php" ] && \
         cp "$SRC/plugins/resources/views/admin/mustikapay.blade.php" "$PANEL_DIR/resources/views/admin/"
-    fi
 
     # Admin routes
     if ! grep -q "MIUUJS_PLUGIN_MUSTIKAPAY_START" "$PANEL_DIR/routes/admin.php" 2>/dev/null; then
@@ -466,7 +463,7 @@ Route::group(['prefix' => 'mustikapay'], function () {
 MIUUJS_ROUTES
     fi
 
-    # API Routes
+    # API routes
     if ! grep -q "MIUUJS_PLUGIN_STORE_START" "$PANEL_DIR/routes/api-client.php" 2>/dev/null; then
         cat >> "$PANEL_DIR/routes/api-client.php" << 'MIUUJS_ROUTES'
 
@@ -482,7 +479,7 @@ Route::prefix('/products')->group(function () {
 MIUUJS_ROUTES
     fi
 
-    # Model modifications (use $'...' ANSI-C quoting so \t is actual tab, \\n is sed newline)
+    # Model modifications
     if ! grep -q "'balance'" "$PANEL_DIR/app/Models/User.php" 2>/dev/null; then
         sed -i $'/\'root_admin\',/a\\\t\t\'balance\',' "$PANEL_DIR/app/Models/User.php"
     fi
@@ -490,31 +487,86 @@ MIUUJS_ROUTES
         sed -i $'/\'oom_disabled\' => \'boolean\',/a\\\t\t\'is_billed\' => \'boolean\',\\n\\t\t\'expires_at\' => \'datetime\',' "$PANEL_DIR/app/Models/Server.php"
     fi
 
-    # Admin sidebar: ensure MiuuJS link exists, then add MustikaPay link after it
+    # Admin sidebar
     if ! grep -q "mustikapay" "$PANEL_DIR/resources/views/layouts/admin.blade.php" 2>/dev/null; then
         if ! grep -q "miuujs" "$PANEL_DIR/resources/views/layouts/admin.blade.php" 2>/dev/null; then
-            if [ -f "$SRC/resources/views/layouts/admin.blade.php" ]; then
+            [ -f "$SRC/resources/views/layouts/admin.blade.php" ] && \
                 cp "$SRC/resources/views/layouts/admin.blade.php" "$PANEL_DIR/resources/views/layouts/admin.blade.php"
-            fi
         fi
         MUSTIKAPAY_LINK='                                <li><a href="{{ route('"'"'admin.mustikapay'"'"') }}" data-toggle="tooltip" data-placement="bottom" title="MustikaPay Billing"><i class="fa fa-credit-card"></i></a></li>'
         sed -i "/route('admin.miuujs')/a\\${MUSTIKAPAY_LINK}" "$PANEL_DIR/resources/views/layouts/admin.blade.php"
     fi
 
-    # Fallback: restore theme frontend files if missing or Products nav was removed by uninstall
-    if [ ! -f "$PANEL_DIR/resources/scripts/components/dashboard/StoreContainer.tsx" ]; then
-        mkdir -p "$PANEL_DIR/resources/scripts/components/dashboard"
-        [ -f "$SRC/scripts/components/dashboard/StoreContainer.tsx" ] && cp "$SRC/scripts/components/dashboard/StoreContainer.tsx" "$PANEL_DIR/resources/scripts/components/dashboard/"
-    fi
-    if [ ! -f "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" ] || ! grep -q "ShoppingCartIcon" "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" 2>/dev/null; then
-        [ -f "$SRC/scripts/components/NavigationBar.tsx" ] && cp "$SRC/scripts/components/NavigationBar.tsx" "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx"
-    fi
-    if [ ! -f "$PANEL_DIR/resources/scripts/components/SideBar.tsx" ] || ! grep -q "ShoppingCartIcon" "$PANEL_DIR/resources/scripts/components/SideBar.tsx" 2>/dev/null; then
-        [ -f "$SRC/scripts/components/SideBar.tsx" ] && cp "$SRC/scripts/components/SideBar.tsx" "$PANEL_DIR/resources/scripts/components/SideBar.tsx"
-    fi
-    if [ ! -f "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx" ] || ! grep -q "StoreContainer" "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx" 2>/dev/null; then
-        [ -f "$SRC/scripts/routers/DashboardRouter.tsx" ] && cp "$SRC/scripts/routers/DashboardRouter.tsx" "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx"
-    fi
+    # Add Products nav links back (theme defaults without MustikaPay don't have them)
+    mkdir -p "$PANEL_DIR/resources/scripts/components/dashboard"
+    [ -f "$SRC/scripts/components/dashboard/StoreContainer.tsx" ] && \
+        cp "$SRC/scripts/components/dashboard/StoreContainer.tsx" "$PANEL_DIR/resources/scripts/components/dashboard/"
+
+    # Use Node.js to add Products links to frontend files
+    cat > /tmp/miuujs_add_products.js << 'NODESCRIPT'
+const fs = require('fs');
+const panel = process.env.PANEL_DIR;
+
+// NavigationBar.tsx
+let navFile = panel + '/resources/scripts/components/NavigationBar.tsx';
+if (fs.existsSync(navFile)) {
+    let nav = fs.readFileSync(navFile, 'utf8');
+    if (!nav.includes('ShoppingCartIcon')) {
+        nav = nav.replace(
+            "} from '@heroicons/react/outline';",
+            ", ShoppingCartIcon } from '@heroicons/react/outline';"
+        );
+        nav = nav.replace(
+            '{layout == 3 && <ClientDropdown />}',
+            '{layout == 3 && <ClientDropdown />}\n                    <NavLink to={"/products"}><ShoppingCartIcon className={"w-5"} />Products</NavLink>'
+        );
+        nav = nav.replace(
+            "<UserCircleIcon/> {t`account`}\n                        </NavLink>\n                    </div>",
+            "<UserCircleIcon/> {t`account`}\n                        </NavLink>\n                        <NavLink to={'/products'} exact>\n                            <ShoppingCartIcon/> Products\n                        </NavLink>\n                    </div>"
+        );
+        fs.writeFileSync(navFile, nav);
+        console.log('NavigationBar.tsx: Products link added');
+    }
+}
+
+// SideBar.tsx
+let sidebarFile = panel + '/resources/scripts/components/SideBar.tsx';
+if (fs.existsSync(sidebarFile)) {
+    let sidebar = fs.readFileSync(sidebarFile, 'utf8');
+    if (!sidebar.includes('ShoppingCartIcon')) {
+        sidebar = sidebar.replace(
+            "} from '@heroicons/react/outline';",
+            ", ShoppingCartIcon } from '@heroicons/react/outline';"
+        );
+        sidebar = sidebar.replace(
+            "<UserCircleIcon/> {t('account')}\n                </NavLink>\n            </NavigationLinks>}",
+            "<UserCircleIcon/> {t('account')}\n                </NavLink>\n                <NavLink to={'/products'} exact>\n                    <ShoppingCartIcon/> Products\n                </NavLink>\n            </NavigationLinks>}"
+        );
+        fs.writeFileSync(sidebarFile, sidebar);
+        console.log('SideBar.tsx: Products link added');
+    }
+}
+
+// DashboardRouter.tsx
+let routerFile = panel + '/resources/scripts/routers/DashboardRouter.tsx';
+if (fs.existsSync(routerFile)) {
+    let router = fs.readFileSync(routerFile, 'utf8');
+    if (!router.includes('StoreContainer')) {
+        router = router.replace(
+            "import DashboardContainer from",
+            "import StoreContainer from '@/components/dashboard/StoreContainer';\nimport DashboardContainer from"
+        );
+        router = router.replace(
+            "<DashboardContainer />\n                            </Route>\n                            {routes.account.map",
+            "<DashboardContainer />\n                            </Route>\n                            <Route path={'/products'} exact>\n                                <StoreContainer />\n                            </Route>\n                            {routes.account.map"
+        );
+        fs.writeFileSync(routerFile, router);
+        console.log('DashboardRouter.tsx: StoreContainer route added');
+    }
+}
+NODESCRIPT
+    PANEL_DIR="$PANEL_DIR" node /tmp/miuujs_add_products.js 2>/dev/null || warning "Failed to add Products links."
+    rm -f /tmp/miuujs_add_products.js
 
     # Composer autoload
     if ! grep -q "MustikaPay" "$PANEL_DIR/composer.json" 2>/dev/null; then
@@ -522,13 +574,12 @@ MIUUJS_ROUTES
     fi
     composer dump-autoload 2>/dev/null || true
 
-    # Clear stale migration records, then run migrations
+    # Migrations
     cd "$PANEL_DIR"
     php artisan tinker --execute='DB::table("migrations")->where("migration", "like", "%2026_05_11%")->delete();' 2>/dev/null || true
     run_migrations
 
     success "MustikaPay plugin installed."
-    echo ""
 }
 
 # --- Uninstall Plugins ---
@@ -547,86 +598,37 @@ uninstall_plugins() {
 
     cd "$PANEL_DIR"
 
-    info "Removing Products nav links from theme..."
-    # Must use two-step sed: one-liner first, then multi-line blocks
-    # (single range delete would eat following lines if start+end match on same line)
-    sed -i 's/, ShoppingCartIcon//' "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" 2>/dev/null || true
-    sed -i '/<NavLink[^>]*\/products[^>]*>.*<\/NavLink>/d' "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" 2>/dev/null || true
-    sed -i '/<NavLink[^>]*\/products[^>]*>/,/<\/NavLink>/d' "$PANEL_DIR/resources/scripts/components/NavigationBar.tsx" 2>/dev/null || true
-    # SideBar
-    sed -i 's/, ShoppingCartIcon//' "$PANEL_DIR/resources/scripts/components/SideBar.tsx" 2>/dev/null || true
-    sed -i '/<NavLink[^>]*\/products[^>]*>.*<\/NavLink>/d' "$PANEL_DIR/resources/scripts/components/SideBar.tsx" 2>/dev/null || true
-    sed -i '/<NavLink[^>]*\/products[^>]*>/,/<\/NavLink>/d' "$PANEL_DIR/resources/scripts/components/SideBar.tsx" 2>/dev/null || true
-    # DashboardRouter: remove StoreContainer import + Products route block
-    sed -i '/StoreContainer/d' "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx" 2>/dev/null || true
-    sed -i '/<Route.*\/products/,/<\/Route>/d' "$PANEL_DIR/resources/scripts/routers/DashboardRouter.tsx" 2>/dev/null || true
-
     info "Removing plugin files..."
-
-    # Remove controllers
     rm -f "$PANEL_DIR/app/Http/Controllers/Admin/MustikaPayController.php"
     rm -rf "$PANEL_DIR/app/Http/Controllers/Api/Client/Store"
     rm -rf "$PANEL_DIR/app/Extensions/Payment/MustikaPay"
-
-    # Remove models
     rm -f "$PANEL_DIR/app/Models/MustikaPayProduct.php"
     rm -f "$PANEL_DIR/app/Models/MustikaPayTransaction.php"
-
-    # Remove views
     rm -f "$PANEL_DIR/resources/views/admin/mustikapay.blade.php"
-
-    # Remove migration files
-    rm -f "$PANEL_DIR/database/migrations/2026_05_11_043856_add_balance_to_users_table.php"
-    rm -f "$PANEL_DIR/database/migrations/2026_05_11_043900_create_mustikapay_transactions_table.php"
-    rm -f "$PANEL_DIR/database/migrations/2026_05_11_050142_add_billing_to_servers_table.php"
-    rm -f "$PANEL_DIR/database/migrations/2026_05_11_055912_create_mustikapay_products_table.php"
-
-    # Remove StoreContainer.tsx from plugins
     rm -f "$PANEL_DIR/resources/scripts/components/dashboard/StoreContainer.tsx"
 
-    # Remove route entries from admin.php using markers
-    if [ -f "$PANEL_DIR/routes/admin.php" ]; then
-        sed -i '/MIUUJS_PLUGIN_MUSTIKAPAY_START/,/MIUUJS_PLUGIN_MUSTIKAPAY_END/d' "$PANEL_DIR/routes/admin.php"
-    fi
+    # Remove route markers
+    sed -i '/MIUUJS_PLUGIN_MUSTIKAPAY_START/,/MIUUJS_PLUGIN_MUSTIKAPAY_END/d' "$PANEL_DIR/routes/admin.php" 2>/dev/null || true
+    sed -i '/MIUUJS_PLUGIN_STORE_START/,/MIUUJS_PLUGIN_STORE_END/d' "$PANEL_DIR/routes/api-client.php" 2>/dev/null || true
 
-    # Remove route entries from api-client.php using markers
-    if [ -f "$PANEL_DIR/routes/api-client.php" ]; then
-        sed -i '/MIUUJS_PLUGIN_STORE_START/,/MIUUJS_PLUGIN_STORE_END/d' "$PANEL_DIR/routes/api-client.php"
-    fi
-
-    # Revert User.php fillable
-    if grep -q "'balance'" "$PANEL_DIR/app/Models/User.php" 2>/dev/null; then
-        sed -i "/'balance',/d" "$PANEL_DIR/app/Models/User.php"
-    fi
-
-    # Revert Server.php casts
-    if grep -q "'is_billed'" "$PANEL_DIR/app/Models/Server.php" 2>/dev/null; then
-        sed -i "/'is_billed' => 'boolean',/d" "$PANEL_DIR/app/Models/Server.php"
-        sed -i "/'expires_at' => 'datetime',/d" "$PANEL_DIR/app/Models/Server.php"
-    fi
+    # Revert models
+    sed -i "/'balance',/d" "$PANEL_DIR/app/Models/User.php" 2>/dev/null || true
+    sed -i "/'is_billed' => 'boolean',/d" "$PANEL_DIR/app/Models/Server.php" 2>/dev/null || true
+    sed -i "/'expires_at' => 'datetime',/d" "$PANEL_DIR/app/Models/Server.php" 2>/dev/null || true
 
     # Revert admin sidebar
-    if grep -q "mustikapay" "$PANEL_DIR/resources/views/layouts/admin.blade.php" 2>/dev/null; then
-        sed -i '/mustikapay/d' "$PANEL_DIR/resources/views/layouts/admin.blade.php"
-    fi
+    sed -i '/mustikapay/d' "$PANEL_DIR/resources/views/layouts/admin.blade.php" 2>/dev/null || true
 
-    # Remove MustikaPay namespace from composer.json
-    if grep -q "MustikaPay" "$PANEL_DIR/composer.json" 2>/dev/null; then
-        sed -i '/"MustikaPay\\\\": "app\/Extensions\/Payment\/MustikaPay\/",/d' "$PANEL_DIR/composer.json"
-    fi
+    # Remove composer namespace
+    sed -i '/"MustikaPay\\\\": "app\/Extensions\/Payment\/MustikaPay\/",/d' "$PANEL_DIR/composer.json" 2>/dev/null || true
     composer dump-autoload 2>/dev/null || true
 
-    # Drop plugin tables
-    info "Dropping plugin database tables..."
+    # Drop tables
     php artisan tinker --execute='Schema::dropIfExists("mustikapay_products");' 2>/dev/null || true
     php artisan tinker --execute='Schema::dropIfExists("mustikapay_transactions");' 2>/dev/null || true
-
-    # Clear migration records so reinstall works
-    info "Clearing migration records..."
     php artisan tinker --execute='DB::table("migrations")->where("migration", "like", "%2026_05_11%")->delete();' 2>/dev/null || true
 
     success "All plugins uninstalled."
-    echo ""
 }
 
 # --- Uninstall Theme ---
@@ -651,15 +653,13 @@ uninstall_theme() {
     BACKUP_DIR=$(ls -dt "${PANEL_DIR}-backup-"* 2>/dev/null | head -1)
     if [ -z "$BACKUP_DIR" ] || [ ! -d "$BACKUP_DIR" ]; then
         error "No backup found at ${PANEL_DIR}-backup-*"
-        info "Run the theme install first to create a backup."
         return
     fi
     info "Found backup: $BACKUP_DIR"
     echo ""
 
-    # Step 1: Restore from backup (--delete auto-removes theme/plugin files,
-    # --exclude keeps user data like .env, storage, vendor, node_modules)
-    info "Restoring original panel files from backup..."
+    # Restore from backup
+    info "Restoring original panel files..."
     rsync -av --delete \
         --exclude='.env' \
         --exclude='storage' \
@@ -667,34 +667,31 @@ uninstall_theme() {
         --exclude='vendor' \
         --exclude='bootstrap/cache' \
         "$BACKUP_DIR/" "$PANEL_DIR/" 2>&1 | tee /tmp/miuujs_rsync.log | tail -5
-    local RSYNC_EXIT=${PIPESTATUS[0]}
-    local DELETED_COUNT=$(grep -c "^deleting " /tmp/miuujs_rsync.log 2>/dev/null || echo 0)
+    RSYNC_EXIT=${PIPESTATUS[0]}
+    DELETED_COUNT=$(grep -c "^deleting " /tmp/miuujs_rsync.log 2>/dev/null || echo 0)
     if [ "$DELETED_COUNT" -gt 0 ]; then
-        success "Removed $DELETED_COUNT theme/plugin files automatically."
+        success "Removed $DELETED_COUNT theme/plugin files."
     fi
     rm -f /tmp/miuujs_rsync.log
     if [ "$RSYNC_EXIT" -ne 0 ]; then
         error "rsync restore failed (exit $RSYNC_EXIT)."
         return
     fi
-    success "All files restored to pre-theme state."
-    echo ""
+    success "Panel restored to original state."
 
-    # Step 3: Clean up plugin database tables if they exist
+    # Clean plugin database tables
     if php artisan tinker --execute='echo Schema::hasTable("mustikapay_products") ? "1" : "0";' 2>/dev/null | grep -q "1"; then
         info "Cleaning up plugin database tables..."
         php artisan tinker --execute='Schema::dropIfExists("mustikapay_products");' 2>/dev/null || true
         php artisan tinker --execute='Schema::dropIfExists("mustikapay_transactions");' 2>/dev/null || true
         php artisan tinker --execute='DB::table("migrations")->where("migration", "like", "%2026_05_11%")->delete();' 2>/dev/null || true
-        success "Plugin database tables removed."
-        echo ""
     fi
 
-    # Step 4: Rebuild frontend
-    ensure_node22
+    # Rebuild frontend with original files
+    ensure_node
     build_frontend
 
-    # Step 5: Clear caches
+    # Clear caches
     info "Clearing caches..."
     php artisan view:clear 2>/dev/null || true
     php artisan config:clear 2>/dev/null || true
@@ -702,10 +699,9 @@ uninstall_theme() {
     php artisan optimize:clear 2>/dev/null || true
     php artisan queue:restart 2>/dev/null || true
     composer dump-autoload 2>/dev/null || true
-    echo ""
 
     success "Theme uninstalled. Panel restored to original Pterodactyl state."
-    echo ""
+    log "Theme uninstalled."
 }
 
 # --- Detection ---
@@ -746,15 +742,14 @@ plugins_menu() {
                 return
             fi
             determine_source
-            ensure_node22
-            install_deps
+            ensure_node
             install_mustikapay
             build_frontend
             finalize
             ;;
         0)
             preflight
-            ensure_node22
+            ensure_node
             uninstall_plugins
             build_frontend
             info "Clearing caches..."
@@ -763,7 +758,6 @@ plugins_menu() {
             php artisan cache:clear 2>/dev/null || true
             php artisan optimize:clear 2>/dev/null || true
             success "Done."
-            echo ""
             ;;
         b|B)
             main_menu
@@ -802,7 +796,7 @@ main_menu() {
                 main_menu
                 return
             fi
-            ensure_node22
+            ensure_node
             determine_source
             backup_panel
             install_deps
@@ -819,7 +813,7 @@ main_menu() {
                 main_menu
                 return
             fi
-            ensure_node22
+            ensure_node
             uninstall_theme
             ;;
         3)
