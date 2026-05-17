@@ -1,0 +1,35 @@
+{
+    "id": "mustikapay",
+    "name": "MustikaPay",
+    "version": "1.0.0",
+    "description": "Payment gateway plugin with top-up saldo, server purchasing, and QRIS/VA integration.",
+    "icon": "fa-credit-card",
+    "features": [
+        "User balance system",
+        "Server store",
+        "QRIS, BCA, BNI, BRI VA"
+    ],
+    "frontend": {
+        "routes": [
+            {
+                "path": "/products",
+                "component": "StoreContainer",
+                "importPath": "./components/dashboard/StoreContainer"
+            }
+        ],
+        "nav": [
+            {
+                "label": "Products",
+                "icon": "ShoppingCartIcon",
+                "path": "/products"
+            }
+        ],
+        "adminLinks": [
+            {
+                "route": "admin.mustikapay",
+                "title": "MustikaPay Billing",
+                "icon": "fa-credit-card"
+            }
+        ]
+    }
+}
