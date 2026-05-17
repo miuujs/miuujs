@@ -18,12 +18,20 @@ MiuuJS is a modern dark theme for Pterodactyl panel. It integrates the full Arix
 ## Quick Install
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/miuujs/miuujs/main/install.sh)
+bash <(curl -sL https://raw.githubusercontent.com/miuujs/miuujs/install/install.sh)
 ```
 
 > [!CAUTION]
 > This theme modifies core Pterodactyl panel files. Always backup your installation before applying.
 > Use at your own risk. The maintainers are not responsible for any data loss or service disruption.
+
+## Branches
+
+| Branch | Description |
+|--------|-------------|
+| `main` | Theme source files (React frontend, PHP backend, views, config) |
+| `install` | Installer scripts (`install.sh` + `uninstall.sh`) |
+| `plugins` | Plugin modules (e.g. `mustika/` for MustikaPay billing) |
 
 ## Features
 
@@ -36,52 +44,35 @@ bash <(curl -s https://raw.githubusercontent.com/miuujs/miuujs/main/install.sh)
 - **Responsive** -- Fully responsive for mobile, tablet, and desktop
 - **Admin Panel** -- Dark-styled admin interface with Arix CSS
 
-## Optional: MustikaPay Store & Billing Mod
+## Uninstall
 
-The theme includes an optional **MustikaPay** store mod that adds:
-
-- **Balance System** -- User balance column on the `users` table
-- **Server Store** -- Browse products and purchase server resources via `/store`
-- **Payment Gateway** -- MustikaPay integration (QRIS, BCA VA, BNI VA, BRI VA)
-- **Admin Billing** -- Configure API key, prices, and products at `/admin/mustikapay`
-- **MiuuJS-styled UI** -- Store container matches theme design (CSS variables, rounded-box, dark)
-
-### Requirements
-- PHP 8.0+ with `curl`, `json`, `mbstring` extensions
-- MySQL/MariaDB for the `balance` column
-- Active [MustikaPay](https://mustikapay.com) merchant account (API key format `MP-xxxx-xxxx`)
-
-### Installation
-The mod is automatically offered during theme installation. You can also run manually:
+The installer creates a backup before applying changes. To uninstall:
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/miuujs/miuujs/main/install.sh)
-# Select option 0 (Install MiuuJS Theme)
-# Answer "y" when asked about MustikaPay mod
+bash <(curl -sL https://raw.githubusercontent.com/miuujs/miuujs/install/uninstall.sh)
 ```
 
-### After Install
-1. Go to **Admin Panel → MustikaPay Billing** (`/admin/mustikapay`)
-2. Set your `MustikaPay API Key` and click Save
-3. Add products (name, description, price, RAM, disk, CPU, servers)
-4. Users can top up at `/store` and purchase resources
+Or run `install.sh` and select option **2** (Uninstall MiuuJS Theme).
 
-### Default Prices
-| Product         | Price  | RAM  | Disk | CPU | Servers |
-|-----------------|--------|------|------|-----|---------|
-| RAM 1GB         | Rp 5000 | 1024 MB | —    | 0%  | 0       |
-| Disk 1GB        | Rp 3000 | —    | 1024 MB | 0%  | 0       |
-| CPU 10%         | Rp 2000 | —    | —    | 10% | 0       |
-| Extra Server Slot | Rp 5000 | —  | —    | 0%  | 1       |
+## Plugins
 
-### Files
-The mod files live under `plugins/` in this repository:
-- `plugins/app/Extensions/Payment/MustikaPay/` -- PHP SDK for MustikaPay API
-- `plugins/app/Http/Controllers/` -- Admin + API controllers
-- `plugins/app/Models/` -- Modified User and Server models with balance/billing fields
-- `plugins/database/migrations/` -- Migration files for balance and billing columns
-- `plugins/resources/` -- Admin blade view and StoreContainer.tsx frontend
-- `plugins/routes/` -- Route stubs injected into admin.php and api-client.php
+Plugins are maintained on the `plugins` branch. Each plugin has its own folder:
+
+| Plugin | Folder | Description |
+|--------|--------|-------------|
+| MustikaPay | `mustika/` | Payment gateway, store, user balance system |
+
+### MustikaPay
+
+Adds top-up saldo, server purchasing, and QRIS/VA payment integration.
+
+**Files:**
+- `mustika/app/Extensions/Payment/MustikaPay/` -- PHP SDK
+- `mustika/app/Http/Controllers/` -- Admin + API controllers
+- `mustika/app/Models/` -- User balance, Server billing models
+- `mustika/database/migrations/` -- Database migrations
+- `mustika/resources/` -- Admin blade view, StoreContainer.tsx
+- `mustika/routes/` -- Route snippets
 
 ## License
 
